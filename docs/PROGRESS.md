@@ -7,7 +7,7 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | GĐ | Hạn | Trạng thái | File task |
 |---|---|---|---|
 | 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
-| 1 Khung | 17/11 | Code và tài liệu xong cả 6 module, đã push `develop` ngày 16/11. Còn chờ chủ repo xác nhận 6 bước kiểm tra bằng tay | `docs/tasks/stage-1-skeleton.md` |
+| 1 Khung | 17/11 | Xong. Đã push `develop` ngày 16/11; chủ repo xác nhận GĐ 1 đạt ngày 16/11 | `docs/tasks/stage-1-skeleton.md` |
 | 2 Suất A | 20/11 | Chưa bắt đầu | `docs/tasks/stage-2-ticket.md` |
 | 3 Suất B | 23/11 | Chưa bắt đầu | `docs/tasks/stage-3-customer.md` |
 | 4 Ghép nối | 25/11 | Chưa bắt đầu | `docs/tasks/stage-4-integration.md` |
@@ -15,7 +15,7 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
 
 ## Việc tiếp theo
-1. Chủ repo xác nhận 6 bước kiểm tra bằng tay của GĐ 1 (mục "Người dùng kiểm tra bằng tay" trong `docs/tasks/stage-1-skeleton.md`); gửi ba file trong `handoff/` cho thành viên B.
+1. Chủ repo gửi ba file trong `handoff/` cho thành viên B.
 2. Mở hai phiên Sonnet 5.5, chạy song song được:
    - GĐ 2: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-2-ticket.md` rồi làm theo." Nhánh `feature/a-ticket`.
    - GĐ 3: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-3-customer.md` rồi làm theo." Nhánh `local/b-work`.
@@ -37,13 +37,13 @@ Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán v�
 ## Trạng thái Git
 - `main`: 1 commit ("first commit"), chỉ có `README.md`.
 - `develop`: đã tạo từ `main` ở GĐ 0, có thêm 1 commit chứa `CLAUDE.md`, `.gitignore`, `.claude/`, `docs/`. Đã push lên `origin/develop` ngày 16/11.
-- `develop`: toàn bộ 11 commit của GĐ 1 đã push lên `origin/develop` ngày 16/11 (tới commit `5fec439`).
+- `develop`: toàn bộ 11 commit của GĐ 1 đã push lên `origin/develop` ngày 16/11, kèm commit `7a88011` (`LoginForm.resx`).
 - `local/b-work`: tạo ngày 16/11 từ `develop`, chỉ có trên máy chủ repo, không bao giờ push. Gồm 1 commit test của suất B và 1 merge commit đưa Module 6 của `develop` vào.
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
 
 ## Việc đang dở
 - Patch số 01 chưa gửi cho thành viên B (gửi tay, vì `handoff/` nằm trong `.gitignore`). Nằm ở `handoff/01-customer-tests.patch` kèm `.msg.txt` và `handoff/README.txt`; `git apply --check` trên `develop` đạt. Patch kế tiếp mang số 02.
-- Chủ repo chưa xác nhận 6 bước kiểm tra bằng tay của GĐ 1. File `Forms/MainForm.resx` do Visual Studio tạo lúc 14:43 ngày 16/11 cho thấy `MainForm` đã được mở bằng Designer (`MainForm.Designer.cs` không bị đổi); kết quả các bước còn lại chưa được báo. Bước 5 (mở Form bằng Designer) không có cách kiểm tra tự động nào thay được.
+- GĐ 1: chủ repo báo "GĐ 1 ok" ngày 16/11 sau khi tự kiểm tra bằng tay; không báo chi tiết từng bước trong 6 bước. `MainForm.resx` và `LoginForm.resx` do Visual Studio tạo cho thấy hai Form này đã mở được bằng Designer.
 - Chưa thử `dotnet publish` single-file (để Module 9 của GĐ 4).
 
 ## Quyết định lệch khỏi plan
