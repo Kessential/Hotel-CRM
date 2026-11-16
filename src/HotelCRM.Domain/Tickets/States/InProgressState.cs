@@ -12,10 +12,10 @@ public sealed class InProgressState : TicketState
     public override string Name => StateName;
 
     /// <summary>True.</summary>
-    public override bool IsActive => throw new NotImplementedException();
+    public override bool IsActive => true;
 
     /// <summary>False.</summary>
-    public override bool IsClosed => throw new NotImplementedException();
+    public override bool IsClosed => false;
 
     /// <summary>
     /// Rule 1: records the note and time with <see cref="SupportTicket.RecordResolution"/> and moves
@@ -24,6 +24,12 @@ public sealed class InProgressState : TicketState
     /// <exception cref="ValidationException">The note is empty.</exception>
     internal override void Resolve(SupportTicket ticket, string note, DateTime now)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(note))
+        {
+            throw new ValidationException("A resolution note is required to resolve a ticket.");
+        }
+
+        ticket.RecordResolution(note.Trim(), now);
+        ticket.MoveTo(new ResolvedState(), now);
     }
 }

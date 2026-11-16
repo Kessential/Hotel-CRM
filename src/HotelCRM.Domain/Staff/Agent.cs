@@ -53,7 +53,7 @@ public sealed class Agent : Employee
     /// <param name="maxActive"><see cref="BusinessSettings.MaxActiveTickets"/>.</param>
     public bool CanTake(int activeCount, int maxActive)
     {
-        throw new NotImplementedException();
+        return activeCount < maxActive;
     }
 
     /// <summary>Rule 3: stops an assignment that would exceed the limit of active tickets.</summary>
@@ -64,7 +64,11 @@ public sealed class Agent : Employee
     /// </exception>
     public void EnsureCanTake(int activeCount, int maxActive)
     {
-        throw new NotImplementedException();
+        if (!CanTake(activeCount, maxActive))
+        {
+            throw new BusinessRuleException(
+                $"{FullName} already handles {activeCount} active tickets; the limit is {maxActive}.");
+        }
     }
 
     /// <summary>Rebuilds an agent from stored data.</summary>

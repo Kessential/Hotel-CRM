@@ -48,27 +48,27 @@ public abstract class TicketState
     /// <exception cref="BusinessRuleException">Always, unless overridden.</exception>
     internal virtual void Start(SupportTicket ticket, DateTime now)
     {
-        throw new NotImplementedException();
+        throw new BusinessRuleException($"A ticket that is {Name} cannot be started.");
     }
 
     /// <summary>Default: resolving is not allowed in this state.</summary>
     /// <exception cref="BusinessRuleException">Always, unless overridden.</exception>
     internal virtual void Resolve(SupportTicket ticket, string note, DateTime now)
     {
-        throw new NotImplementedException();
+        throw new BusinessRuleException($"A ticket that is {Name} cannot be resolved.");
     }
 
     /// <summary>Default: closing is not allowed in this state.</summary>
     /// <exception cref="BusinessRuleException">Always, unless overridden.</exception>
     internal virtual void Close(SupportTicket ticket, DateTime now)
     {
-        throw new NotImplementedException();
+        throw new BusinessRuleException($"A ticket that is {Name} cannot be closed.");
     }
 
     /// <summary>Default: reopening is not allowed in this state.</summary>
     /// <exception cref="BusinessRuleException">Always, unless overridden.</exception>
     internal virtual void Reopen(SupportTicket ticket, DateTime now, int reopenDays)
     {
-        throw new NotImplementedException();
+        throw new BusinessRuleException($"A ticket that is {Name} cannot be reopened.");
     }
 }

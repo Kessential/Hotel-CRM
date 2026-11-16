@@ -129,13 +129,13 @@ public abstract class SupportTicket : IEntity
     public abstract string HandlingDepartmentCode { get; }
 
     /// <summary>Loyalty points the customer receives when the ticket is closed: 10 by default, 50 for a complaint.</summary>
-    public virtual int GoodwillPoints => throw new NotImplementedException();
+    public virtual int GoodwillPoints => 10;
 
     /// <summary>
     /// Hours between creation and the most recent resolution (<c>ResolvedAt - CreatedAt</c>);
     /// null when the ticket has never been resolved.
     /// </summary>
-    public double? ResolutionHours => throw new NotImplementedException();
+    public double? ResolutionHours => ResolvedAt is null ? null : (ResolvedAt.Value - CreatedAt).TotalHours;
 
     /// <summary>
     /// Rule 4: returns <c>CreatedAt + BaseSlaHours x priority multiplier x slaFactor</c> hours, using the
@@ -145,13 +145,13 @@ public abstract class SupportTicket : IEntity
     /// <param name="slaFactor">Factor of the customer's tier: Standard 1.0, Silver 0.9, Gold 0.75, VIP 0.5.</param>
     public DateTime CalculateDueAt(double slaFactor)
     {
-        throw new NotImplementedException();
+        return CreatedAt.AddHours(BaseSlaHours * PriorityMultiplier(Priority) * slaFactor);
     }
 
     /// <summary>Whether the ticket missed its deadline: <c>(ResolvedAt ?? now) &gt; DueAt</c>.</summary>
     public bool IsOverdue(DateTime now)
     {
-        throw new NotImplementedException();
+        return (ResolvedAt ?? now) > DueAt;
     }
 
     /// <summary>
@@ -165,7 +165,6 @@ public abstract class SupportTicket : IEntity
     /// </param>
     public virtual void Validate(bool roomInActiveStay)
     {
-        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -181,14 +180,28 @@ public abstract class SupportTicket : IEntity
     /// </exception>
     public void AssignTo(Agent? agent, int activeCount, int maxActive)
     {
-        throw new NotImplementedException();
+        if (agent is null)
+        {
+            throw new BusinessRuleException("No agent is available to take this ticket.");
+        }
+
+        if (!State.IsActive)
+        {
+            throw new BusinessRuleException($"A ticket that is {State.Name} cannot be assigned.");
+        }
+
+        agent.EnsureCanTake(activeCount, maxActive);
+        AssignedAgent = agent;
     }
 
     /// <summary>Rule 11: stops the operation unless the acting employee is the agent this ticket is assigned to.</summary>
     /// <exception cref="BusinessRuleException">The ticket is unassigned or assigned to somebody else.</exception>
     public void EnsureAssignedTo(Employee actor)
     {
-        throw new NotImplementedException();
+        if (AssignedAgent is null || AssignedAgent.Id != actor.Id)
+        {
+            throw new BusinessRuleException("Only the agent assigned to this ticket can work on it.");
+        }
     }
 
     /// <summary>Rule 1: Open to InProgress. Delegates to the current state.</summary>
@@ -196,7 +209,7 @@ public abstract class SupportTicket : IEntity
     /// <exception cref="BusinessRuleException">The ticket is not Open, or no agent is assigned.</exception>
     public void Start(DateTime now)
     {
-        throw new NotImplementedException();
+        State.Start(this, now);
     }
 
     /// <summary>Rule 1: InProgress to Resolved. Stores the note and the resolution time. Delegates to the current state.</summary>
@@ -206,7 +219,7 @@ public abstract class SupportTicket : IEntity
     /// <exception cref="BusinessRuleException">The ticket is not InProgress.</exception>
     public void Resolve(string note, DateTime now)
     {
-        throw new NotImplementedException();
+        State.Resolve(this, note, now);
     }
 
     /// <summary>Rule 1: Resolved to Closed. A closed ticket never changes again. Delegates to the current state.</summary>
@@ -214,7 +227,7 @@ public abstract class SupportTicket : IEntity
     /// <exception cref="BusinessRuleException">The ticket is not Resolved.</exception>
     public void Close(DateTime now)
     {
-        throw new NotImplementedException();
+        State.Close(this, now);
     }
 
     /// <summary>
@@ -226,7 +239,7 @@ public abstract class SupportTicket : IEntity
     /// <exception cref="BusinessRuleException">The ticket is not Resolved, or the reopen window has passed.</exception>
     public void Reopen(DateTime now, int reopenDays)
     {
-        throw new NotImplementedException();
+        State.Reopen(this, now, reopenDays);
     }
 
     /// <summary>
@@ -248,19 +261,23 @@ public abstract class SupportTicket : IEntity
     /// </summary>
     internal void MoveTo(TicketState next, DateTime now)
     {
-        throw new NotImplementedException();
+        TicketState previous = State;
+        State = next;
+        UpdatedAt = now;
+        Notify(previous, next);
     }
 
     /// <summary>For the state classes: stores the resolution note and time.</summary>
     internal void RecordResolution(string note, DateTime now)
     {
-        throw new NotImplementedException();
+        ResolutionNote = note;
+        ResolvedAt = now;
     }
 
     /// <summary>For the state classes: stores the closing time.</summary>
     internal void RecordClosure(DateTime now)
     {
-        throw new NotImplementedException();
+        ClosedAt = now;
     }
 
     /// <summary>
@@ -268,12 +285,35 @@ public abstract class SupportTicket : IEntity
     /// </summary>
     private void ApplyCreationRules(CustomerSlaProfile slaProfile)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(Title))
+        {
+            throw new ValidationException("The ticket title is required.");
+        }
+
+        int raised = Math.Min((int)Priority + Math.Max(slaProfile.PriorityBoost, 0), (int)TicketPriority.Urgent);
+        Priority = (TicketPriority)raised;
+        DueAt = CalculateDueAt(slaProfile.SlaFactor);
     }
 
     /// <summary>Calls <see cref="ITicketObserver.OnStateChanged"/> on every attached observer; exceptions propagate.</summary>
     private void Notify(TicketState from, TicketState to)
     {
-        throw new NotImplementedException();
+        foreach (ITicketObserver observer in _observers.ToArray())
+        {
+            observer.OnStateChanged(this, from, to);
+        }
+    }
+
+    /// <summary>SLA multiplier of a priority level (rule 4): Low 2.0, Medium 1.0, High 0.5, Urgent 0.25.</summary>
+    private static double PriorityMultiplier(TicketPriority priority)
+    {
+        return priority switch
+        {
+            TicketPriority.Low => 2.0,
+            TicketPriority.Medium => 1.0,
+            TicketPriority.High => 0.5,
+            TicketPriority.Urgent => 0.25,
+            _ => throw new ArgumentOutOfRangeException(nameof(priority), priority, "Unknown ticket priority."),
+        };
     }
 }
