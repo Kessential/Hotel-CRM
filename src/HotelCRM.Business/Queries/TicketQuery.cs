@@ -21,24 +21,28 @@ public sealed class TicketQuery : ITicketQuery
     /// <summary>True when a ticket of the customer has a state whose <c>IsClosed</c> is false.</summary>
     public bool HasOpenTickets(int customerId)
     {
-        throw new NotImplementedException();
+        return _tickets.GetAll().Any(t => t.CustomerId == customerId && !t.State.IsClosed);
     }
 
     /// <summary>True when the ticket exists and its state's <c>IsActive</c> is false.</summary>
     public bool IsResolvedOrClosed(int ticketId)
     {
-        throw new NotImplementedException();
+        SupportTicket? ticket = _tickets.GetById(ticketId);
+        return ticket is not null && !ticket.State.IsActive;
     }
 
     /// <inheritdoc />
     public IReadOnlyList<SupportTicket> GetByCustomer(int customerId)
     {
-        throw new NotImplementedException();
+        return _tickets.GetAll()
+            .Where(t => t.CustomerId == customerId)
+            .OrderBy(t => t.CreatedAt)
+            .ToList();
     }
 
     /// <inheritdoc />
     public IReadOnlyList<SupportTicket> GetAll()
     {
-        throw new NotImplementedException();
+        return _tickets.GetAll();
     }
 }
