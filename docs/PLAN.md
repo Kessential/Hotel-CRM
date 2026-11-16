@@ -24,7 +24,7 @@ BTL môn LTHĐT, nhóm 2 người, đề "Quản lý dịch vụ chăm sóc khá
 | 12 | | Đánh giá hiệu quả Design Pattern; cả 2 thành viên thực hành mở rộng thêm chức năng/lớp mới ngay trên code | 5 bài mở rộng trong `viva-notes.md` |
 | 13 | Nguyên lý LTHĐT & Code | Đóng gói và trừu tượng hóa toàn dự án: che giấu thuộc tính (private), kiểm tra dữ liệu hợp lệ khi giao tiếp giữa các lớp | `private set`, validate trong constructor/method, lớp abstract |
 | 14 | | Kế thừa và đa hình: lớp cơ sở/giao diện dùng chung, ghi đè phương thức, lớp con thay thế được lớp cha | 5 cây kế thừa, override, test dùng lớp con qua kiểu cha |
-| 15 | | Mỗi lớp một nhiệm vụ rõ ràng, interface tinh gọn, thống nhất Coding Convention giữa 2 thành viên | mỗi service một nhóm UC; interface 1–4 hàm; `.editorconfig` |
+| 15 | | Mỗi lớp một nhiệm vụ rõ ràng, interface tinh gọn, thống nhất Coding Convention giữa 2 thành viên | mỗi service một nhóm UC; interface 1–5 hàm; `.editorconfig` |
 | 16 | | Ghép nối công việc 2 thành viên qua interface, dễ mở rộng hoặc thay đổi cài đặt mà không làm lỗi code của nhau | `ICustomerDirectory`, `IStayLookup`, `ITicketQuery`, `ITicketObserver`, `IAssignmentStrategy` |
 | 17 | Đóng gói | Tích hợp mã nguồn 2 thành viên, đóng gói thành 1 tệp thực thi hoàn chỉnh, đường dẫn dữ liệu tương đối, chạy được trên máy khác | lệnh publish single-file, đường dẫn theo `AppContext.BaseDirectory` |
 | 18 | | Dữ liệu mẫu liên thông và ca kiểm thử (≥ 20 test case chia đều 2 thành viên) cho các phương thức xử lý chính | `Data/*.json`, 22 test xUnit |
@@ -108,11 +108,11 @@ HotelCRM.sln   Directory.Build.props   .editorconfig   .gitignore   README.md   
 │   ├─ Hotel/       RoomType, Room, Booking, BookingStatus
 │   ├─ Staff/       Agent, Manager, Department
 │   ├─ Tickets/     SupportTicket + 3 lớp con, TicketPriority, States/ (TicketState + 4 state)
-│   └─ Interfaces/  IEntity, IRepository<T>, ITicketObserver, ICustomerDirectory, CustomerSlaProfile, IStayLookup, ITicketQuery
+│   └─ Interfaces/  IEntity, IRepository<T>, RepositoryExtensions, ITicketObserver, ICustomerDirectory, CustomerSlaProfile, CustomerSummary, IStayLookup, ITicketQuery
 ├─ src/HotelCRM.Business/      # tầng nghiệp vụ
-│   ├─ Services/    AuthService, TicketService, CustomerService, BookingService, SurveyService, ReportService
+│   ├─ Services/    AuthService, TicketService, CustomerService, BookingService, SurveyService, ReportService (+ AgentPerformanceRow, DepartmentReportRow)
 │   ├─ Queries/     CustomerDirectory, StayLookup, TicketQuery   # cài đặt 3 interface ranh giới, chỉ dựa trên repository
-│   ├─ Assignment/  IAssignmentStrategy + 3 strategy
+│   ├─ Assignment/  IAssignmentStrategy, AgentWorkload + 3 strategy
 │   ├─ Factories/   TicketFactory + 3 factory
 │   ├─ Observers/   InteractionLogger, LoyaltyObserver
 │   └─ Security/    PasswordHasher, UserSession
@@ -130,6 +130,7 @@ HotelCRM.sln   Directory.Build.props   .editorconfig   .gitignore   README.md   
 └─ tests/HotelCRM.Tests/       # xUnit: Tickets/ (A), Customers/ và Assignment/ (B), Fakes/ (lớp giả viết tay)
 docs/  PLAN.md, PROGRESS.md, tasks/stage-N-*.md, uml/*.puml + ảnh, report/ (LaTeX), demo-script.md, viva-notes.md
 handoff/  (git-ignore) patch của suất B
+tools/  HashPassword.cs (file-based app sinh chuỗi băm mật khẩu, không nằm trong solution)
 ```
 Chiều gọi: `WinForms → Business → Domain ← Data`. Form chỉ gọi Service; Service chỉ biết `IRepository<T>`; `Program.cs` tạo `AppConfig`, repository, observer, strategy, service rồi truyền qua constructor (inject thủ công, không dùng thư viện DI).
 
@@ -138,8 +139,8 @@ Chiều gọi: `WinForms → Business → Domain ← Data`. Form chỉ gọi Ser
 ## Lớp thực thể (26 lớp + 4 enum)
 Enum: `EmployeeRole` (Agent, Manager), `TicketPriority` (Low, Medium, High, Urgent), `BookingStatus`, `ContactChannel`. Loại ticket không phải enum mà là lớp con.
 
-- **Người (5):** `Person` (abstract: Id, FullName, Phone, Email) → `Customer`; `Employee` (abstract: Username, PasswordHash, Salt, `Role`, `Department`, abstract `CanAssign()`/`CanClose()`/`CanReopen()`) → `Agent`, `Manager`
-- **Tổ chức (1):** `Department` (Id, `Code`, Name)
+- **Người (5):** `Person` (abstract: Id, FullName, Phone, Email) → `Customer`; `Employee` (abstract: Username, PasswordHash, Salt, `Role`, `Department`, abstract `CanAssign()`/`CanClose()`/`CanReopen()`, kèm `EnsureCanAssign()`/`EnsureCanClose()`/`EnsureCanReopen()` ném lỗi khi không có quyền) → `Agent`, `Manager`
+- **Tổ chức (1):** `Department` (Id, `Code`, Name, `Agents`)
 - **Hạng thành viên (5):** `MembershipTier` (abstract: `Name`, `SlaFactor`, `PriorityBoost`, `MinPoints`, `Next()`) → `StandardTier`, `SilverTier`, `GoldTier`, `VipTier`
 - **Khách sạn (3):** `RoomType`, `Room`, `Booking` (+ enum `BookingStatus`: Reserved, CheckedIn, CheckedOut, Cancelled)
 - **Ticket (4):** `SupportTicket` (abstract; các thành viên được override: `BaseSlaHours`, `HandlingDepartmentCode`, `GoodwillPoints`, `Validate()`) → `ComplaintTicket`, `ServiceRequestTicket`, `MaintenanceTicket`
@@ -169,10 +170,10 @@ Bốn interface đầu nằm trong `Domain/Interfaces`. Không service nào tham
 ## Design Pattern
 | Pattern | Người | Vai trò lớp | Bài mở rộng khi vấn đáp |
 |---|---|---|---|
-| **State** | A | Context `SupportTicket`; State `TicketState`; Concrete 4 state. `Start()`, `Resolve(note)`, `Close()`, `Reopen()` ủy quyền cho `_state` | thêm `OnHoldState` |
+| **State** | A | Context `SupportTicket`; State `TicketState`; Concrete 4 state. `Start(now)`, `Resolve(note, now)`, `Close(now)`, `Reopen(now, reopenDays)` ủy quyền cho `State`; lớp State đổi trạng thái qua `SupportTicket.MoveTo(next, now)` | thêm `OnHoldState` |
 | **Factory Method** | A | Creator `TicketFactory.Create(...)` → `ComplaintTicketFactory`, `ServiceRequestTicketFactory`, `MaintenanceTicketFactory`. `TicketService.CreateTicket()` chọn factory qua bảng tra `tên loại → TicketFactory` dựng trong `Program.cs` | thêm `LostItemTicket` + factory |
 | **Observer** | B | Subject `SupportTicket` (`Attach`/`Notify`, phần Subject do A cài ở GĐ 2); `ITicketObserver.OnStateChanged(ticket, from, to)` → `InteractionLogger`, `LoyaltyObserver`, `UiNotificationObserver` | thêm `EmailNotifier` |
-| **Strategy** | B | `IAssignmentStrategy.Pick(ticket, agents)` → `LeastLoadedStrategy`, `DepartmentMatchStrategy`, `RoundRobinStrategy`; Context `TicketService.AutoAssign()` (của A, chỉ biết interface); chọn theo `DefaultAssignmentStrategy` trong `appsettings.json` qua bảng tra dựng trong `Program.cs` | thêm `SkillBasedStrategy` |
+| **Strategy** | B | `IAssignmentStrategy.Pick(departmentCode, candidates)` (`candidates` là danh sách `AgentWorkload` của các Agent còn nhận được ticket; trả về `Agent?`) → `LeastLoadedStrategy`, `DepartmentMatchStrategy`, `RoundRobinStrategy`; Context `TicketService.AutoAssign()` (của A, chỉ biết interface); chọn theo `DefaultAssignmentStrategy` trong `appsettings.json` qua bảng tra dựng trong `Program.cs` | thêm `SkillBasedStrategy` |
 | **Repository + Singleton** | Chung | `IRepository<T>` → `JsonRepository`, `InMemoryRepository` (dùng cho test); `AppConfig.Instance` | thêm repository lưu CSV |
 
 - Bảng mô tả thiết kế trong báo cáo: Design Pattern 1 = State (A), Design Pattern 2 = Observer (B). Ba mẫu còn lại trình bày ở mục riêng; cả hai thành viên cùng trình bày Repository + Singleton.
@@ -186,15 +187,15 @@ Cách đặt quy tắc: **service tra cứu, lớp Domain quyết định.** Quy
 |---|---|---|---|
 | 1 | A | Chuyển trạng thái hợp lệ: Open→InProgress (phải có Agent), InProgress→Resolved (phải có ghi chú), Resolved→Closed, Resolved→InProgress (Reopen); Closed bất biến. Phân công lần đầu chỉ ở Open; phân công lại ở Open hoặc InProgress | các lớp `*State`; `SupportTicket.AssignTo()` |
 | 2 | A | Reopen chỉ khi `now ≤ ResolvedAt + ReopenDays`; ticket quay về InProgress và giữ nguyên Agent | `SupportTicket.Reopen(now, reopenDays)` → `ResolvedState.Reopen()` |
-| 3 | A | Agent không giữ quá `MaxActiveTickets` ticket đang mở | `Agent.EnsureCanTake(activeCount, maxActive)`, gọi từ `SupportTicket.AssignTo(agent, activeCount, maxActive)`; `TicketService` đếm `activeCount` |
+| 3 | A | Agent không giữ quá `MaxActiveTickets` ticket đang mở | `Agent.EnsureCanTake(activeCount, maxActive)` (và `Agent.CanTake` trả `bool`, dùng để lọc ứng viên), gọi từ `SupportTicket.AssignTo(agent, activeCount, maxActive)`; `TicketService` đếm `activeCount` |
 | 4 | A | Mức ưu tiên được nâng theo `PriorityBoost` của hạng khách lúc tạo ticket và lưu vào ticket. Hạn SLA = `BaseSlaHours` × hệ số Priority × `SlaFactor` | constructor của `SupportTicket` (nâng mức ưu tiên), `SupportTicket.CalculateDueAt(slaFactor)`; `TicketService` lấy `CustomerSlaProfile` từ `ICustomerDirectory` |
 | 5 | A | `MaintenanceTicket` phải gắn phòng khách đang ở (booking CheckedIn) | `MaintenanceTicket.Validate(roomInActiveStay)`; `TicketService` tra `IStayLookup` |
 | 6 | B | SĐT/Email đúng định dạng, không trùng | định dạng: `Person` (cài ở GĐ 1 vì đăng nhập cần); không trùng: `Customer.EnsureUnique(phoneTaken, emailTaken)`, `CustomerService.Register()`/`Update()` tra cứu |
-| 7 | B | CheckOut > CheckIn; phòng không bị đặt chồng (booking Reserved và CheckedIn chặn); chỉ hủy được booking Reserved | constructor của `Booking`; `Room.IsAvailable(checkIn, checkOut, bookings)`; `Booking.Cancel()` |
+| 7 | B | CheckOut > CheckIn; phòng không bị đặt chồng (booking Reserved và CheckedIn chặn); chỉ hủy được booking Reserved | constructor của `Booking`; `Room.IsAvailable(checkInDate, checkOutDate, bookings)` và `Room.EnsureAvailable(...)` (ném lỗi); `Booking.CheckIn()`/`CheckOut()`/`Cancel()` |
 | 8 | B | Cộng điểm khi checkout và khi ticket Closed; tự nâng hạng theo ngưỡng, có thể nâng nhiều bậc một lần, không hạ | `Customer.AddPoints()`, `MembershipTier.Next()` |
 | 9 | B | Khảo sát chỉ cho ticket Resolved/Closed, điểm 1–5, mỗi ticket một lần | `SatisfactionSurvey.Create(score, ticketResolvedOrClosed, alreadySurveyed)`; `SurveyService.Submit()` tra `ITicketQuery` và repository |
 | 10 | B | Không xóa khách còn ticket chưa đóng | `Customer.EnsureCanBeDeleted(hasOpenTickets)`; `CustomerService.Delete()` tra `ITicketQuery` |
-| 11 | Chung | Tạo ticket: cả hai vai trò. Phân công và phân công lại: chỉ Manager. Start và Resolve: chỉ Agent đang được giao ticket đó. Close và Reopen: chỉ Manager. Agent không tự nhận ticket | `Employee.CanAssign()`/`CanClose()`/`CanReopen()` (khai báo ở GĐ 1, `Agent`/`Manager` override); `SupportTicket.EnsureAssignedTo(actor)`; `TicketService` nhận `actor` và gọi các hàm này trước mỗi thao tác (A cài ở GĐ 2) |
+| 11 | Chung | Tạo ticket: cả hai vai trò. Phân công và phân công lại: chỉ Manager. Start và Resolve: chỉ Agent đang được giao ticket đó. Close và Reopen: chỉ Manager. Agent không tự nhận ticket | `Employee.CanAssign()`/`CanClose()`/`CanReopen()` (`Agent`/`Manager` override) và `Employee.EnsureCanAssign()`/`EnsureCanClose()`/`EnsureCanReopen()` ném `BusinessRuleException` (cài ở GĐ 1); `SupportTicket.EnsureAssignedTo(actor)`; `TicketService` nhận `actor` và gọi các hàm `Ensure...` trước mỗi thao tác (A cài ở GĐ 2) |
 
 Vi phạm ném `ValidationException` hoặc `BusinessRuleException` (con của `DomainException`); quy tắc nào ném loại nào xem mục "Quyết định thiết kế bổ sung".
 
@@ -229,7 +230,7 @@ Vi phạm ném `ValidationException` hoặc `BusinessRuleException` (con của `
 
 **2. Cấu hình và thời gian đi xuống Domain.** `BusinessSettings` (`Domain/Common`: `MaxActiveTickets`, `ReopenDays`, tự kiểm tra > 0). `AppConfig.Instance.Rules` trả về `BusinessSettings`; `Program.cs` truyền nó vào constructor của service. Lớp Domain không đọc cấu hình và không gọi `DateTime.Now`: giới hạn và thời điểm `now` đi vào qua tham số. `AppConfig` chỉ được gọi trong `Program.cs`.
 
-**3. Ranh giới giữa hai phân hệ ở tầng Domain.** `Domain/Tickets` không dùng lớp nào của `Domain/Customers` hay `Domain/Hotel`, và ngược lại chỉ `ITicketObserver` nhận `SupportTicket`. Ticket lấy thông tin hạng khách qua `ICustomerDirectory.GetSlaProfile(customerId)`, trả về `CustomerSlaProfile(SlaFactor, PriorityBoost)` — hai con số, không phải `MembershipTier`.
+**3. Ranh giới giữa hai phân hệ ở tầng Domain.** `Domain/Tickets` không dùng lớp nào của `Domain/Customers` hay `Domain/Hotel`, và `Domain/Customers`, `Domain/Hotel` không dùng lớp nào của `Domain/Tickets`; chỉ hai interface `ITicketObserver` và `ITicketQuery` (trong `Domain/Interfaces`) đưa `SupportTicket` sang cho tầng Business của suất B. Ticket lấy thông tin hạng khách qua `ICustomerDirectory.GetSlaProfile(customerId)`, trả về `CustomerSlaProfile(SlaFactor, PriorityBoost)` — hai con số, không phải `MembershipTier`. Form ticket chọn và hiển thị khách qua `CustomerSummary(Id, FullName, Phone, TierName)`, không dùng `Customer`. "Không tìm thấy theo Id" do `RepositoryExtensions.GetRequired` ném, để service không tự ném lỗi nghiệp vụ.
 
 **4. Con số và định nghĩa nghiệp vụ.**
 | Mục | Giá trị |
@@ -274,6 +275,8 @@ Vi phạm ném `ValidationException` hoặc `BusinessRuleException` (con của `
 - `InteractionLogger` và `LoyaltyObserver` nhận `IRepository<Customer>` qua constructor, sửa `Customer` rồi tự gọi repository để lưu.
 - `InteractionLogger` ghi một `Interaction` mỗi lần ticket đổi trạng thái. `LoyaltyObserver` cộng `GoodwillPoints` khi ticket chuyển sang Closed.
 - `Interaction` lúc check-in và check-out do `BookingService` ghi trực tiếp vào `Customer`, không đi qua `ITicketObserver`.
+- Thời điểm đổi trạng thái nằm ở `SupportTicket.UpdatedAt`; observer đọc từ đó vì `OnStateChanged(ticket, from, to)` không mang thời gian.
+- Từ GĐ 1 đến hết GĐ 3, thân `OnStateChanged` của ba observer để rỗng (không ném `NotImplementedException`) để các thao tác trên ticket chạy được ở điểm duyệt chung đầu GĐ 4; GĐ 4 điền thân hàm.
 
 ## Kiểm thử (22 test xUnit, dùng `InMemoryRepository`)
 Cả 22 test được viết ở GĐ 1 trên khung. Ở cuối GĐ 1: 2 test định dạng của `CustomerTests` xanh (vì `Person` đã cài), 20 test còn lại đỏ và lý do duy nhất là `NotImplementedException`. Các giai đoạn sau làm cho test xanh và **không sửa test**; thấy test sai thì dừng, ghi vào `PROGRESS.md`. Thời điểm `now` luôn là giá trị cố định.

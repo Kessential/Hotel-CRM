@@ -10,14 +10,15 @@ Bài tập lớn OOP nhóm 2 người: hệ thống quản lý chăm sóc khách
 Quy ước riêng từng tầng nằm trong `.claude/rules/`. Các file này chỉ tự nạp khi đã có file khớp đường dẫn; khi tạo file đầu tiên trong một thư mục thì tự đọc file rules tương ứng trước.
 
 ## Lệnh
-Solution được tạo ở GĐ 1; trước đó các lệnh này chưa chạy được.
-
 ```
 dotnet build HotelCRM.sln
 dotnet test HotelCRM.sln
 dotnet run --project src/HotelCRM.WinForms
 dotnet publish src/HotelCRM.WinForms -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+dotnet run tools/HashPassword.cs -- <mật khẩu>
 ```
+
+Lệnh cuối sinh `PasswordHash` và `Salt` cho `employees.json`. Tài khoản mẫu nằm trong `README.md`.
 
 ## Kiến trúc
 - Tham chiếu project: `WinForms → Business → Domain`, `Data → Domain`. `WinForms` tham chiếu `Data` chỉ để `Program.cs` khởi tạo. `Domain` không tham chiếu project nào. `Tests` tham chiếu `Domain`, `Business`, `Data`.

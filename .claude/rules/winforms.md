@@ -13,8 +13,13 @@ paths:
   - Khai báo control là field `private` ở cuối file Designer.
   - Code nạp dữ liệu, gắn danh sách vào lưới đặt trong `XxxForm.cs`.
 - Chép cấu trúc của `LoginForm` và `MainForm` (form mẫu của GĐ 1) cho mọi Form: cách nhận service, cách đặt tên control, cách bố trí.
-- Tên control có tiền tố theo loại: `txt`, `btn`, `cbo`, `dgv`, `lbl`, `dtp`, `num`, `chk`.
-- Mọi event handler bọc trong `ErrorHandler.Run(() => { ... })`. Không tự viết `try/catch` trong Form.
+- File `.Designer.cs` viết đúng kiểu Visual Studio sinh ra (xem `LoginForm.Designer.cs`): `components`, `Dispose`, vùng `#region Windows Form Designer generated code`, khai báo control ở cuối. Nếu Visual Studio tạo file `.resx` cho Form thì commit kèm.
+- Tên control có tiền tố theo loại: `txt`, `btn`, `cbo`, `dgv`, `lbl`, `dtp`, `num`, `chk`, `mnu` (mục menu), `sts` (thanh trạng thái), `tab`.
+- Tên handler theo kiểu Visual Studio: `btnSave_Click(object? sender, EventArgs e)`.
+- Mọi event handler bọc trong `ErrorHandler.Run(() => { ... })`. Không tự viết `try/catch` trong Form. `ErrorHandler.Run` trả `true` khi không có lỗi, dùng khi cần làm thêm việc giao diện sau thao tác (xem `LoginForm.btnLogin_Click`).
+- Form con mở dạng hộp thoại: `using` + `ShowDialog(this)`; đóng hộp thoại thì nạp lại dữ liệu của Form cha.
+- Constructor của Form chỉ nhận service và không đổi sau GĐ 1. Dữ liệu ngữ cảnh (Id ticket, Id khách) truyền qua một hàm public của Form gọi trước `ShowDialog`, ví dụ `ShowTicket(int ticketId)`. Mọi Form phải dùng được cả khi mở trống từ menu của `MainForm`.
+- Thời điểm `now` truyền xuống service là `DateTime.Now` lấy trong Form.
 - Thao tác cần phân quyền truyền `UserSession.Current` vào tham số `actor` của service.
 - Menu và nút hiển thị theo `UserSession.Current.Role`; việc kiểm tra quyền thật sự vẫn nằm ở tầng dưới.
 - Chữ trên giao diện và thông báo bằng tiếng Anh.

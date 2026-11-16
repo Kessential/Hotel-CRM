@@ -7,15 +7,20 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | GĐ | Hạn | Trạng thái | File task |
 |---|---|---|---|
 | 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
-| 1 Khung | 17/11 | Đang làm: xong Module 5/6, còn Module 6 | `docs/tasks/stage-1-skeleton.md` |
-| 2 Suất A | 20/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
-| 3 Suất B | 23/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
-| 4 Ghép nối | 25/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
+| 1 Khung | 17/11 | Code và tài liệu xong cả 6 module, đã commit, chưa push. Còn chờ chủ repo xác nhận 6 bước kiểm tra bằng tay | `docs/tasks/stage-1-skeleton.md` |
+| 2 Suất A | 20/11 | Chưa bắt đầu | `docs/tasks/stage-2-ticket.md` |
+| 3 Suất B | 23/11 | Chưa bắt đầu | `docs/tasks/stage-3-customer.md` |
+| 4 Ghép nối | 25/11 | Chưa bắt đầu | `docs/tasks/stage-4-integration.md` |
 | 5 Tài liệu kỹ thuật | 27/11 | Chưa bắt đầu | viết ở cuối GĐ 4 |
 | 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
 
 ## Việc tiếp theo
-GĐ 1, Module 6 (viết `stage-2-ticket.md`, `stage-3-customer.md`, `stage-4-integration.md`; rà 5 file `.claude/rules/`; sửa `docs/PLAN.md` theo bảng "Quyết định lệch khỏi plan") trong `docs/tasks/stage-1-skeleton.md`. Phiên 16/11 dừng trước Module 6 vì hết hạn mức sử dụng. Sau Module 6: merge `develop` vào `local/b-work`. Chủ repo đã cho phép (16/11) làm lần lượt Module 2–6, commit sau mỗi module rồi báo cáo.
+1. Chủ repo làm 6 bước kiểm tra bằng tay của GĐ 1 (mục "Người dùng kiểm tra bằng tay" trong `docs/tasks/stage-1-skeleton.md`) và quyết định push `develop`.
+2. Mở hai phiên Sonnet 5.5, chạy song song được:
+   - GĐ 2: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-2-ticket.md` rồi làm theo." Nhánh `feature/a-ticket`.
+   - GĐ 3: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-3-customer.md` rồi làm theo." Nhánh `local/b-work`.
+
+   Hai phiên cùng lúc trên một thư mục sẽ giẫm nhánh của nhau: dùng worktree riêng cho một trong hai.
 
 ## Cách commit của suất B
 **Nhận patch** (mặc định). Thành viên B chưa xác nhận; hạn 17/11. Nếu họ chọn tự code, sửa dòng này thành "Tự code".
@@ -32,17 +37,18 @@ Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán v�
 ## Trạng thái Git
 - `main`: 1 commit ("first commit"), chỉ có `README.md`.
 - `develop`: đã tạo từ `main` ở GĐ 0, có thêm 1 commit chứa `CLAUDE.md`, `.gitignore`, `.claude/`, `docs/`. Đã push lên `origin/develop` ngày 16/11.
-- `develop` (cục bộ) đi trước `origin/develop` các commit của GĐ 1 Module 1–5; chưa push.
-- `local/b-work`: tạo ngày 16/11 từ `develop`, chỉ có trên máy chủ repo, không bao giờ push.
+- `develop` (cục bộ) đi trước `origin/develop` toàn bộ commit của GĐ 1; chưa push.
+- `local/b-work`: tạo ngày 16/11 từ `develop`, chỉ có trên máy chủ repo, không bao giờ push. Gồm 1 commit test của suất B và 1 merge commit đưa Module 6 của `develop` vào.
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
 
 ## Việc đang dở
-- GĐ 1: Module 1–5 xong và đã commit (chưa push). Module 6 chưa làm: chưa có file task GĐ 2–4, chưa rà rules, chưa sửa `docs/PLAN.md`.
-- `local/b-work` đã tạo từ `develop` (commit `1386d6f`), có 1 commit chứa 11 test của suất B và `FakeTicketQuery`. Patch số 01 nằm ở `handoff/01-customer-tests.patch` kèm `.msg.txt` và `handoff/README.txt`; `git apply --check` trên `develop` đạt. Thành viên B chỉ áp được sau khi `develop` được push.
-- Chủ repo chưa làm 6 bước kiểm tra bằng tay của GĐ 1 (mục "Người dùng kiểm tra bằng tay" trong file task). Riêng bước 5 (mở Form bằng Designer của Visual Studio) không có cách kiểm tra tự động nào thay được.
+- GĐ 1: chưa push `develop`. Thành viên B chỉ clone, build và áp patch được sau khi push.
+- Patch số 01 nằm ở `handoff/01-customer-tests.patch` kèm `.msg.txt` và `handoff/README.txt`; `git apply --check` trên `develop` đạt. Patch kế tiếp mang số 02.
+- Chủ repo chưa xác nhận 6 bước kiểm tra bằng tay của GĐ 1. File `Forms/MainForm.resx` do Visual Studio tạo lúc 14:43 ngày 16/11 cho thấy `MainForm` đã được mở bằng Designer (`MainForm.Designer.cs` không bị đổi); kết quả các bước còn lại chưa được báo. Bước 5 (mở Form bằng Designer) không có cách kiểm tra tự động nào thay được.
+- Chưa thử `dotnet publish` single-file (để Module 9 của GĐ 4).
 
 ## Quyết định lệch khỏi plan
-Chốt ở GĐ 1 Module 2 khi viết chữ ký. `docs/PLAN.md` sẽ được sửa cho khớp ở Module 6.
+Chốt ở GĐ 1 Module 2 khi viết chữ ký. `docs/PLAN.md` và 5 file `.claude/rules/` đã được sửa cho khớp ở Module 6 (16/11).
 
 | # | Plan ghi | Code thật | Lý do |
 |---|---|---|---|
@@ -76,3 +82,4 @@ Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone
 - 16/11/2026 — GĐ 1 Module 3: `AppConfig` (Singleton), `IMapper`, `JsonRepository`, `InMemoryRepository`, 9 record (8 file + `InteractionRecord`), 8 mapper, `appsettings.json`, dữ liệu mẫu tối thiểu (4 phòng ban, 1 manager, 2 agent, 6 file `[]`), `tools/HashPassword.cs`. `appsettings.json` và `Data/*.json` được chép ra thư mục output và đặt ngoài file `.exe` khi publish single-file. Đã kiểm tra bằng một script tạm ngoài repo (31 phép thử, đều đạt): nạp cả 8 file, tham chiếu trỏ đúng cùng đối tượng, ghi rồi nạp lại cho JSON giống hệt, xóa có ghi file, đăng nhập đúng/sai bằng tài khoản mẫu, JSON hỏng / thiếu file / tên trạng thái lạ đều báo lỗi có tên file. Chưa kiểm tra: publish single-file.
 - 16/11/2026 — GĐ 1 Module 4: `Program.cs` (composition root, bảng strategy và factory, `Application.ThreadException`, vòng đăng nhập lại sau Logout), `ErrorHandler` (`Run` trả về `bool`, `Handle`, `ReportStartupFailure`), `UiNotificationObserver` (sự kiện `NotificationRaised`, `MainForm` hiện lên thanh trạng thái), `LoginForm`, `MainForm`, vỏ 9 Form, mục "Sample accounts" trong `README.md`. Các Form con mở dạng hộp thoại (`ShowDialog`). Menu: Reports chỉ Manager thấy, Record Survey chỉ Agent thấy. `.editorconfig` bỏ quy tắc PascalCase cho hàm trong `Forms/` vì tên handler theo kiểu Visual Studio (`btnLogin_Click`). Đã kiểm tra bằng script tạm ngoài repo (29 phép thử, đều đạt): nối dây như `Program`, đăng nhập sai bị từ chối, đăng nhập 2 vai trò, menu ẩn/hiện đúng, cả 9 Form tạo được cửa sổ, Logout kết thúc phiên. Chạy file `.exe` thật: hiện cửa sổ "Hotel CRM - Log In"; đổi `MaxActiveTickets` vẫn khởi động; đổi `DefaultAssignmentStrategy` thành tên lạ thì hiện hộp thoại lỗi và ghi `logs/error.log` có nêu 3 tên hợp lệ. Chưa kiểm tra: bấm thật trên giao diện, mở Form bằng Designer của Visual Studio (chỉ người làm được).
 - 16/11/2026 — GĐ 1 Module 5: 11 test suất A + `FakeCustomerDirectory`, `FakeStayLookup`, `TicketTestData` trên `develop`; 11 test suất B + `FakeTicketQuery`, `CustomerTestData` trên `local/b-work`; xuất `handoff/01-customer-tests.*` và `handoff/README.txt`. Đã kiểm tra: `dotnet test` trên `develop` 11 test, cả 11 đỏ; trên `local/b-work` 22 test, 2 xanh (`Constructor_InvalidEmail_ThrowsValidation`, `Constructor_InvalidPhone_ThrowsValidation`), 20 đỏ. Mọi test đỏ đều do `NotImplementedException` (2 test hiện "Assert.Throws: not an exact match" vì lời gọi bị bọc trong `Assert.Throws`, ngoại lệ thật vẫn là `NotImplementedException`). `TicketServiceTests` dùng một strategy giả lồng trong lớp test để không phụ thuộc strategy của suất B.
+- 16/11/2026 — GĐ 1 Module 6: viết `docs/tasks/stage-2-ticket.md`, `stage-3-customer.md`, `stage-4-integration.md`; sửa 5 file `.claude/rules/` theo code thật (mẫu `Restore`, `EnsureXxx`/`CanXxx`, `GetRequired`, chữ ký `Pick`, `IRepository` 5 hàm, tiền tố `mnu`/`sts`/`tab`, cách truyền ngữ cảnh cho Form, lớp trợ giúp và lớp giả của test); sửa `docs/PLAN.md` ở các chỗ lệch (cây thư mục, `Employee`, `Department`, bảng State và Strategy, quy tắc 3/7/11, ranh giới Domain, observer); thêm lệnh băm mật khẩu vào `CLAUDE.md`; commit kèm `MainForm.resx` do Visual Studio tạo. Ba điểm các phiên sau cần biết, đã ghi trong file task: (1) Form ticket ở GĐ 2 không gọi các hàm đi sang suất B lúc mở Form, vì chúng còn ném `NotImplementedException` tới khi ghép; (2) GĐ 3 thêm vài dòng vào `roomtypes.json` và `rooms.json` để bấm thử, GĐ 4 thay bằng dữ liệu đầy đủ; (3) khi đếm ticket đang mở của Agent để phân công, không tính chính ticket đang được phân công. Đã kiểm tra: build 0 lỗi 0 warning; `develop` 11 test đỏ, `local/b-work` 22 test (2 xanh, 20 đỏ) sau khi merge. Chưa kiểm tra: ba file task chưa được phiên nào chạy thử.
