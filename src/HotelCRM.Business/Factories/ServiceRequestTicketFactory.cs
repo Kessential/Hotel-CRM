@@ -17,6 +17,6 @@ public sealed class ServiceRequestTicketFactory : TicketFactory
         DateTime createdAt,
         int? roomId)
     {
-        throw new NotImplementedException();
+        return new ServiceRequestTicket(id, customerId, title, description, priority, slaProfile, createdAt);
     }
 }

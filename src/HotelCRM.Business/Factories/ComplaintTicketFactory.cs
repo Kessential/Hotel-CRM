@@ -17,6 +17,6 @@ public sealed class ComplaintTicketFactory : TicketFactory
         DateTime createdAt,
         int? roomId)
     {
-        throw new NotImplementedException();
+        return new ComplaintTicket(id, customerId, title, description, priority, slaProfile, createdAt);
     }
 }
