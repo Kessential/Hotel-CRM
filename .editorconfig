@@ -101,6 +101,10 @@ dotnet_naming_rule.locals_and_parameters_are_camel_case.severity = warning
 [*.Designer.cs]
 generated_code = true
 
+# Event handlers keep the name Visual Studio generates: controlName_EventName.
+[src/HotelCRM.WinForms/Forms/**.cs]
+dotnet_naming_rule.members_are_pascal_case.severity = none
+
 # Test methods are named Method_Condition_Expected.
 [tests/**.cs]
 dotnet_naming_rule.members_are_pascal_case.severity = none
