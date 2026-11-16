@@ -7,7 +7,7 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | GĐ | Hạn | Trạng thái | File task |
 |---|---|---|---|
 | 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
-| 1 Khung | 17/11 | Chưa bắt đầu | `docs/tasks/stage-1-skeleton.md` |
+| 1 Khung | 17/11 | Đang làm: xong Module 1/6 | `docs/tasks/stage-1-skeleton.md` |
 | 2 Suất A | 20/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
 | 3 Suất B | 23/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
 | 4 Ghép nối | 25/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
@@ -15,7 +15,7 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
 
 ## Việc tiếp theo
-Mở phiên mới bằng model mạnh (Fable 5.2 hoặc Opus 5.5) với câu: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-1-skeleton.md` rồi làm theo."
+GĐ 1, Module 2 (khung Domain và Business) trong `docs/tasks/stage-1-skeleton.md`. Chủ repo đã cho phép (16/11) làm lần lượt Module 2–6, commit sau mỗi module rồi báo cáo.
 
 ## Cách commit của suất B
 **Nhận patch** (mặc định). Thành viên B chưa xác nhận; hạn 17/11. Nếu họ chọn tự code, sửa dòng này thành "Tự code".
@@ -27,7 +27,8 @@ Mở phiên mới bằng model mạnh (Fable 5.2 hoặc Opus 5.5) với câu: "�
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
 
 ## Việc đang dở
-(chưa có)
+- GĐ 1: Module 1 xong và đã commit trên `develop` (chưa push). Module 2–6 chưa làm.
+- `src/HotelCRM.WinForms/Program.cs` hiện là bản tạm (chỉ gọi `ApplicationConfiguration.Initialize()` rồi thoát) để solution build được sau khi xóa `Form1`. Module 4 viết lại thành composition root.
 
 ## Quyết định lệch khỏi plan
 (chưa có)
@@ -45,3 +46,4 @@ Mở phiên mới bằng model mạnh (Fable 5.2 hoặc Opus 5.5) với câu: "�
 - 15/11/2026 — GĐ 0: tạo `CLAUDE.md`, `.gitignore`, `.claude/settings.json`, 5 file `.claude/rules/`, file này và `docs/tasks/stage-1-skeleton.md`. Các file rules viết khi chưa có code, phải rà lại ở cuối GĐ 1.
 - 15/11/2026 — Rà soát và sửa plan + instruction theo 34 điểm. Các thay đổi chính: Strategy sang suất B, Repository + Singleton và toàn bộ `Data/` thành phần chung; quy tắc đặt theo "service tra cứu, Domain quyết định"; ticket không dùng `MembershipTier` mà nhận `CustomerSlaProfile`; GĐ 1 viết luôn `Program.cs` và vỏ 9 Form; ma trận phân quyền của quy tắc 11; commit không kèm `Co-Authored-By`. Chưa có dòng code nào; quy tắc `PowerShell(...)` trong `settings.json` chưa được chạy thử.
 - 16/11/2026 — Tạo nhánh `develop` từ `main` và commit toàn bộ file GĐ 0 trên `develop` (commit số 1 trong danh sách đề xuất của `stage-1-skeleton.md`). GĐ 1 không cần tạo lại nhánh, chỉ cần chuyển sang `develop`.
+- 16/11/2026 — GĐ 1 Module 1 (SDK 10.0.403): tạo `HotelCRM.sln` (định dạng `sln`), 5 project với tham chiếu đúng bảng trong file task, `Directory.Build.props`, `.editorconfig`; xóa `Class1.cs`, `UnitTest1.cs`, `Form1`. `InternalsVisibleTo("HotelCRM.Data")` khai báo bằng item `<InternalsVisibleTo>` trong `HotelCRM.Domain.csproj`. Gói test là bộ mặc định của mẫu `xunit` (xunit 2.9.3, xunit.runner.visualstudio 3.1.4, Microsoft.NET.Test.Sdk 17.14.1, coverlet.collector 6.0.4). Đã kiểm tra: `dotnet build HotelCRM.sln` 0 lỗi 0 warning; `dotnet test` chạy được, chưa có test nào. Chưa kiểm tra: mở solution bằng Visual Studio. Quy tắc đặt tên trong `.editorconfig` chỉ hiện trong IDE, không chặn `dotnet build` (không bật `EnforceCodeStyleInBuild` vì file task chỉ nêu 4 thuộc tính cho `Directory.Build.props`).
