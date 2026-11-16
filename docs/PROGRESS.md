@@ -7,7 +7,7 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | GĐ | Hạn | Trạng thái | File task |
 |---|---|---|---|
 | 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
-| 1 Khung | 17/11 | Đang làm: xong Module 4/6 | `docs/tasks/stage-1-skeleton.md` |
+| 1 Khung | 17/11 | Đang làm: xong Module 5/6, còn Module 6 | `docs/tasks/stage-1-skeleton.md` |
 | 2 Suất A | 20/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
 | 3 Suất B | 23/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
 | 4 Ghép nối | 25/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
@@ -15,7 +15,7 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
 
 ## Việc tiếp theo
-GĐ 1, Module 5 (22 test) trong `docs/tasks/stage-1-skeleton.md`. Chủ repo đã cho phép (16/11) làm lần lượt Module 2–6, commit sau mỗi module rồi báo cáo.
+GĐ 1, Module 6 (viết `stage-2-ticket.md`, `stage-3-customer.md`, `stage-4-integration.md`; rà 5 file `.claude/rules/`; sửa `docs/PLAN.md` theo bảng "Quyết định lệch khỏi plan") trong `docs/tasks/stage-1-skeleton.md`. Phiên 16/11 dừng trước Module 6 vì hết hạn mức sử dụng. Sau Module 6: merge `develop` vào `local/b-work`. Chủ repo đã cho phép (16/11) làm lần lượt Module 2–6, commit sau mỗi module rồi báo cáo.
 
 ## Cách commit của suất B
 **Nhận patch** (mặc định). Thành viên B chưa xác nhận; hạn 17/11. Nếu họ chọn tự code, sửa dòng này thành "Tự code".
@@ -32,11 +32,13 @@ Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán v�
 ## Trạng thái Git
 - `main`: 1 commit ("first commit"), chỉ có `README.md`.
 - `develop`: đã tạo từ `main` ở GĐ 0, có thêm 1 commit chứa `CLAUDE.md`, `.gitignore`, `.claude/`, `docs/`. Đã push lên `origin/develop` ngày 16/11.
-- Chưa có nhánh `local/b-work`.
+- `develop` (cục bộ) đi trước `origin/develop` các commit của GĐ 1 Module 1–5; chưa push.
+- `local/b-work`: tạo ngày 16/11 từ `develop`, chỉ có trên máy chủ repo, không bao giờ push.
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
 
 ## Việc đang dở
-- GĐ 1: Module 1–4 xong và đã commit trên `develop` (chưa push). Module 5–6 chưa làm.
+- GĐ 1: Module 1–5 xong và đã commit (chưa push). Module 6 chưa làm: chưa có file task GĐ 2–4, chưa rà rules, chưa sửa `docs/PLAN.md`.
+- `local/b-work` đã tạo từ `develop` (commit `1386d6f`), có 1 commit chứa 11 test của suất B và `FakeTicketQuery`. Patch số 01 nằm ở `handoff/01-customer-tests.patch` kèm `.msg.txt` và `handoff/README.txt`; `git apply --check` trên `develop` đạt. Thành viên B chỉ áp được sau khi `develop` được push.
 - Chủ repo chưa làm 6 bước kiểm tra bằng tay của GĐ 1 (mục "Người dùng kiểm tra bằng tay" trong file task). Riêng bước 5 (mở Form bằng Designer của Visual Studio) không có cách kiểm tra tự động nào thay được.
 
 ## Quyết định lệch khỏi plan
@@ -73,3 +75,4 @@ Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone
 - 16/11/2026 — GĐ 1 Module 2: khung `Domain` (Common, Staff, Interfaces, Tickets + States, Customers, Hotel) và `Business` (Services, Queries, Assignment, Factories, Observers, Security), mọi thành viên public có chú thích XML. Cài thật: `Person`, `Employee`, `Agent`/`Manager` (trừ `CanTake`/`EnsureCanTake`), `Department`, `BusinessSettings`, 3 ngoại lệ, mọi `Restore`, `TicketState.FromName`, `MembershipTier.FromName`, `SupportTicket.Attach`, `PasswordHasher`, `UserSession`, `AuthService`, constructor của mọi service. Phần còn lại ném `NotImplementedException` (riêng 2 observer để thân rỗng, xem bảng lệch plan). Đã kiểm tra: build 0 lỗi 0 warning. Chưa kiểm tra bằng test (22 test thuộc Module 5). Ba commit: lõi chung + ticket, khách hàng + khách sạn, Business.
 - 16/11/2026 — GĐ 1 Module 3: `AppConfig` (Singleton), `IMapper`, `JsonRepository`, `InMemoryRepository`, 9 record (8 file + `InteractionRecord`), 8 mapper, `appsettings.json`, dữ liệu mẫu tối thiểu (4 phòng ban, 1 manager, 2 agent, 6 file `[]`), `tools/HashPassword.cs`. `appsettings.json` và `Data/*.json` được chép ra thư mục output và đặt ngoài file `.exe` khi publish single-file. Đã kiểm tra bằng một script tạm ngoài repo (31 phép thử, đều đạt): nạp cả 8 file, tham chiếu trỏ đúng cùng đối tượng, ghi rồi nạp lại cho JSON giống hệt, xóa có ghi file, đăng nhập đúng/sai bằng tài khoản mẫu, JSON hỏng / thiếu file / tên trạng thái lạ đều báo lỗi có tên file. Chưa kiểm tra: publish single-file.
 - 16/11/2026 — GĐ 1 Module 4: `Program.cs` (composition root, bảng strategy và factory, `Application.ThreadException`, vòng đăng nhập lại sau Logout), `ErrorHandler` (`Run` trả về `bool`, `Handle`, `ReportStartupFailure`), `UiNotificationObserver` (sự kiện `NotificationRaised`, `MainForm` hiện lên thanh trạng thái), `LoginForm`, `MainForm`, vỏ 9 Form, mục "Sample accounts" trong `README.md`. Các Form con mở dạng hộp thoại (`ShowDialog`). Menu: Reports chỉ Manager thấy, Record Survey chỉ Agent thấy. `.editorconfig` bỏ quy tắc PascalCase cho hàm trong `Forms/` vì tên handler theo kiểu Visual Studio (`btnLogin_Click`). Đã kiểm tra bằng script tạm ngoài repo (29 phép thử, đều đạt): nối dây như `Program`, đăng nhập sai bị từ chối, đăng nhập 2 vai trò, menu ẩn/hiện đúng, cả 9 Form tạo được cửa sổ, Logout kết thúc phiên. Chạy file `.exe` thật: hiện cửa sổ "Hotel CRM - Log In"; đổi `MaxActiveTickets` vẫn khởi động; đổi `DefaultAssignmentStrategy` thành tên lạ thì hiện hộp thoại lỗi và ghi `logs/error.log` có nêu 3 tên hợp lệ. Chưa kiểm tra: bấm thật trên giao diện, mở Form bằng Designer của Visual Studio (chỉ người làm được).
+- 16/11/2026 — GĐ 1 Module 5: 11 test suất A + `FakeCustomerDirectory`, `FakeStayLookup`, `TicketTestData` trên `develop`; 11 test suất B + `FakeTicketQuery`, `CustomerTestData` trên `local/b-work`; xuất `handoff/01-customer-tests.*` và `handoff/README.txt`. Đã kiểm tra: `dotnet test` trên `develop` 11 test, cả 11 đỏ; trên `local/b-work` 22 test, 2 xanh (`Constructor_InvalidEmail_ThrowsValidation`, `Constructor_InvalidPhone_ThrowsValidation`), 20 đỏ. Mọi test đỏ đều do `NotImplementedException` (2 test hiện "Assert.Throws: not an exact match" vì lời gọi bị bọc trong `Assert.Throws`, ngoại lệ thật vẫn là `NotImplementedException`). `TicketServiceTests` dùng một strategy giả lồng trong lớp test để không phụ thuộc strategy của suất B.
