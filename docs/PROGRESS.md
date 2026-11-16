@@ -6,7 +6,7 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 
 | GĐ | Hạn | Trạng thái | File task |
 |---|---|---|---|
-| 0 Chuẩn bị | 16/11 | Xong, đã commit trên `develop` (chưa push) | — |
+| 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
 | 1 Khung | 17/11 | Chưa bắt đầu | `docs/tasks/stage-1-skeleton.md` |
 | 2 Suất A | 20/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
 | 3 Suất B | 23/11 | Chưa bắt đầu | viết ở cuối GĐ 1 |
@@ -22,7 +22,7 @@ Mở phiên mới bằng model mạnh (Fable 5.2 hoặc Opus 5.5) với câu: "�
 
 ## Trạng thái Git
 - `main`: 1 commit ("first commit"), chỉ có `README.md`.
-- `develop`: đã tạo từ `main` ở GĐ 0, có thêm 1 commit chứa `CLAUDE.md`, `.gitignore`, `.claude/`, `docs/`. Chưa push.
+- `develop`: đã tạo từ `main` ở GĐ 0, có thêm 1 commit chứa `CLAUDE.md`, `.gitignore`, `.claude/`, `docs/`. Đã push lên `origin/develop` ngày 16/11.
 - Chưa có nhánh `local/b-work`.
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
 
