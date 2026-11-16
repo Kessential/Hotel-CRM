@@ -1,0 +1,45 @@
+namespace HotelCRM.Domain.Customers;
+
+/// <summary>
+/// Membership tier of a customer. Abstract: each tier is a subclass that supplies its own numbers,
+/// so the code never switches on the tier. The numbers are constants of the classes, not configuration.
+/// </summary>
+public abstract class MembershipTier
+{
+    /// <summary>Name of the tier: <c>Standard</c>, <c>Silver</c>, <c>Gold</c> or <c>VIP</c>. Stored in <c>customers.json</c>.</summary>
+    public abstract string Name { get; }
+
+    /// <summary>Rule 4: multiplier of the ticket handling time. Standard 1.0, Silver 0.9, Gold 0.75, VIP 0.5.</summary>
+    public abstract double SlaFactor { get; }
+
+    /// <summary>Rule 4: priority levels added to a new ticket. Standard 0, Silver 0, Gold 1, VIP 2.</summary>
+    public abstract int PriorityBoost { get; }
+
+    /// <summary>Rule 8: points needed to reach this tier. Standard 0, Silver 1000, Gold 5000, VIP 15000.</summary>
+    public abstract int MinPoints { get; }
+
+    /// <summary>
+    /// Returns the tier object for a stored name. Adding a new tier means adding one line here.
+    /// </summary>
+    /// <exception cref="ArgumentException">The name is not a known tier (corrupt data file).</exception>
+    public static MembershipTier FromName(string name)
+    {
+        return name switch
+        {
+            StandardTier.TierName => new StandardTier(),
+            SilverTier.TierName => new SilverTier(),
+            GoldTier.TierName => new GoldTier(),
+            VipTier.TierName => new VipTier(),
+            _ => throw new ArgumentException($"Unknown membership tier '{name}'.", nameof(name)),
+        };
+    }
+
+    /// <summary>Rule 8: returns the next higher tier, or null when this is the highest tier.</summary>
+    public abstract MembershipTier? Next();
+
+    /// <summary>Returns <see cref="Name"/>.</summary>
+    public override string ToString()
+    {
+        return Name;
+    }
+}
