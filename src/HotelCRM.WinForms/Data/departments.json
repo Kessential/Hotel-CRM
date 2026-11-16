@@ -1,0 +1,22 @@
+[
+  {
+    "Id": 1,
+    "Code": "GUEST",
+    "Name": "Guest Relations"
+  },
+  {
+    "Id": 2,
+    "Code": "HOUSE",
+    "Name": "Housekeeping"
+  },
+  {
+    "Id": 3,
+    "Code": "ENG",
+    "Name": "Engineering"
+  },
+  {
+    "Id": 4,
+    "Code": "FRONT",
+    "Name": "Front Office"
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "Id": 1,
+    "Role": "Manager",
+    "FullName": "Olivia Bennett",
+    "Phone": "0901000001",
+    "Email": "olivia.bennett@grandhotel.example",
+    "Username": "manager1",
+    "PasswordHash": "0ofssNkR8ZVSWNHMsLt5KnJXbH4waFIT669cwaKW/PI=",
+    "Salt": "qZCSep7C6XqF03YeLWNrTg==",
+    "DepartmentId": 4
+  },
+  {
+    "Id": 2,
+    "Role": "Agent",
+    "FullName": "Daniel Carter",
+    "Phone": "0901000002",
+    "Email": "daniel.carter@grandhotel.example",
+    "Username": "agent1",
+    "PasswordHash": "dbRBqqK+9kfgZPMLj0r61QZRHsPrmLqSSFG9t8GTgx8=",
+    "Salt": "tu4NXwoCGRxAZODcupQseg==",
+    "DepartmentId": 1
+  },
+  {
+    "Id": 3,
+    "Role": "Agent",
+    "FullName": "Sophia Nguyen",
+    "Phone": "0901000003",
+    "Email": "sophia.nguyen@grandhotel.example",
+    "Username": "agent2",
+    "PasswordHash": "1/xEPMHjmBnukfiM84rxentV8uMlBpEd/XegLgO/cSs=",
+    "Salt": "5d16c4GCVEJn/8QrgS2dYw==",
+    "DepartmentId": 3
+  }
+]
