@@ -86,7 +86,17 @@ public sealed class TicketService
         int? roomId,
         DateTime now)
     {
-        throw new NotImplementedException();
+        CustomerSlaProfile slaProfile = _customers.GetSlaProfile(customerId);
+        TicketFactory factory = _factories[typeName];
+        int id = _tickets.NextId();
+        SupportTicket ticket = factory.Create(id, customerId, title, description, priority, slaProfile, now, roomId);
+
+        bool roomInActiveStay = roomId is not null && _stays.IsRoomInActiveStay(customerId, roomId.Value);
+        ticket.Validate(roomInActiveStay);
+
+        AttachObservers(ticket);
+        _tickets.Save(ticket);
+        return ticket;
     }
 
     /// <summary>
@@ -102,7 +112,26 @@ public sealed class TicketService
     /// </exception>
     public Agent AutoAssign(Employee actor, int ticketId)
     {
-        throw new NotImplementedException();
+        actor.EnsureCanAssign();
+        SupportTicket ticket = _tickets.GetRequired(ticketId);
+
+        List<AgentWorkload> candidates = new();
+        foreach (Agent agent in GetAgents())
+        {
+            int activeCount = CountActiveTickets(agent.Id, ticket.Id);
+            if (agent.CanTake(activeCount, _settings.MaxActiveTickets))
+            {
+                candidates.Add(new AgentWorkload(agent, activeCount));
+            }
+        }
+
+        Agent? chosen = _strategy.Pick(ticket.HandlingDepartmentCode, candidates);
+        int chosenCount = chosen is null ? 0 : CountActiveTickets(chosen.Id, ticket.Id);
+        ticket.AssignTo(chosen, chosenCount, _settings.MaxActiveTickets);
+        _tickets.Save(ticket);
+
+        // AssignTo succeeded, so the ticket now has an agent.
+        return ticket.AssignedAgent!;
     }
 
     /// <summary>
@@ -116,48 +145,71 @@ public sealed class TicketService
     /// </exception>
     public void AssignManually(Employee actor, int ticketId, int agentId)
     {
-        throw new NotImplementedException();
+        actor.EnsureCanAssign();
+        SupportTicket ticket = _tickets.GetRequired(ticketId);
+        Agent? agent = _employees.GetRequired(agentId) as Agent;
+        int activeCount = agent is null ? 0 : CountActiveTickets(agent.Id, ticket.Id);
+
+        ticket.AssignTo(agent, activeCount, _settings.MaxActiveTickets);
+        _tickets.Save(ticket);
     }
 
     /// <summary>
     /// UC4: Open to InProgress. Steps: <see cref="SupportTicket.EnsureAssignedTo"/> (rule 11);
-    /// <see cref="SupportTicket.Start"/> (rule 1); save.
+    /// <see cref="SupportTicket.Start"/> (rule 1); save, even when an observer failed (see <see cref="ChangeStateAndSave"/>).
     /// </summary>
     /// <exception cref="BusinessRuleException">The actor is not the assigned agent, or the ticket is not Open.</exception>
     public void Start(Employee actor, int ticketId, DateTime now)
     {
-        throw new NotImplementedException();
+        SupportTicket ticket = _tickets.GetRequired(ticketId);
+        ticket.EnsureAssignedTo(actor);
+        ChangeStateAndSave(ticket, () => ticket.Start(now));
     }
 
     /// <summary>
     /// UC4: InProgress to Resolved. Steps: <see cref="SupportTicket.EnsureAssignedTo"/> (rule 11);
-    /// <see cref="SupportTicket.Resolve"/> (rule 1); save.
+    /// <see cref="SupportTicket.Resolve"/> (rule 1); save, even when an observer failed (see <see cref="ChangeStateAndSave"/>).
     /// </summary>
     /// <exception cref="ValidationException">The note is empty.</exception>
     /// <exception cref="BusinessRuleException">The actor is not the assigned agent, or the ticket is not InProgress.</exception>
     public void Resolve(Employee actor, int ticketId, string note, DateTime now)
     {
-        throw new NotImplementedException();
+        SupportTicket ticket = _tickets.GetRequired(ticketId);
+        ticket.EnsureAssignedTo(actor);
+        ChangeStateAndSave(ticket, () => ticket.Resolve(note, now));
     }
 
     /// <summary>
     /// UC4: Resolved to Closed. Steps: <see cref="Employee.EnsureCanClose"/> (rule 11);
-    /// <see cref="SupportTicket.Close"/> (rule 1); save.
+    /// <see cref="SupportTicket.Close"/> (rule 1); save, even when an observer failed (see <see cref="ChangeStateAndSave"/>).
     /// </summary>
     /// <exception cref="BusinessRuleException">The actor is not a manager, or the ticket is not Resolved.</exception>
     public void Close(Employee actor, int ticketId, DateTime now)
     {
-        throw new NotImplementedException();
+        actor.EnsureCanClose();
+        SupportTicket ticket = _tickets.GetRequired(ticketId);
+        ChangeStateAndSave(ticket, () => ticket.Close(now));
     }
 
     /// <summary>
     /// UC4: Resolved back to InProgress. Steps: <see cref="Employee.EnsureCanReopen"/> (rule 11);
-    /// <see cref="SupportTicket.Reopen"/> with <see cref="BusinessSettings.ReopenDays"/> (rules 1 and 2); save.
+    /// count the active tickets of the assigned agent and call <see cref="Agent.EnsureCanTake"/>, because
+    /// the reopened ticket becomes active again for the same agent (rule 3);
+    /// <see cref="SupportTicket.Reopen"/> with <see cref="BusinessSettings.ReopenDays"/> (rules 1 and 2);
+    /// save, even when an observer failed (see <see cref="ChangeStateAndSave"/>).
     /// </summary>
-    /// <exception cref="BusinessRuleException">The actor is not a manager, the ticket is not Resolved, or the reopen window has passed.</exception>
+    /// <exception cref="BusinessRuleException">
+    /// The actor is not a manager, the assigned agent already holds <see cref="BusinessSettings.MaxActiveTickets"/>
+    /// active tickets, the ticket is not Resolved, or the reopen window has passed.
+    /// </exception>
     public void Reopen(Employee actor, int ticketId, DateTime now)
     {
-        throw new NotImplementedException();
+        actor.EnsureCanReopen();
+        SupportTicket ticket = _tickets.GetRequired(ticketId);
+        ticket.AssignedAgent?.EnsureCanTake(
+            CountActiveTickets(ticket.AssignedAgent.Id, ticket.Id),
+            _settings.MaxActiveTickets);
+        ChangeStateAndSave(ticket, () => ticket.Reopen(now, _settings.ReopenDays));
     }
 
     /// <summary>
@@ -176,39 +228,67 @@ public sealed class TicketService
         int? agentId,
         string? keyword)
     {
-        throw new NotImplementedException();
+        IEnumerable<SupportTicket> result = _tickets.GetAll();
+
+        if (!string.IsNullOrEmpty(stateName))
+        {
+            result = result.Where(t => t.State.Name == stateName);
+        }
+
+        if (priority is not null)
+        {
+            result = result.Where(t => t.Priority == priority.Value);
+        }
+
+        if (!string.IsNullOrEmpty(typeName))
+        {
+            result = result.Where(t => t.TypeName == typeName);
+        }
+
+        if (agentId is not null)
+        {
+            result = result.Where(t => t.AssignedAgent?.Id == agentId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            string text = keyword.Trim();
+            result = result.Where(t => t.Title.Contains(text, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return result.OrderByDescending(t => t.CreatedAt).ToList();
     }
 
     /// <summary>Returns one ticket for the detail form.</summary>
     /// <exception cref="BusinessRuleException">The ticket does not exist.</exception>
     public SupportTicket GetById(int ticketId)
     {
-        throw new NotImplementedException();
+        return _tickets.GetRequired(ticketId);
     }
 
     /// <summary>Returns the ticket type names that have a factory, for the type list of the forms.</summary>
     public IReadOnlyList<string> GetTicketTypes()
     {
-        throw new NotImplementedException();
+        return _factories.Keys.ToList();
     }
 
     /// <summary>Returns every agent, for the manual assignment list and the search filter.</summary>
     public IReadOnlyList<Agent> GetAgents()
     {
-        throw new NotImplementedException();
+        return _employees.GetAll().OfType<Agent>().ToList();
     }
 
     /// <summary>Finds customers for the ticket form; forwards to <see cref="ICustomerDirectory.Search"/>.</summary>
     public IReadOnlyList<CustomerSummary> FindCustomers(string keyword)
     {
-        throw new NotImplementedException();
+        return _customers.Search(keyword);
     }
 
     /// <summary>Returns the summary of a ticket's customer; forwards to <see cref="ICustomerDirectory.GetSummary"/>.</summary>
     /// <exception cref="BusinessRuleException">The customer does not exist.</exception>
     public CustomerSummary GetCustomer(int customerId)
     {
-        throw new NotImplementedException();
+        return _customers.GetSummary(customerId);
     }
 
     /// <summary>
@@ -217,13 +297,44 @@ public sealed class TicketService
     /// </summary>
     public IReadOnlyDictionary<int, string> GetActiveRooms(int customerId)
     {
-        throw new NotImplementedException();
+        return _stays.GetActiveRooms(customerId);
     }
 
     /// <summary>Returns the number of a room; forwards to <see cref="IStayLookup.GetRoomNumber"/>.</summary>
     public string GetRoomNumber(int roomId)
     {
-        throw new NotImplementedException();
+        return _stays.GetRoomNumber(roomId);
+    }
+
+    /// <summary>
+    /// Rule 3: number of Open or InProgress tickets assigned to the agent, not counting the ticket
+    /// being assigned (so reassigning a ticket to its current agent does not count it twice).
+    /// </summary>
+    private int CountActiveTickets(int agentId, int excludedTicketId)
+    {
+        return _tickets.GetAll().Count(t =>
+            t.Id != excludedTicketId
+            && t.AssignedAgent?.Id == agentId
+            && t.State.IsActive);
+    }
+
+    /// <summary>
+    /// Runs a state change and saves the ticket even if it throws. The state classes reject an illegal
+    /// change before touching the ticket, so a rejected change saves unchanged data. An observer, however,
+    /// runs after the state has changed: if it throws, the new state is valid and is already in memory,
+    /// so it is saved here to keep the stored ticket equal to the one in memory, and the observer's
+    /// exception still reaches the caller.
+    /// </summary>
+    private void ChangeStateAndSave(SupportTicket ticket, Action change)
+    {
+        try
+        {
+            change();
+        }
+        finally
+        {
+            _tickets.Save(ticket);
+        }
     }
 
     private void AttachObservers(SupportTicket ticket)

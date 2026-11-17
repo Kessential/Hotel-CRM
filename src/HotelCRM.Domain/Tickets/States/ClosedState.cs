@@ -13,8 +13,8 @@ public sealed class ClosedState : TicketState
     public override string Name => StateName;
 
     /// <summary>False.</summary>
-    public override bool IsActive => throw new NotImplementedException();
+    public override bool IsActive => false;
 
     /// <summary>True.</summary>
-    public override bool IsClosed => throw new NotImplementedException();
+    public override bool IsClosed => true;
 }

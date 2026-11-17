@@ -35,10 +35,10 @@ public sealed class ServiceRequestTicket : SupportTicket
     public override string TypeName => TypeKey;
 
     /// <summary>8 hours.</summary>
-    public override int BaseSlaHours => throw new NotImplementedException();
+    public override int BaseSlaHours => 8;
 
     /// <summary><c>HOUSE</c> (Housekeeping).</summary>
-    public override string HandlingDepartmentCode => throw new NotImplementedException();
+    public override string HandlingDepartmentCode => "HOUSE";
 
     /// <summary>Rebuilds a service request from stored data.</summary>
     internal static ServiceRequestTicket Restore(TicketSnapshot snapshot)

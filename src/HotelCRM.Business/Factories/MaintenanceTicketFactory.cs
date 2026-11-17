@@ -20,6 +20,6 @@ public sealed class MaintenanceTicketFactory : TicketFactory
         DateTime createdAt,
         int? roomId)
     {
-        throw new NotImplementedException();
+        return new MaintenanceTicket(id, customerId, title, description, priority, slaProfile, createdAt, roomId);
     }
 }

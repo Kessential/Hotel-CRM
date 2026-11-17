@@ -35,20 +35,23 @@ public sealed class ComplaintTicket : SupportTicket
     public override string TypeName => TypeKey;
 
     /// <summary>24 hours.</summary>
-    public override int BaseSlaHours => throw new NotImplementedException();
+    public override int BaseSlaHours => 24;
 
     /// <summary><c>GUEST</c> (Guest Relations).</summary>
-    public override string HandlingDepartmentCode => throw new NotImplementedException();
+    public override string HandlingDepartmentCode => "GUEST";
 
     /// <summary>50 points.</summary>
-    public override int GoodwillPoints => throw new NotImplementedException();
+    public override int GoodwillPoints => 50;
 
     /// <summary>A complaint must describe what happened: the description is required.</summary>
     /// <param name="roomInActiveStay">Not used by this kind of ticket.</param>
     /// <exception cref="ValidationException">The description is empty.</exception>
     public override void Validate(bool roomInActiveStay)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(Description))
+        {
+            throw new ValidationException("A complaint must have a description of what happened.");
+        }
     }
 
     /// <summary>Rebuilds a complaint from stored data.</summary>

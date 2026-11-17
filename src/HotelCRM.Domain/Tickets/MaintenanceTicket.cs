@@ -43,17 +43,21 @@ public sealed class MaintenanceTicket : SupportTicket
     public override string TypeName => TypeKey;
 
     /// <summary>12 hours.</summary>
-    public override int BaseSlaHours => throw new NotImplementedException();
+    public override int BaseSlaHours => 12;
 
     /// <summary><c>ENG</c> (Engineering).</summary>
-    public override string HandlingDepartmentCode => throw new NotImplementedException();
+    public override string HandlingDepartmentCode => "ENG";
 
     /// <summary>Rule 5: the room must belong to a CheckedIn booking of the ticket's customer.</summary>
     /// <param name="roomInActiveStay">Result of <see cref="IStayLookup.IsRoomInActiveStay"/> for <c>CustomerId</c> and <see cref="RoomId"/>.</param>
     /// <exception cref="BusinessRuleException"><paramref name="roomInActiveStay"/> is false.</exception>
     public override void Validate(bool roomInActiveStay)
     {
-        throw new NotImplementedException();
+        if (!roomInActiveStay)
+        {
+            throw new BusinessRuleException(
+                "The room of a maintenance ticket must belong to the customer's current stay (checked in).");
+        }
     }
 
     /// <summary>Rebuilds a maintenance ticket from stored data.</summary>
@@ -65,6 +69,9 @@ public sealed class MaintenanceTicket : SupportTicket
     /// <summary>Throws <see cref="ValidationException"/> when no room was given.</summary>
     private static void EnsureRoomGiven(int? roomId)
     {
-        throw new NotImplementedException();
+        if (roomId is null)
+        {
+            throw new ValidationException("A maintenance ticket must name the room that needs repair.");
+        }
     }
 }
