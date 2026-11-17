@@ -8,15 +8,14 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 |---|---|---|---|
 | 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
 | 1 Khung | 17/11 | Xong. Đã push `develop` ngày 16/11; chủ repo xác nhận GĐ 1 đạt ngày 16/11 | `docs/tasks/stage-1-skeleton.md` |
-| 2 Suất A | 20/11 | Code xong cả 7 module (16/11), 11/11 test xanh. `/code-review high` chạy 17/11, sửa 4 lỗi. Đã merge `feature/a-ticket` vào `develop` ngày 17/11. Chủ repo xác nhận 3 bước kiểm tra bằng tay đạt ngày 17/11. **Xong**, chưa push `develop` | `docs/tasks/stage-2-ticket.md` |
+| 2 Suất A | 20/11 | Code xong cả 7 module (16/11), 11/11 test xanh. `/code-review high` chạy 17/11, sửa 4 lỗi. Đã merge `feature/a-ticket` vào `develop` ngày 17/11. Chủ repo xác nhận 3 bước kiểm tra bằng tay đạt ngày 17/11. **Xong**, đã push `develop` ngày 17/11 | `docs/tasks/stage-2-ticket.md` |
 | 3 Suất B | 23/11 | Chưa bắt đầu | `docs/tasks/stage-3-customer.md` |
 | 4 Ghép nối | 25/11 | Chưa bắt đầu | `docs/tasks/stage-4-integration.md` |
 | 5 Tài liệu kỹ thuật | 27/11 | Chưa bắt đầu | viết ở cuối GĐ 4 |
 | 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
 
 ## Việc tiếp theo
-1. Push `develop` khi chủ repo đồng ý (đang đi trước `origin/develop`).
-2. Phiên GĐ 3 trên `local/b-work`: merge `develop` mới (có GĐ 2 và nhánh của B) vào `local/b-work`; `docs/PROGRESS.md` có thể xung đột vì cả hai nhánh cùng sửa.
+1. Phiên GĐ 3 trên `local/b-work`: merge `develop` mới (có GĐ 2 và nhánh của B) vào `local/b-work`; `docs/PROGRESS.md` có thể xung đột vì cả hai nhánh cùng sửa.
 3. Mở phiên Sonnet 5.5 cho GĐ 3: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-3-customer.md` rồi làm theo." Nhánh `local/b-work`. Nếu chạy cùng lúc với phiên sửa lỗi của GĐ 2 trên một thư mục thì hai phiên sẽ giẫm nhánh của nhau: dùng worktree riêng cho một trong hai.
 
 ## Cách commit của suất B
@@ -36,8 +35,8 @@ Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán v�
 - `develop`: đã tạo từ `main` ở GĐ 0, có thêm 1 commit chứa `CLAUDE.md`, `.gitignore`, `.claude/`, `docs/`. Đã push lên `origin/develop` ngày 16/11.
 - `develop`: toàn bộ 11 commit của GĐ 1 đã push lên `origin/develop` ngày 16/11, kèm commit `7a88011` (`LoginForm.resx`).
 - `local/b-work`: tạo ngày 16/11 từ `develop`, chỉ có trên máy chủ repo, không bao giờ push. Gồm 1 commit test của suất B và 1 merge commit đưa Module 6 của `develop` vào.
-- `feature/a-ticket`: tạo ngày 16/11 từ `develop` tại `1707f97` (commit ghi nhận GĐ 1 đạt; commit này mới ở máy, chưa push). Có 8 commit của GĐ 2 (7 module + 1 commit sửa lỗi sau review), chưa push. Đã merge vào `develop` ngày 17/11 bằng `--no-ff`.
-- `develop` sau merge GĐ 2: chưa push; đi trước `origin/develop` gồm `1707f97`, 8 commit của GĐ 2 và merge commit.
+- `feature/a-ticket`: tạo ngày 16/11 từ `develop` tại `1707f97` (commit ghi nhận GĐ 1 đạt; đã lên `origin/develop` ngày 17/11 cùng GĐ 2). Có 8 commit của GĐ 2 (7 module + 1 commit sửa lỗi sau review), chưa push. Đã merge vào `develop` ngày 17/11 bằng `--no-ff`.
+- `develop` sau merge GĐ 2 và nhánh của B: đã push lên `origin/develop` ngày 17/11 (`7a88011..870424b`), kèm commit cập nhật file này ngay sau đó.
 - `origin/feature/b-customer`: thành viên B push 1 commit `f3992b8` (17/11, "Add the eleven customer subsystem tests and FakeTicketQuery"), dựa trên `origin/develop`. So với commit patch 01 trên `local/b-work` (`9450105`), `src` và `tests` chỉ khác `LoginForm.resx`, `MainForm.resx` (đến từ `origin/develop`), tức 11 test khớp patch 01. Đã merge vào `develop` ngày 17/11 bằng `--no-ff`. Từ đây `dotnet test` trên `develop` chạy 22 test: 13 xanh, 9 đỏ (test suất B, `NotImplementedException`, xanh dần ở GĐ 3–4).
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
 
@@ -99,4 +98,5 @@ Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone
 - 16/11/2026 — GĐ 2 Module 7: build 0 lỗi 0 warning; `dotnet test` 11/11 xanh; không file cấm nào bị sửa (so với `develop`: không đổi `tests/`, `Data/`, `Program.cs`, `MainForm`, `Domain/Common`, `Domain/Interfaces`). Ghi nhận cho vấn đáp: thông báo "không tìm thấy" có dạng `SupportTicket 99 does not exist.` vì `RepositoryExtensions.GetRequired` (phần chung) dùng tên kiểu; không sửa vì là file cấm.
 - 17/11/2026 — GĐ 2: chạy `/code-review high` trên `develop...feature/a-ticket`, ra 10 điểm. Người dùng cho sửa 4 lỗi chính: (1) observer ném lỗi sau khi đổi trạng thái → `TicketService` lưu ticket trong `finally` (bảng lệch plan dòng 11); (2) Reopen vượt giới hạn tải → `EnsureCanTake` trước Reopen (dòng 10); (3) `TicketListForm`: ticket vừa phân công không còn khớp bộ lọc thì bỏ chọn hết thay vì để lưới tự chọn dòng đầu, `SelectedTicketId` chỉ trả Id khi dòng đang được tô; (4) `TicketDetailForm`: Load xóa form trước khi nạp nên Id sai để lại form trống, nút thao tác bị tắt; `RunOnTicket` nạp lại ticket cả khi thao tác lỗi. Không đổi Domain, chữ ký public, file Designer hay test. Đã kiểm tra: build 0 lỗi 0 warning; 11/11 test xanh (không test nào chạm 4 chỗ sửa); chương trình tạm ngoài repo, 6 phép thử đều đạt (observer ném lỗi khi Close: lỗi vẫn tới người gọi, ticket được lưu ở trạng thái Closed; Close lần nữa bị từ chối; Reopen bị chặn khi Agent đủ 2/2, được phép khi còn 1/2). Chưa kiểm tra (người dùng bấm thử): `TicketListForm` lọc theo Agent A, phân công ticket cho B → không dòng nào được chọn, bấm Assign báo "Select a ticket first."; `TicketDetailForm` Load một Id có thật rồi Load 99 → form trống, các nút bị tắt.
 - 17/11/2026 — Fetch `origin`: `origin/develop` và `origin/main` không có commit mới so với máy (không cần pull); có nhánh mới `origin/feature/b-customer` của thành viên B (xem "Trạng thái Git"). Commit bản sửa sau review trên `feature/a-ticket`, rồi theo yêu cầu của chủ repo merge `feature/a-ticket` vào `develop` (`--no-ff`) trước khi kiểm tra bằng tay. Chưa push.
-- 17/11/2026 — Chủ repo xác nhận đủ 3 bước kiểm tra bằng tay của GĐ 2 (3 Form mở được bằng Designer; chạy app mở 3 Form và Search không lỗi; Agent không thấy Auto Assign/Assign). GĐ 2 đạt. Commit 3 file `.resx` do Visual Studio tạo cho 3 Form ticket lên `develop`. Đối chiếu `origin/feature/b-customer` với yêu cầu của GĐ 1 (đủ 11 test + `FakeTicketQuery`, giống hệt patch 01) rồi merge vào `develop` (`--no-ff`). Chưa push.
+- 17/11/2026 — Chủ repo xác nhận đủ 3 bước kiểm tra bằng tay của GĐ 2 (3 Form mở được bằng Designer; chạy app mở 3 Form và Search không lỗi; Agent không thấy Auto Assign/Assign). GĐ 2 đạt. Commit 3 file `.resx` do Visual Studio tạo cho 3 Form ticket lên `develop`. Đối chiếu `origin/feature/b-customer` với yêu cầu của GĐ 1 (đủ 11 test + `FakeTicketQuery`, giống hệt patch 01) rồi merge vào `develop` (`--no-ff`).
+- 17/11/2026 — Push `develop` lên `origin` (`7a88011..870424b`) theo yêu cầu của chủ repo. Không push `feature/a-ticket` hay `local/b-work`.
