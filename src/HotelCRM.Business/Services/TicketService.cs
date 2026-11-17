@@ -156,20 +156,19 @@ public sealed class TicketService
 
     /// <summary>
     /// UC4: Open to InProgress. Steps: <see cref="SupportTicket.EnsureAssignedTo"/> (rule 11);
-    /// <see cref="SupportTicket.Start"/> (rule 1); save.
+    /// <see cref="SupportTicket.Start"/> (rule 1); save, even when an observer failed (see <see cref="ChangeStateAndSave"/>).
     /// </summary>
     /// <exception cref="BusinessRuleException">The actor is not the assigned agent, or the ticket is not Open.</exception>
     public void Start(Employee actor, int ticketId, DateTime now)
     {
         SupportTicket ticket = _tickets.GetRequired(ticketId);
         ticket.EnsureAssignedTo(actor);
-        ticket.Start(now);
-        _tickets.Save(ticket);
+        ChangeStateAndSave(ticket, () => ticket.Start(now));
     }
 
     /// <summary>
     /// UC4: InProgress to Resolved. Steps: <see cref="SupportTicket.EnsureAssignedTo"/> (rule 11);
-    /// <see cref="SupportTicket.Resolve"/> (rule 1); save.
+    /// <see cref="SupportTicket.Resolve"/> (rule 1); save, even when an observer failed (see <see cref="ChangeStateAndSave"/>).
     /// </summary>
     /// <exception cref="ValidationException">The note is empty.</exception>
     /// <exception cref="BusinessRuleException">The actor is not the assigned agent, or the ticket is not InProgress.</exception>
@@ -177,34 +176,40 @@ public sealed class TicketService
     {
         SupportTicket ticket = _tickets.GetRequired(ticketId);
         ticket.EnsureAssignedTo(actor);
-        ticket.Resolve(note, now);
-        _tickets.Save(ticket);
+        ChangeStateAndSave(ticket, () => ticket.Resolve(note, now));
     }
 
     /// <summary>
     /// UC4: Resolved to Closed. Steps: <see cref="Employee.EnsureCanClose"/> (rule 11);
-    /// <see cref="SupportTicket.Close"/> (rule 1); save.
+    /// <see cref="SupportTicket.Close"/> (rule 1); save, even when an observer failed (see <see cref="ChangeStateAndSave"/>).
     /// </summary>
     /// <exception cref="BusinessRuleException">The actor is not a manager, or the ticket is not Resolved.</exception>
     public void Close(Employee actor, int ticketId, DateTime now)
     {
         actor.EnsureCanClose();
         SupportTicket ticket = _tickets.GetRequired(ticketId);
-        ticket.Close(now);
-        _tickets.Save(ticket);
+        ChangeStateAndSave(ticket, () => ticket.Close(now));
     }
 
     /// <summary>
     /// UC4: Resolved back to InProgress. Steps: <see cref="Employee.EnsureCanReopen"/> (rule 11);
-    /// <see cref="SupportTicket.Reopen"/> with <see cref="BusinessSettings.ReopenDays"/> (rules 1 and 2); save.
+    /// count the active tickets of the assigned agent and call <see cref="Agent.EnsureCanTake"/>, because
+    /// the reopened ticket becomes active again for the same agent (rule 3);
+    /// <see cref="SupportTicket.Reopen"/> with <see cref="BusinessSettings.ReopenDays"/> (rules 1 and 2);
+    /// save, even when an observer failed (see <see cref="ChangeStateAndSave"/>).
     /// </summary>
-    /// <exception cref="BusinessRuleException">The actor is not a manager, the ticket is not Resolved, or the reopen window has passed.</exception>
+    /// <exception cref="BusinessRuleException">
+    /// The actor is not a manager, the assigned agent already holds <see cref="BusinessSettings.MaxActiveTickets"/>
+    /// active tickets, the ticket is not Resolved, or the reopen window has passed.
+    /// </exception>
     public void Reopen(Employee actor, int ticketId, DateTime now)
     {
         actor.EnsureCanReopen();
         SupportTicket ticket = _tickets.GetRequired(ticketId);
-        ticket.Reopen(now, _settings.ReopenDays);
-        _tickets.Save(ticket);
+        ticket.AssignedAgent?.EnsureCanTake(
+            CountActiveTickets(ticket.AssignedAgent.Id, ticket.Id),
+            _settings.MaxActiveTickets);
+        ChangeStateAndSave(ticket, () => ticket.Reopen(now, _settings.ReopenDays));
     }
 
     /// <summary>
@@ -311,6 +316,25 @@ public sealed class TicketService
             t.Id != excludedTicketId
             && t.AssignedAgent?.Id == agentId
             && t.State.IsActive);
+    }
+
+    /// <summary>
+    /// Runs a state change and saves the ticket even if it throws. The state classes reject an illegal
+    /// change before touching the ticket, so a rejected change saves unchanged data. An observer, however,
+    /// runs after the state has changed: if it throws, the new state is valid and is already in memory,
+    /// so it is saved here to keep the stored ticket equal to the one in memory, and the observer's
+    /// exception still reaches the caller.
+    /// </summary>
+    private void ChangeStateAndSave(SupportTicket ticket, Action change)
+    {
+        try
+        {
+            change();
+        }
+        finally
+        {
+            _tickets.Save(ticket);
+        }
     }
 
     private void AttachObservers(SupportTicket ticket)

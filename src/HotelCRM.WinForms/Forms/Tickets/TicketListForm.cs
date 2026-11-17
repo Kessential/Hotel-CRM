@@ -213,20 +213,27 @@ public partial class TicketListForm : Form
 
         if (selectTicketId is not null)
         {
-            foreach (DataGridViewRow row in dgvTickets.Rows)
+            DataGridViewRow? match = dgvTickets.Rows
+                .Cast<DataGridViewRow>()
+                .FirstOrDefault(row => row.DataBoundItem is TicketRow ticketRow && ticketRow.Id == selectTicketId.Value);
+            if (match is not null)
             {
-                if (row.DataBoundItem is TicketRow ticketRow && ticketRow.Id == selectTicketId.Value)
-                {
-                    dgvTickets.CurrentCell = row.Cells[0];
-                    break;
-                }
+                dgvTickets.CurrentCell = match.Cells[0];
+            }
+            else
+            {
+                // The ticket no longer matches the filters: select nothing, so the next action cannot
+                // silently hit the first row instead.
+                dgvTickets.ClearSelection();
+                dgvTickets.CurrentCell = null;
             }
         }
     }
 
+    /// <summary>Id of the highlighted row, or null when no row is highlighted.</summary>
     private int? SelectedTicketId()
     {
-        return (dgvTickets.CurrentRow?.DataBoundItem as TicketRow)?.Id;
+        return dgvTickets.CurrentRow is { Selected: true } row ? (row.DataBoundItem as TicketRow)?.Id : null;
     }
 
     /// <summary>Returns the selected ticket Id, or tells the user to select one and returns null.</summary>

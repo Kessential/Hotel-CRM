@@ -53,7 +53,12 @@ public partial class TicketDetailForm : Form
 
     private void btnLoad_Click(object? sender, EventArgs e)
     {
-        ErrorHandler.Run(() => LoadTicket((int)numTicketId.Value));
+        ErrorHandler.Run(() =>
+        {
+            // Clear first: if the Id does not exist, the form stays empty instead of keeping the previous ticket.
+            ClearTicket();
+            LoadTicket((int)numTicketId.Value);
+        });
     }
 
     private void btnRoomNumber_Click(object? sender, EventArgs e)
@@ -96,21 +101,49 @@ public partial class TicketDetailForm : Form
         ErrorHandler.Run(Close);
     }
 
-    /// <summary>Runs a state change on the shown ticket, then reloads it from the service.</summary>
+    /// <summary>
+    /// Runs a state change on the shown ticket, then reloads it from the service. The reload also runs
+    /// when the change failed, because an observer may fail after the state has already changed.
+    /// </summary>
     /// <returns>True when the change succeeded.</returns>
     private bool RunOnTicket(Action<int> action)
     {
-        return ErrorHandler.Run(() =>
+        if (_ticketId is not int ticketId)
         {
-            if (_ticketId is null)
-            {
-                MessageBox.Show(this, "Load a ticket first.", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
+            ErrorHandler.Run(() =>
+                MessageBox.Show(this, "Load a ticket first.", Text, MessageBoxButtons.OK, MessageBoxIcon.Information));
+            return false;
+        }
 
-            action(_ticketId.Value);
-            LoadTicket(_ticketId.Value);
-        });
+        bool succeeded = ErrorHandler.Run(() => action(ticketId));
+        ErrorHandler.Run(() => LoadTicket(ticketId));
+        return succeeded;
+    }
+
+    /// <summary>Empties the form and disables the action buttons until a ticket is loaded.</summary>
+    private void ClearTicket()
+    {
+        _ticketId = null;
+        _roomId = null;
+
+        Text = "Ticket Details";
+        txtType.Clear();
+        txtState.Clear();
+        txtPriority.Clear();
+        txtAgent.Clear();
+        txtCreated.Clear();
+        txtDue.Clear();
+        txtResolved.Clear();
+        txtClosed.Clear();
+        txtTitle.Clear();
+        txtDescription.Clear();
+        txtResolutionNote.Clear();
+        txtRoom.Clear();
+        lblRoom.Visible = false;
+        txtRoom.Visible = false;
+        btnRoomNumber.Visible = false;
+
+        UpdateActionButtons();
     }
 
     private void LoadTicket(int ticketId)

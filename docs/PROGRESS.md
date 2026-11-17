@@ -8,15 +8,15 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 |---|---|---|---|
 | 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
 | 1 Khung | 17/11 | Xong. Đã push `develop` ngày 16/11; chủ repo xác nhận GĐ 1 đạt ngày 16/11 | `docs/tasks/stage-1-skeleton.md` |
-| 2 Suất A | 20/11 | Code xong cả 7 module trên `feature/a-ticket` (16/11), 11/11 test xanh. Chờ: người dùng kiểm tra bằng tay, `/code-review`, rồi merge vào `develop` | `docs/tasks/stage-2-ticket.md` |
+| 2 Suất A | 20/11 | Code xong cả 7 module (16/11), 11/11 test xanh. `/code-review high` chạy 17/11, sửa 4 lỗi. Theo yêu cầu của chủ repo, đã merge `feature/a-ticket` vào `develop` ngày 17/11 trước khi kiểm tra bằng tay. Chờ: chủ repo kiểm tra bằng tay (Designer + bấm thử) | `docs/tasks/stage-2-ticket.md` |
 | 3 Suất B | 23/11 | Chưa bắt đầu | `docs/tasks/stage-3-customer.md` |
 | 4 Ghép nối | 25/11 | Chưa bắt đầu | `docs/tasks/stage-4-integration.md` |
 | 5 Tài liệu kỹ thuật | 27/11 | Chưa bắt đầu | viết ở cuối GĐ 4 |
 | 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
 
 ## Việc tiếp theo
-1. GĐ 2: chủ repo làm 3 bước "Người dùng kiểm tra bằng tay" của `docs/tasks/stage-2-ticket.md` (mở 3 Form ticket bằng Designer; chạy app, mở 3 Form từ menu Tickets, bấm Search; đăng nhập Agent không thấy Auto Assign/Assign). Sau đó mở phiên Opus chạy `/code-review` trên `feature/a-ticket`, sửa lỗi tìm ra, rồi mới merge vào `develop` (hỏi trước khi merge).
-2. Chủ repo gửi ba file trong `handoff/` cho thành viên B.
+1. GĐ 2: chủ repo làm 3 bước "Người dùng kiểm tra bằng tay" của `docs/tasks/stage-2-ticket.md` trên `develop` (mở 3 Form ticket bằng Designer; chạy app, mở 3 Form từ menu Tickets, bấm Search; đăng nhập Agent không thấy Auto Assign/Assign) và bấm thử 2 chỗ sửa sau review (xem nhật ký 17/11). Lỗi tìm ra thì sửa trên `develop`. Push `develop` khi chủ repo đồng ý.
+2. Thành viên B đã push `origin/feature/b-customer` (xem "Trạng thái Git"). Theo mục "Git" của `docs/PLAN.md`, merge nhánh này vào `develop` khi chủ repo đồng ý; chưa làm.
 3. Mở phiên Sonnet 5.5 cho GĐ 3: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-3-customer.md` rồi làm theo." Nhánh `local/b-work`. Nếu chạy cùng lúc với phiên sửa lỗi của GĐ 2 trên một thư mục thì hai phiên sẽ giẫm nhánh của nhau: dùng worktree riêng cho một trong hai.
 
 ## Cách commit của suất B
@@ -32,17 +32,25 @@ dotnet run tools/HashPassword.cs -- <mật khẩu 1> [<mật khẩu 2> ...]
 Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán vào `src/HotelCRM.WinForms/Data/employees.json`. Mỗi lần chạy sinh salt mới nên chuỗi băm khác nhau dù cùng mật khẩu. GĐ 4 dùng lại lệnh này cho `employees.json` đầy đủ. Mật khẩu của tài khoản mẫu ghi trong mục "Sample accounts" của `README.md` (viết ở Module 4).
 
 ## Trạng thái Git
-- `main`: 1 commit ("first commit"), chỉ có `README.md`.
+- `main`: commit "first commit" (`README.md`), và commit `f533f3a` ("add file", thành viên B, 16/11) thêm `PLAN.md` và `TEAM-BRIEF.md` ở thư mục gốc. Phát hiện khi fetch ngày 17/11; `develop` không chứa commit này.
 - `develop`: đã tạo từ `main` ở GĐ 0, có thêm 1 commit chứa `CLAUDE.md`, `.gitignore`, `.claude/`, `docs/`. Đã push lên `origin/develop` ngày 16/11.
 - `develop`: toàn bộ 11 commit của GĐ 1 đã push lên `origin/develop` ngày 16/11, kèm commit `7a88011` (`LoginForm.resx`).
 - `local/b-work`: tạo ngày 16/11 từ `develop`, chỉ có trên máy chủ repo, không bao giờ push. Gồm 1 commit test của suất B và 1 merge commit đưa Module 6 của `develop` vào.
-- `feature/a-ticket`: tạo ngày 16/11 từ `develop` tại `1707f97` (commit ghi nhận GĐ 1 đạt; commit này mới ở máy, chưa push). Có 7 commit của GĐ 2, chưa push, chưa merge.
+- `feature/a-ticket`: tạo ngày 16/11 từ `develop` tại `1707f97` (commit ghi nhận GĐ 1 đạt; commit này mới ở máy, chưa push). Có 8 commit của GĐ 2 (7 module + 1 commit sửa lỗi sau review), chưa push. Đã merge vào `develop` ngày 17/11 bằng `--no-ff`.
+- `develop` sau merge GĐ 2: chưa push; đi trước `origin/develop` gồm `1707f97`, 8 commit của GĐ 2 và merge commit.
+- `origin/feature/b-customer`: thành viên B push 1 commit `f3992b8` (17/11, "Add the eleven customer subsystem tests and FakeTicketQuery"), dựa trên `origin/develop`. So với commit patch 01 trên `local/b-work` (`9450105`), `src` và `tests` chỉ khác `LoginForm.resx`, `MainForm.resx` (đến từ `origin/develop`), tức 11 test khớp patch 01. Chưa merge vào `develop`.
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
 
 ## Việc đang dở
-- Patch số 01 chưa gửi cho thành viên B (gửi tay, vì `handoff/` nằm trong `.gitignore`). Nằm ở `handoff/01-customer-tests.patch` kèm `.msg.txt` và `handoff/README.txt`; `git apply --check` trên `develop` đạt. Patch kế tiếp mang số 02.
+- Patch số 01 (`handoff/01-customer-tests.patch`) đã tới thành viên B: nội dung đã có trên `origin/feature/b-customer` (17/11). Patch kế tiếp mang số 02.
 - GĐ 1: chủ repo báo "GĐ 1 ok" ngày 16/11 sau khi tự kiểm tra bằng tay; không báo chi tiết từng bước trong 6 bước. `MainForm.resx` và `LoginForm.resx` do Visual Studio tạo cho thấy hai Form này đã mở được bằng Designer.
-- GĐ 2: chưa ai mở 3 Form ticket bằng Designer của Visual Studio và chưa bấm thử trên giao diện thật; chưa chạy `/code-review`.
+- GĐ 2: chưa ai mở 3 Form ticket bằng Designer của Visual Studio và chưa bấm thử trên giao diện thật (đã merge vào `develop` trước bước này theo yêu cầu của chủ repo). `/code-review high` đã chạy 17/11; 4 lỗi đã sửa, 6 điểm để lại chưa sửa:
+  - `AssignTo` kiểm tra agent `null` trước trạng thái, nên ticket Closed hoặc phân công cho Manager đều báo "No agent is available" (`SupportTicket.cs:183`; đúng thứ tự của file task, đổi thì cần duyệt).
+  - Ticket đã Reopen không bao giờ hiện trễ hạn vì `IsOverdue` dùng `ResolvedAt` cũ (`SupportTicket.cs:154`; hệ quả của quy tắc 2).
+  - `ResolvedState.Reopen` lấy `UpdatedAt` khi `ResolvedAt` là `null`, che dữ liệu hỏng (`ResolvedState.cs:37`).
+  - Thông báo Reopen in ngày theo culture của máy (`{deadline:g}`, `ResolvedState.cs:42`).
+  - `AutoAssign` đếm lại ticket cho từng Agent (`TicketService.cs:129`).
+  - Chuỗi `"yyyy-MM-dd HH:mm"` lặp ở `TicketListForm.cs` và `TicketEditForm.cs`.
 - Chưa thử `dotnet publish` single-file (để Module 9 của GĐ 4).
 
 ## Quyết định lệch khỏi plan
@@ -59,6 +67,8 @@ Chốt ở GĐ 1 Module 2 khi viết chữ ký. `docs/PLAN.md` và 5 file `.clau
 | 7 | `Booking.CheckIn`/`CheckOut` vừa là ngày vừa là hàm | Thuộc tính `CheckInDate`, `CheckOutDate`; hàm `CheckIn()`, `CheckOut()`, `Cancel()` | C# không cho thuộc tính và hàm trùng tên |
 | 8 | `Department (Id, Code, Name)`, `RoomType` | Thêm `Department.Agents` và `RoomType.Rooms` (Agent/Room tự đăng ký khi được tạo) | Để quan hệ kết tập `Department ◇— Agent`, `RoomType ◇— Room` có thật trong code |
 | 9 | (chưa nêu) | Kiểu phụ: `TicketSnapshot` (internal, dùng cho `Restore`), `AgentWorkload`, `AgentPerformanceRow`, `DepartmentReportRow` | Gói tham số của `Restore`; kiểu trả về của `ReportService` |
+| 10 | Reopen (quy tắc 2) không nhắc quy tắc 3 | `TicketService.Reopen` gọi `AssignedAgent.EnsureCanTake(...)` trước `ticket.Reopen` | Reopen đưa ticket về InProgress với Agent cũ nên có thể vượt `MaxActiveTickets`. Đặt ở service để không đổi chữ ký `SupportTicket.Reopen` (test dùng bản 2 tham số). Hệ quả: (a) ticket Resolved của Agent đã đủ tải không Reopen được và cũng không phân công lại được (`AssignTo` từ chối Resolved), phải đợi Agent bớt tải; (b) ticket Closed hoặc quá hạn mở lại mà Agent đủ tải sẽ nhận thông báo giới hạn tải thay vì thông báo trạng thái. Sửa (b) cho gọn cần đổi chữ ký và sửa test, chưa làm |
+| 11 | (chưa nêu) | Start/Resolve/Close/Reopen của `TicketService` lưu ticket trong `finally` (hàm `ChangeStateAndSave`) | Observer chạy sau khi trạng thái đổi; nếu observer ném lỗi thì trạng thái mới vẫn nằm trong bộ nhớ và sẽ bị ghi xuống file ở lần lưu kế tiếp. Lưu ngay để file khớp bộ nhớ, lỗi của observer vẫn tới người dùng. Lưu ý cho GĐ 4: Close mà `LoyaltyObserver` ném lỗi thì ticket vẫn Closed và không đóng lại được để thử lại, nên thứ tự observer và việc observer làm lại được an toàn là quan trọng |
 
 Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone`, `Email`, `IdentityNumber`, `Nationality` (bắt buộc) và `Notes` (tùy chọn); `ContactChannel` gồm `FrontDesk`, `Phone`, `Email`, `System`; `TicketFactory.Create(id, customerId, title, description, priority, slaProfile, createdAt, roomId)`.
 
@@ -87,3 +97,5 @@ Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone
 - 16/11/2026 — GĐ 2 Module 3: `TicketService` (đủ 15 hàm) và `TicketQuery`. Đếm ticket đang mở của Agent bằng hàm `private CountActiveTickets(agentId, excludedTicketId)`, không tính chính ticket đang phân công. `AutoAssign` lọc ứng viên bằng `Agent.CanTake`, giữ thứ tự repository, kết quả `null` của strategy vẫn đưa vào `AssignTo` để Domain ném lỗi. `AssignManually`: nhân viên không phải Agent thì truyền `null`. Service không tự `throw`. Đã kiểm tra: build 0 lỗi 0 warning, 11/11 test xanh. Commit `885b1a1`.
 - 16/11/2026 — GĐ 2 Module 4–6: `TicketListForm`, `TicketEditForm`, `TicketDetailForm` (file Designer chỉ có gán thuộc tính và đăng ký sự kiện). Thêm hàm public `TicketDetailForm.ShowTicket(int)`. Các hàm đi sang suất B (`FindCustomers`, `GetActiveRooms`, `GetRoomNumber`) chỉ gọi khi bấm nút Find / Load Rooms / Room Number; lúc mở Form chỉ gọi `GetTicketTypes`, `GetAgents`, `Search`, `GetById`. Form không tự `try/catch`. Commit theo thứ tự 5 (`c1fd0e7`), 6 (`79a8b69`), 4 (`2d54152`) vì `TicketListForm` mở hai Form kia; cả ba commit build sạch. Đã kiểm tra bằng chương trình tạm ngoài repo (47 phép thử, đều đạt; hộp thoại được đóng tự động và ghi lại nội dung): mở 3 Form không lỗi, danh sách rỗng bấm Search không lỗi, tạo complaint (nâng Medium→High, hạn 9 giờ) và maintenance có phòng, từ chối thiếu mô tả/thiếu phòng/thiếu ghi chú, Auto Assign, Assign lại, lọc theo Agent và từ khóa, Agent không thấy nút phân công, Agent khác không Start được, Manager Close, Reopen ticket đã Closed bị từ chối, observer được gọi. Chưa kiểm tra: Designer của Visual Studio, bấm thật trên giao diện.
 - 16/11/2026 — GĐ 2 Module 7: build 0 lỗi 0 warning; `dotnet test` 11/11 xanh; không file cấm nào bị sửa (so với `develop`: không đổi `tests/`, `Data/`, `Program.cs`, `MainForm`, `Domain/Common`, `Domain/Interfaces`). Ghi nhận cho vấn đáp: thông báo "không tìm thấy" có dạng `SupportTicket 99 does not exist.` vì `RepositoryExtensions.GetRequired` (phần chung) dùng tên kiểu; không sửa vì là file cấm.
+- 17/11/2026 — GĐ 2: chạy `/code-review high` trên `develop...feature/a-ticket`, ra 10 điểm. Người dùng cho sửa 4 lỗi chính: (1) observer ném lỗi sau khi đổi trạng thái → `TicketService` lưu ticket trong `finally` (bảng lệch plan dòng 11); (2) Reopen vượt giới hạn tải → `EnsureCanTake` trước Reopen (dòng 10); (3) `TicketListForm`: ticket vừa phân công không còn khớp bộ lọc thì bỏ chọn hết thay vì để lưới tự chọn dòng đầu, `SelectedTicketId` chỉ trả Id khi dòng đang được tô; (4) `TicketDetailForm`: Load xóa form trước khi nạp nên Id sai để lại form trống, nút thao tác bị tắt; `RunOnTicket` nạp lại ticket cả khi thao tác lỗi. Không đổi Domain, chữ ký public, file Designer hay test. Đã kiểm tra: build 0 lỗi 0 warning; 11/11 test xanh (không test nào chạm 4 chỗ sửa); chương trình tạm ngoài repo, 6 phép thử đều đạt (observer ném lỗi khi Close: lỗi vẫn tới người gọi, ticket được lưu ở trạng thái Closed; Close lần nữa bị từ chối; Reopen bị chặn khi Agent đủ 2/2, được phép khi còn 1/2). Chưa kiểm tra (người dùng bấm thử): `TicketListForm` lọc theo Agent A, phân công ticket cho B → không dòng nào được chọn, bấm Assign báo "Select a ticket first."; `TicketDetailForm` Load một Id có thật rồi Load 99 → form trống, các nút bị tắt.
+- 17/11/2026 — Fetch `origin`: `origin/develop` và `origin/main` không có commit mới so với máy (không cần pull); có nhánh mới `origin/feature/b-customer` của thành viên B (xem "Trạng thái Git"). Commit bản sửa sau review trên `feature/a-ticket`, rồi theo yêu cầu của chủ repo merge `feature/a-ticket` vào `develop` (`--no-ff`) trước khi kiểm tra bằng tay. Chưa push.
