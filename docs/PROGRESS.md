@@ -9,21 +9,23 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
 | 1 Khung | 17/11 | Xong. Đã push `develop` ngày 16/11; chủ repo xác nhận GĐ 1 đạt ngày 16/11 | `docs/tasks/stage-1-skeleton.md` |
 | 2 Suất A | 20/11 | Code xong cả 7 module (16/11), 11/11 test xanh. `/code-review high` chạy 17/11, sửa 4 lỗi. Đã merge `feature/a-ticket` vào `develop` ngày 17/11. Chủ repo xác nhận 3 bước kiểm tra bằng tay đạt ngày 17/11. **Xong**, đã push `develop` ngày 17/11 | `docs/tasks/stage-2-ticket.md` |
-| 3 Suất B | 23/11 | Code xong 7 module + 1 lần sửa sau tự rà soát (17/11, trên `local/b-work`, patch 02–09 trong `handoff/`), 9 test suất B xanh. Chờ: chủ repo kiểm tra bằng tay, mở 3 Form bằng Designer, chạy `/code-review` | `docs/tasks/stage-3-customer.md` |
+| 3 Suất B | 23/11 | Code xong 7 module + 1 lần sửa sau tự rà soát (17/11, trên `local/b-work`, patch 02–09 trong `handoff/`), 9 test suất B xanh. Từ 18/11 thành viên B nhận chốt GĐ 3 (áp patch 02–09 rồi tự kiểm tra bằng tay, mở 3 Form bằng Designer, chạy `/code-review`, sửa lỗi trên `feature/b-customer`). Chờ: B push, chủ repo merge vào `develop` | `docs/tasks/stage-3-customer.md` |
 | 3b Chuyển SQLite | 22/11 | Kế hoạch chốt 18/11, chưa có code. Làm sau khi chốt GĐ 3, xong trước GĐ 4 | `docs/tasks/stage-3b-sqlite.md` |
 | 4 Ghép nối | 25/11 | Chưa bắt đầu | `docs/tasks/stage-4-integration.md` |
 | 5 Tài liệu kỹ thuật | 27/11 | Chưa bắt đầu | viết ở cuối GĐ 4 |
 | 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
 
 ## Việc tiếp theo
-1. Trong worktree `.claude/worktrees/b-work`: merge `develop` mới (có GĐ 2 và nhánh của B) vào `local/b-work`. Chưa làm; GĐ 3 không sửa `docs/PROGRESS.md` trên `local/b-work` nên file này không xung đột.
-2. Chốt GĐ 3 trên JSON: chủ repo làm 6 bước kiểm tra bằng tay của `stage-3-customer.md` và mở 3 Form bằng Designer (trong worktree); mở phiên Opus chạy `/code-review` cho phần GĐ 3 trên `local/b-work`; lỗi sửa xong thì xuất patch kế tiếp (số 10).
-3. Publish thử bản JSON hiện tại trên `develop` (lệnh trong `CLAUDE.md`), chép sang thư mục khác và chạy, để có mốc so sánh cho Mốc 1 của GĐ 3b.
-4. Gửi patch 02–09 cho thành viên B.
+1. Gửi cho thành viên B: `handoff/02`→`09` (`.patch` + `.msg.txt`), `handoff/README.txt`, kèm `handoff/export-patch-SKILL.draft.md` nếu B muốn. Push `develop` để B thấy bản cập nhật của file này.
+2. Chủ repo không làm tiếp GĐ 3 trên `local/b-work`: không kiểm tra bằng tay, không mở Designer, không `/code-review`, không xuất patch 10. Bỏ các file `.resx` chưa track (2 file `Forms/Customers/*.resx` ở thư mục chính, 4 file trong worktree `b-work`): B sẽ commit `.resx` của mình, file chưa track trùng tên sẽ chặn merge.
+3. Khi B push xong GĐ 3: merge `origin/feature/b-customer` vào `develop` (`--no-ff`); build 0 lỗi 0 warning; `dotnet test` 22 test, 20 xanh, 2 đỏ (`SurveyServiceTests`); đánh dấu GĐ 3 xong; push `develop`.
+4. Publish thử bản JSON hiện tại trên `develop` (lệnh trong `CLAUDE.md`), chép sang thư mục khác và chạy, để có mốc so sánh cho Mốc 1 của GĐ 3b.
 5. Mở phiên Sonnet 5.5 cho GĐ 3b: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-3b-sqlite.md` rồi làm Module A1." Thư mục chính, nhánh `feature/sql-storage` tạo từ `develop`.
 
 ## Cách commit của suất B
-**Nhận patch** (mặc định). Thành viên B chưa xác nhận chính thức; thực tế B đã áp patch 01 và push (17/11). GĐ 3b: chủ repo chốt ngày 18/11 rằng phần của B (Module B1, B2) cũng đi qua patch. Nếu B chọn tự code, sửa dòng này thành "Tự code".
+**GĐ 3: Tự code** (từ 18/11). Code GĐ 3 do chủ repo viết trên `local/b-work` (patch 02–09); B áp các patch này lên `feature/b-customer`, rồi tự làm phần chốt còn lại và tự sửa lỗi trên nhánh đó, không qua patch. Chủ repo không sửa GĐ 3 trên `local/b-work` nữa.
+
+**GĐ 3b: Nhận patch** (chủ repo chốt 18/11, chưa đổi): Module B1, B2 làm trên `local/b-work` và xuất patch. Vì lỗi sửa ở GĐ 3 nằm trên nhánh của B, trước B1 phải merge `develop` (đã có GĐ 3 của B) vào `local/b-work`.
 
 ## Tiện ích băm mật khẩu
 `tools/HashPassword.cs` là file-based app của .NET 10, không nằm trong solution, gọi thẳng `PasswordHasher` của project `Business`. Chạy từ thư mục gốc repo:
@@ -43,12 +45,12 @@ Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán v�
 - `develop` sau merge GĐ 2 và nhánh của B: đã push lên `origin/develop` ngày 17/11 (`7a88011..870424b`), kèm commit cập nhật file này ngay sau đó.
 - `origin/feature/b-customer`: thành viên B push 1 commit `f3992b8` (17/11, "Add the eleven customer subsystem tests and FakeTicketQuery"), dựa trên `origin/develop`. So với commit patch 01 trên `local/b-work` (`9450105`), `src` và `tests` chỉ khác `LoginForm.resx`, `MainForm.resx` (đến từ `origin/develop`), tức 11 test khớp patch 01. Đã merge vào `develop` ngày 17/11 bằng `--no-ff`. Từ đây `dotnet test` trên `develop` chạy 22 test: 13 xanh, 9 đỏ (test suất B, `NotImplementedException`, xanh dần ở GĐ 3–4).
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
-- `local/b-work`: thêm 8 commit GĐ 3 (`f349f5c` … `584ab86`), làm trong worktree `.claude/worktrees/b-work` (thư mục nằm trong `.gitignore`). Chưa merge `develop` mới (`870424b` trở đi). Không push.
+- `local/b-work`: thêm 8 commit GĐ 3 (`f349f5c` … `584ab86`), làm trong worktree `.claude/worktrees/b-work` (thư mục nằm trong `.gitignore`). Ngày 18/11 merge `develop` (`93c3b3a`, có GĐ 2 và kế hoạch GĐ 3b) vào, merge commit `d837bb1`, không xung đột. Không push.
 
 ## Việc đang dở
-- Patch số 01 (`handoff/01-customer-tests.patch`) đã tới thành viên B: nội dung đã có trên `origin/feature/b-customer` (17/11). Patch 02–09 (GĐ 3) chưa gửi. Đã kiểm tra: áp lần lượt 01→09 lên `origin/develop` (`7a88011`) đều sạch; sau khi áp build 0 lỗi 0 warning, `dotnet test` 22 test: 9 xanh, 13 đỏ (11 `Tickets/` + 2 `SurveyServiceTests`, đều `NotImplementedException`). Patch kế tiếp mang số 10.
+- Patch số 01 (`handoff/01-customer-tests.patch`) đã tới thành viên B: nội dung đã có trên `origin/feature/b-customer` (17/11). Patch 02–09 (GĐ 3) chưa gửi. Đã kiểm tra: áp lần lượt 01→09 lên `origin/develop` (`7a88011`) đều sạch; sau khi áp build 0 lỗi 0 warning, `dotnet test` 22 test: 9 xanh, 13 đỏ (11 `Tickets/` + 2 `SurveyServiceTests`, đều `NotImplementedException`). Ngày 18/11 áp lại 02→09 lên `origin/develop` mới (`93c3b3a`, đã có patch 01 và GĐ 2): cả 8 patch sạch, kết quả `src`/`tests` trùng với `local/b-work` (24 file, +1467/−62). GĐ 3 không còn patch 10 (B tự sửa); patch kế tiếp của GĐ 3b mang số 10.
 - Bản nháp skill xuất patch nằm ở `handoff/export-patch-SKILL.draft.md`; chưa chép thành `.claude/skills/export-patch/SKILL.md`. `handoff/stage3-notes.md` đã chép vào file này ngày 18/11, chưa xóa.
-- GĐ 3 chưa kiểm tra bằng tay (6 bước trong file task) và chưa mở Form bằng Designer.
+- GĐ 3 chưa kiểm tra bằng tay (6 bước trong file task), chưa mở Form bằng Designer, chưa `/code-review`. Ba việc này giao cho thành viên B từ 18/11.
 - `CustomerListForm.btnHistory` mở `CustomerHistoryForm` trống. GĐ 4 thêm hàm public nhận Id khách cho Form đó (ví dụ `ShowCustomer(int customerId)`) thì phải sửa thêm một dòng trong `btnHistory_Click` để gọi hàm này trước `ShowDialog`.
 - GĐ 3b chưa bắt đầu. `CLAUDE.md` và `.claude/rules/data.md` vẫn cấm thêm gói NuGet và sửa phần chung; chỉ gỡ ở bước đầu của Module A1, theo mục "Phê duyệt đã có" của `docs/tasks/stage-3b-sqlite.md`.
 - GĐ 1: chủ repo báo "GĐ 1 ok" ngày 16/11 sau khi tự kiểm tra bằng tay; không báo chi tiết từng bước trong 6 bước. `MainForm.resx` và `LoginForm.resx` do Visual Studio tạo cho thấy hai Form này đã mở được bằng Designer.
@@ -97,9 +99,9 @@ Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone
 | Thành viên B chọn cách commit: nhận patch hay tự code | 17/11 | |
 | Mẫu báo cáo LaTeX | 26/11 | |
 | Máy có Java (xuất ảnh PlantUML) và bản TeX không | 26/11 | |
-| Chủ repo kiểm tra bằng tay GĐ 3 (6 bước), mở 3 Form bằng Designer, chạy `/code-review` | 18/11 (trước Module A1) | |
+| Thành viên B kiểm tra bằng tay GĐ 3 (6 bước), mở 3 Form bằng Designer, chạy `/code-review`, sửa lỗi | 18/11 (trước Module A1) | |
 | Publish thử bản JSON làm mốc cho GĐ 3b | 18/11 (trước Module A1) | |
-| Thành viên B áp patch 02–09 và push | 20/11 | |
+| Thành viên B áp patch 02–09, chốt GĐ 3 và push `feature/b-customer` | 18/11 | |
 | Chủ repo đồng ý push `develop` sau Module A2 (B cần A1, A2 trước patch của B1) | 20/11 | |
 | Thành viên B merge `origin/develop`, áp patch B1, B2 của GĐ 3b, push | 22/11 (chậm nhất hết 23/11) | |
 
@@ -135,4 +137,6 @@ Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone
 
   Đã kiểm tra: build 0 lỗi 0 warning; 9 test suất B xanh, 13 đỏ đúng dự kiến; chuỗi patch 01→09 áp sạch lên `origin/develop`. Một script tạm ngoài repo (60 phép thử, đều đạt) chạy service thật trên bản sao `Data/`: trùng SĐT/email (cả khi sửa), sai định dạng, khách không hợp lệ không được lưu, đặt chồng/nối tiếp ngày, ngày đảo ngược trong phòng đã có booking, hủy sai trạng thái, check-in/out cộng điểm và ghi lịch sử, lên thẳng Gold, xóa khách còn ticket, nạp lại JSON giữ nguyên dữ liệu, ba strategy, và ba Form tạo được, nạp lưới, tìm phòng, tìm khách. Chưa kiểm tra: bấm thật trên giao diện, mở Form bằng Designer (chỉ người làm được), `/code-review`.
 - 18/11/2026 — Chép `handoff/stage3-notes.md` (do phiên GĐ 3 viết, chờ `feature/a-ticket` merge) vào file này: đánh lại số các dòng lệch plan 10–13 của ghi chú thành 12–15 vì `develop` đã có dòng 10–11; giữ dòng "patch 01 đã tới B" vì ghi chú viết rằng patch 01 chưa gửi. Chưa xóa ghi chú, chưa chép skill `export-patch`.
-- 17–18/11/2026 — Chốt kế hoạch chuyển lưu trữ JSON → SQLite qua ba vòng hỏi đáp với chủ repo; viết `docs/tasks/stage-3b-sqlite.md` (GĐ 3b, 5 module A1, A2, B1, B2, A3; Mốc 1 ngày 20/11, Mốc 2 ngày 22/11; phương án quay về JSON). Thêm dòng 16–20 vào bảng lệch plan. Chưa sửa code, `CLAUDE.md`, `docs/PLAN.md`, `.claude/rules/` (để Module A1). Chưa commit.
+- 17–18/11/2026 — Chốt kế hoạch chuyển lưu trữ JSON → SQLite qua ba vòng hỏi đáp với chủ repo; viết `docs/tasks/stage-3b-sqlite.md` (GĐ 3b, 5 module A1, A2, B1, B2, A3; Mốc 1 ngày 20/11, Mốc 2 ngày 22/11; phương án quay về JSON). Thêm dòng 16–20 vào bảng lệch plan. Chưa sửa code, `CLAUDE.md`, `docs/PLAN.md`, `.claude/rules/` (để Module A1). Commit `93c3b3a` trên `develop`, chưa push.
+- 18/11/2026 — Merge `develop` (`93c3b3a`) vào `local/b-work` trong worktree theo yêu cầu của chủ repo: merge commit `d837bb1`, không xung đột. 8 file test và `FakeTicketQuery` có ở cả hai nhánh với nội dung giống hệt nên không đổi; không file nào của suất B bị đụng. Patch 02–09 không đổi (merge commit không xuất patch). Đã kiểm tra trên `local/b-work`: build 0 lỗi 0 warning; `dotnet test` 22 test, 20 xanh, 2 đỏ (`SurveyServiceTests`, `NotImplementedException`, để GĐ 4). Chưa kiểm tra bằng tay app đã ghép hai phân hệ.
+- 18/11/2026 — Thành viên B nhận chốt GĐ 3 (tự code trên `feature/b-customer`, xem "Cách commit của suất B"). Thử áp patch 02→09 lên `origin/develop` (`93c3b3a`) trong worktree tạm: sạch, kết quả trùng `local/b-work`; worktree tạm đã xóa. Sửa "Việc tiếp theo", "Chờ người dùng" theo việc giao mới. Chưa gửi patch, chưa xóa các `.resx` chưa track.
