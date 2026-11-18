@@ -11,6 +11,15 @@ public sealed class LeastLoadedStrategy : IAssignmentStrategy
     /// <inheritdoc />
     public Agent? Pick(string departmentCode, IReadOnlyList<AgentWorkload> candidates)
     {
-        throw new NotImplementedException();
+        AgentWorkload? best = null;
+        foreach (AgentWorkload candidate in candidates)
+        {
+            if (best is null || candidate.ActiveCount < best.ActiveCount)
+            {
+                best = candidate;
+            }
+        }
+
+        return best?.Agent;
     }
 }
