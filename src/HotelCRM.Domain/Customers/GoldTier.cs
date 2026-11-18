@@ -10,17 +10,17 @@ public sealed class GoldTier : MembershipTier
     public override string Name => TierName;
 
     /// <summary>0.75.</summary>
-    public override double SlaFactor => throw new NotImplementedException();
+    public override double SlaFactor => 0.75;
 
     /// <summary>1.</summary>
-    public override int PriorityBoost => throw new NotImplementedException();
+    public override int PriorityBoost => 1;
 
     /// <summary>5000.</summary>
-    public override int MinPoints => throw new NotImplementedException();
+    public override int MinPoints => 5000;
 
     /// <summary>Returns <see cref="VipTier"/>.</summary>
     public override MembershipTier? Next()
     {
-        throw new NotImplementedException();
+        return new VipTier();
     }
 }

@@ -33,6 +33,13 @@ public sealed class InteractionHistory
     /// <exception cref="ValidationException">The summary is empty.</exception>
     internal Interaction Add(ContactChannel channel, string summary, DateTime occurredAt, int? ticketId)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(summary))
+        {
+            throw new ValidationException("Interaction summary is required.");
+        }
+
+        Interaction interaction = new(channel, summary.Trim(), occurredAt, ticketId);
+        _items.Add(interaction);
+        return interaction;
     }
 }
