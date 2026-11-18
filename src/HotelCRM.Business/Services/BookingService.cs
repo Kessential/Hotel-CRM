@@ -32,7 +32,12 @@ public sealed class BookingService
     /// <exception cref="BusinessRuleException">Customer or room does not exist, or the room is already booked for part of the dates.</exception>
     public Booking Book(int customerId, int roomId, DateTime checkInDate, DateTime checkOutDate)
     {
-        throw new NotImplementedException();
+        Customer customer = _customers.GetRequired(customerId);
+        Room room = _rooms.GetRequired(roomId);
+        room.EnsureAvailable(checkInDate, checkOutDate, _bookings.GetAll());
+        Booking booking = new(_bookings.NextId(), customer, room, checkInDate, checkOutDate);
+        _bookings.Save(booking);
+        return booking;
     }
 
     /// <summary>
@@ -44,7 +49,12 @@ public sealed class BookingService
     /// <exception cref="BusinessRuleException">The booking does not exist or is not Reserved.</exception>
     public void CheckIn(int bookingId, DateTime now)
     {
-        throw new NotImplementedException();
+        Booking booking = _bookings.GetRequired(bookingId);
+        booking.CheckIn();
+        booking.Customer.LogInteraction(
+            ContactChannel.FrontDesk, $"Checked in to room {booking.Room.Number}.", now, null);
+        _bookings.Save(booking);
+        _customers.Save(booking.Customer);
     }
 
     /// <summary>
@@ -56,20 +66,39 @@ public sealed class BookingService
     /// <exception cref="BusinessRuleException">The booking does not exist or is not CheckedIn.</exception>
     public void CheckOut(int bookingId, DateTime now)
     {
-        throw new NotImplementedException();
+        Booking booking = _bookings.GetRequired(bookingId);
+        booking.CheckOut();
+        int points = booking.PointsEarned;
+        if (points > 0)
+        {
+            booking.Customer.AddPoints(points);
+        }
+
+        booking.Customer.LogInteraction(
+            ContactChannel.FrontDesk,
+            $"Checked out of room {booking.Room.Number}; earned {points} loyalty points.",
+            now,
+            null);
+        _bookings.Save(booking);
+        _customers.Save(booking.Customer);
     }
 
     /// <summary>UC7: cancels a reservation. Steps: <see cref="Booking.Cancel"/> (rule 7); save.</summary>
     /// <exception cref="BusinessRuleException">The booking does not exist or is not Reserved.</exception>
     public void Cancel(int bookingId)
     {
-        throw new NotImplementedException();
+        Booking booking = _bookings.GetRequired(bookingId);
+        booking.Cancel();
+        _bookings.Save(booking);
     }
 
     /// <summary>Returns every booking, newest check-in date first.</summary>
     public IReadOnlyList<Booking> GetAll()
     {
-        throw new NotImplementedException();
+        return _bookings.GetAll()
+            .OrderByDescending(b => b.CheckInDate)
+            .ThenByDescending(b => b.Id)
+            .ToList();
     }
 
     /// <summary>
@@ -78,6 +107,15 @@ public sealed class BookingService
     /// </summary>
     public IReadOnlyList<Room> GetAvailableRooms(DateTime checkInDate, DateTime checkOutDate)
     {
-        throw new NotImplementedException();
+        if (checkOutDate.Date <= checkInDate.Date)
+        {
+            return Array.Empty<Room>();
+        }
+
+        IReadOnlyList<Booking> bookings = _bookings.GetAll();
+        return _rooms.GetAll()
+            .Where(r => r.IsAvailable(checkInDate, checkOutDate, bookings))
+            .OrderBy(r => r.Number, StringComparer.Ordinal)
+            .ToList();
     }
 }

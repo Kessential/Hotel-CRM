@@ -24,18 +24,30 @@ public sealed class StayLookup : IStayLookup
     /// <inheritdoc />
     public bool IsRoomInActiveStay(int customerId, int roomId)
     {
-        throw new NotImplementedException();
+        return ActiveStays(customerId).Any(b => b.Room.Id == roomId);
     }
 
     /// <inheritdoc />
     public IReadOnlyDictionary<int, string> GetActiveRooms(int customerId)
     {
-        throw new NotImplementedException();
+        Dictionary<int, string> rooms = new();
+        foreach (Booking booking in ActiveStays(customerId))
+        {
+            rooms[booking.Room.Id] = booking.Room.Number;
+        }
+
+        return rooms;
     }
 
     /// <inheritdoc />
     public string GetRoomNumber(int roomId)
     {
-        throw new NotImplementedException();
+        return _rooms.GetById(roomId)?.Number ?? string.Empty;
+    }
+
+    private IEnumerable<Booking> ActiveStays(int customerId)
+    {
+        return _bookings.GetAll()
+            .Where(b => b.Customer.Id == customerId && b.Status == BookingStatus.CheckedIn);
     }
 }
