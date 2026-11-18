@@ -9,17 +9,21 @@ Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết t
 | 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
 | 1 Khung | 17/11 | Xong. Đã push `develop` ngày 16/11; chủ repo xác nhận GĐ 1 đạt ngày 16/11 | `docs/tasks/stage-1-skeleton.md` |
 | 2 Suất A | 20/11 | Code xong cả 7 module (16/11), 11/11 test xanh. `/code-review high` chạy 17/11, sửa 4 lỗi. Đã merge `feature/a-ticket` vào `develop` ngày 17/11. Chủ repo xác nhận 3 bước kiểm tra bằng tay đạt ngày 17/11. **Xong**, đã push `develop` ngày 17/11 | `docs/tasks/stage-2-ticket.md` |
-| 3 Suất B | 23/11 | Chưa bắt đầu | `docs/tasks/stage-3-customer.md` |
+| 3 Suất B | 23/11 | Code xong 7 module + 1 lần sửa sau tự rà soát (17/11, trên `local/b-work`, patch 02–09 trong `handoff/`), 9 test suất B xanh. Chờ: chủ repo kiểm tra bằng tay, mở 3 Form bằng Designer, chạy `/code-review` | `docs/tasks/stage-3-customer.md` |
+| 3b Chuyển SQLite | 22/11 | Kế hoạch chốt 18/11, chưa có code. Làm sau khi chốt GĐ 3, xong trước GĐ 4 | `docs/tasks/stage-3b-sqlite.md` |
 | 4 Ghép nối | 25/11 | Chưa bắt đầu | `docs/tasks/stage-4-integration.md` |
 | 5 Tài liệu kỹ thuật | 27/11 | Chưa bắt đầu | viết ở cuối GĐ 4 |
 | 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
 
 ## Việc tiếp theo
-1. Phiên GĐ 3 trên `local/b-work`: merge `develop` mới (có GĐ 2 và nhánh của B) vào `local/b-work`; `docs/PROGRESS.md` có thể xung đột vì cả hai nhánh cùng sửa.
-3. Mở phiên Sonnet 5.5 cho GĐ 3: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-3-customer.md` rồi làm theo." Nhánh `local/b-work`. Nếu chạy cùng lúc với phiên sửa lỗi của GĐ 2 trên một thư mục thì hai phiên sẽ giẫm nhánh của nhau: dùng worktree riêng cho một trong hai.
+1. Trong worktree `.claude/worktrees/b-work`: merge `develop` mới (có GĐ 2 và nhánh của B) vào `local/b-work`. Chưa làm; GĐ 3 không sửa `docs/PROGRESS.md` trên `local/b-work` nên file này không xung đột.
+2. Chốt GĐ 3 trên JSON: chủ repo làm 6 bước kiểm tra bằng tay của `stage-3-customer.md` và mở 3 Form bằng Designer (trong worktree); mở phiên Opus chạy `/code-review` cho phần GĐ 3 trên `local/b-work`; lỗi sửa xong thì xuất patch kế tiếp (số 10).
+3. Publish thử bản JSON hiện tại trên `develop` (lệnh trong `CLAUDE.md`), chép sang thư mục khác và chạy, để có mốc so sánh cho Mốc 1 của GĐ 3b.
+4. Gửi patch 02–09 cho thành viên B.
+5. Mở phiên Sonnet 5.5 cho GĐ 3b: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-3b-sqlite.md` rồi làm Module A1." Thư mục chính, nhánh `feature/sql-storage` tạo từ `develop`.
 
 ## Cách commit của suất B
-**Nhận patch** (mặc định). Thành viên B chưa xác nhận; hạn 17/11. Nếu họ chọn tự code, sửa dòng này thành "Tự code".
+**Nhận patch** (mặc định). Thành viên B chưa xác nhận chính thức; thực tế B đã áp patch 01 và push (17/11). GĐ 3b: chủ repo chốt ngày 18/11 rằng phần của B (Module B1, B2) cũng đi qua patch. Nếu B chọn tự code, sửa dòng này thành "Tự code".
 
 ## Tiện ích băm mật khẩu
 `tools/HashPassword.cs` là file-based app của .NET 10, không nằm trong solution, gọi thẳng `PasswordHasher` của project `Business`. Chạy từ thư mục gốc repo:
@@ -39,9 +43,14 @@ Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán v�
 - `develop` sau merge GĐ 2 và nhánh của B: đã push lên `origin/develop` ngày 17/11 (`7a88011..870424b`), kèm commit cập nhật file này ngay sau đó.
 - `origin/feature/b-customer`: thành viên B push 1 commit `f3992b8` (17/11, "Add the eleven customer subsystem tests and FakeTicketQuery"), dựa trên `origin/develop`. So với commit patch 01 trên `local/b-work` (`9450105`), `src` và `tests` chỉ khác `LoginForm.resx`, `MainForm.resx` (đến từ `origin/develop`), tức 11 test khớp patch 01. Đã merge vào `develop` ngày 17/11 bằng `--no-ff`. Từ đây `dotnet test` trên `develop` chạy 22 test: 13 xanh, 9 đỏ (test suất B, `NotImplementedException`, xanh dần ở GĐ 3–4).
 - `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
+- `local/b-work`: thêm 8 commit GĐ 3 (`f349f5c` … `584ab86`), làm trong worktree `.claude/worktrees/b-work` (thư mục nằm trong `.gitignore`). Chưa merge `develop` mới (`870424b` trở đi). Không push.
 
 ## Việc đang dở
-- Patch số 01 (`handoff/01-customer-tests.patch`) đã tới thành viên B: nội dung đã có trên `origin/feature/b-customer` (17/11). Patch kế tiếp mang số 02.
+- Patch số 01 (`handoff/01-customer-tests.patch`) đã tới thành viên B: nội dung đã có trên `origin/feature/b-customer` (17/11). Patch 02–09 (GĐ 3) chưa gửi. Đã kiểm tra: áp lần lượt 01→09 lên `origin/develop` (`7a88011`) đều sạch; sau khi áp build 0 lỗi 0 warning, `dotnet test` 22 test: 9 xanh, 13 đỏ (11 `Tickets/` + 2 `SurveyServiceTests`, đều `NotImplementedException`). Patch kế tiếp mang số 10.
+- Bản nháp skill xuất patch nằm ở `handoff/export-patch-SKILL.draft.md`; chưa chép thành `.claude/skills/export-patch/SKILL.md`. `handoff/stage3-notes.md` đã chép vào file này ngày 18/11, chưa xóa.
+- GĐ 3 chưa kiểm tra bằng tay (6 bước trong file task) và chưa mở Form bằng Designer.
+- `CustomerListForm.btnHistory` mở `CustomerHistoryForm` trống. GĐ 4 thêm hàm public nhận Id khách cho Form đó (ví dụ `ShowCustomer(int customerId)`) thì phải sửa thêm một dòng trong `btnHistory_Click` để gọi hàm này trước `ShowDialog`.
+- GĐ 3b chưa bắt đầu. `CLAUDE.md` và `.claude/rules/data.md` vẫn cấm thêm gói NuGet và sửa phần chung; chỉ gỡ ở bước đầu của Module A1, theo mục "Phê duyệt đã có" của `docs/tasks/stage-3b-sqlite.md`.
 - GĐ 1: chủ repo báo "GĐ 1 ok" ngày 16/11 sau khi tự kiểm tra bằng tay; không báo chi tiết từng bước trong 6 bước. `MainForm.resx` và `LoginForm.resx` do Visual Studio tạo cho thấy hai Form này đã mở được bằng Designer.
 - GĐ 2: `/code-review high` đã chạy 17/11; 4 lỗi đã sửa, 6 điểm để lại chưa sửa:
   - `AssignTo` kiểm tra agent `null` trước trạng thái, nên ticket Closed hoặc phân công cho Manager đều báo "No agent is available" (`SupportTicket.cs:183`; đúng thứ tự của file task, đổi thì cần duyệt).
@@ -50,7 +59,7 @@ Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán v�
   - Thông báo Reopen in ngày theo culture của máy (`{deadline:g}`, `ResolvedState.cs:42`).
   - `AutoAssign` đếm lại ticket cho từng Agent (`TicketService.cs:129`).
   - Chuỗi `"yyyy-MM-dd HH:mm"` lặp ở `TicketListForm.cs` và `TicketEditForm.cs`.
-- Chưa thử `dotnet publish` single-file (để Module 9 của GĐ 4).
+- Chưa thử `dotnet publish` single-file. Kế hoạch mới: publish thử bản JSON trước Module A1 của GĐ 3b (việc tiếp theo số 3), rồi thử lại với SQLite ở Mốc 1.
 
 ## Quyết định lệch khỏi plan
 Chốt ở GĐ 1 Module 2 khi viết chữ ký. `docs/PLAN.md` và 5 file `.claude/rules/` đã được sửa cho khớp ở Module 6 (16/11).
@@ -68,6 +77,15 @@ Chốt ở GĐ 1 Module 2 khi viết chữ ký. `docs/PLAN.md` và 5 file `.clau
 | 9 | (chưa nêu) | Kiểu phụ: `TicketSnapshot` (internal, dùng cho `Restore`), `AgentWorkload`, `AgentPerformanceRow`, `DepartmentReportRow` | Gói tham số của `Restore`; kiểu trả về của `ReportService` |
 | 10 | Reopen (quy tắc 2) không nhắc quy tắc 3 | `TicketService.Reopen` gọi `AssignedAgent.EnsureCanTake(...)` trước `ticket.Reopen` | Reopen đưa ticket về InProgress với Agent cũ nên có thể vượt `MaxActiveTickets`. Đặt ở service để không đổi chữ ký `SupportTicket.Reopen` (test dùng bản 2 tham số). Hệ quả: (a) ticket Resolved của Agent đã đủ tải không Reopen được và cũng không phân công lại được (`AssignTo` từ chối Resolved), phải đợi Agent bớt tải; (b) ticket Closed hoặc quá hạn mở lại mà Agent đủ tải sẽ nhận thông báo giới hạn tải thay vì thông báo trạng thái. Sửa (b) cho gọn cần đổi chữ ký và sửa test, chưa làm |
 | 11 | (chưa nêu) | Start/Resolve/Close/Reopen của `TicketService` lưu ticket trong `finally` (hàm `ChangeStateAndSave`) | Observer chạy sau khi trạng thái đổi; nếu observer ném lỗi thì trạng thái mới vẫn nằm trong bộ nhớ và sẽ bị ghi xuống file ở lần lưu kế tiếp. Lưu ngay để file khớp bộ nhớ, lỗi của observer vẫn tới người dùng. Lưu ý cho GĐ 4: Close mà `LoyaltyObserver` ném lỗi thì ticket vẫn Closed và không đóng lại được để thử lại, nên thứ tự observer và việc observer làm lại được an toàn là quan trọng |
+| 12 | File task GĐ 3: mỗi lớp một commit, 13 patch (02–14) | Mỗi module một commit, 7 patch (02–08), cộng 1 patch sửa lỗi rà soát (09) | Chủ repo yêu cầu ngày 17/11 |
+| 13 | File task GĐ 3 Module 8: "11 test xanh (2 có sẵn + 9 mới)" | 9 test xanh | 2 test định dạng có sẵn nằm trong 4 test `CustomerTests`, đã tính trong 9; 9 + 13 đỏ = 22 |
+| 14 | (chưa nêu) | `Room.IsAvailable` coi khoảng ngày có ngày trả ≤ ngày nhận là không chồng lên gì | Service chạy `EnsureAvailable` trước khi tạo `Booking`; nếu không thì ngày đảo ngược nằm trong một booking có sẵn bị báo "đã đặt" thay vì lỗi ngày |
+| 15 | (chưa nêu) | Cột lưới đặt tên `colXxx` | Danh sách tiền tố trong `.claude/rules/winforms.md` không có tiền tố cho cột `DataGridView` |
+| 16 | Lưu JSON (`JsonRepository`, 8 file `Data/*.json`) | **Đã chốt 18/11, chưa cài.** Lưu SQLite qua `Microsoft.Data.Sqlite`, `SqliteRepository`; 8 file seed `Data/*.sql`; `hotel.db` tự tạo; bỏ JSON ở Module A3 | Chủ repo quyết định 17–18/11 (yêu cầu/điểm của môn học, để học). Chi tiết ở `docs/tasks/stage-3b-sqlite.md` |
+| 17 | Phần chung không sửa sau GĐ 1; không thêm gói NuGet ngoài bộ xUnit | **Đã chốt, chưa cài.** GĐ 3b sửa `Data/`, `Program.cs`, `AppConfig`, file `.csproj`, `tools/HashPassword.cs`; thêm gói `Microsoft.Data.Sqlite` | Chủ repo đồng ý 18/11; phạm vi ghi ở mục "Phê duyệt đã có" của file task |
+| 18 | `Program.cs` là phần chung | **Đã chốt, chưa cài.** Mỗi suất sửa dòng repository của mình (A: `departments`, `employees`, `tickets`; B: `roomTypes`, `rooms`, `customers`, `bookings`, `surveys`) | Chia việc chuyển SQLite theo phân hệ |
+| 19 | 22 test | **Đã chốt, chưa cài.** 26 test: thêm 4 test ghi rồi nạp lại bảng (A 2, B 2) | Kiểm tra kho lưu mới |
+| 20 | GĐ 4 sinh 7 file JSON; `HashPassword` in cặp cho `employees.json` | **Đã chốt, chưa cài.** GĐ 4 sinh file `.sql`; `HashPassword` in thêm dạng SQL cho `02-employees.sql` | Hệ quả của dòng 16 |
 
 Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone`, `Email`, `IdentityNumber`, `Nationality` (bắt buộc) và `Notes` (tùy chọn); `ContactChannel` gồm `FrontDesk`, `Phone`, `Email`, `System`; `TicketFactory.Create(id, customerId, title, description, priority, slaProfile, createdAt, roomId)`.
 
@@ -79,6 +97,11 @@ Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone
 | Thành viên B chọn cách commit: nhận patch hay tự code | 17/11 | |
 | Mẫu báo cáo LaTeX | 26/11 | |
 | Máy có Java (xuất ảnh PlantUML) và bản TeX không | 26/11 | |
+| Chủ repo kiểm tra bằng tay GĐ 3 (6 bước), mở 3 Form bằng Designer, chạy `/code-review` | 18/11 (trước Module A1) | |
+| Publish thử bản JSON làm mốc cho GĐ 3b | 18/11 (trước Module A1) | |
+| Thành viên B áp patch 02–09 và push | 20/11 | |
+| Chủ repo đồng ý push `develop` sau Module A2 (B cần A1, A2 trước patch của B1) | 20/11 | |
+| Thành viên B merge `origin/develop`, áp patch B1, B2 của GĐ 3b, push | 22/11 (chậm nhất hết 23/11) | |
 
 ## Nhật ký
 - 15/11/2026 — GĐ 0: tạo `CLAUDE.md`, `.gitignore`, `.claude/settings.json`, 5 file `.claude/rules/`, file này và `docs/tasks/stage-1-skeleton.md`. Các file rules viết khi chưa có code, phải rà lại ở cuối GĐ 1.
@@ -100,3 +123,16 @@ Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone
 - 17/11/2026 — Fetch `origin`: `origin/develop` và `origin/main` không có commit mới so với máy (không cần pull); có nhánh mới `origin/feature/b-customer` của thành viên B (xem "Trạng thái Git"). Commit bản sửa sau review trên `feature/a-ticket`, rồi theo yêu cầu của chủ repo merge `feature/a-ticket` vào `develop` (`--no-ff`) trước khi kiểm tra bằng tay. Chưa push.
 - 17/11/2026 — Chủ repo xác nhận đủ 3 bước kiểm tra bằng tay của GĐ 2 (3 Form mở được bằng Designer; chạy app mở 3 Form và Search không lỗi; Agent không thấy Auto Assign/Assign). GĐ 2 đạt. Commit 3 file `.resx` do Visual Studio tạo cho 3 Form ticket lên `develop`. Đối chiếu `origin/feature/b-customer` với yêu cầu của GĐ 1 (đủ 11 test + `FakeTicketQuery`, giống hệt patch 01) rồi merge vào `develop` (`--no-ff`).
 - 17/11/2026 — Push `develop` lên `origin` (`7a88011..870424b`) theo yêu cầu của chủ repo. Không push `feature/a-ticket` hay `local/b-work`.
+- 17/11/2026 — GĐ 3 Module 1–7 trên `local/b-work` (worktree `.claude/worktrees/b-work`), mỗi module một commit và một patch:
+  - 02 `membership-and-customer`: 4 hạng tự trả số liệu và `Next()`; `Customer` kiểm tra số định danh/quốc tịch, `UpdateProfile` kiểm tra hết rồi mới gán, `EnsureUnique`/`EnsureCanBeDeleted`, `AddPoints` lặp `Next()` để lên nhiều bậc; `InteractionHistory.Add`.
+  - 03 `rooms-and-bookings`: kiểm tra `RoomType`/`Room`/`Booking`; `Nights`, `TotalAmount`, `PointsEarned` (làm tròn xuống), `BlocksRoom`; chuyển trạng thái; `Room.IsAvailable` chỉ xét booking Reserved/CheckedIn của chính phòng.
+  - 04 `customer-service`: `CustomerService` và `CustomerDirectory`. Kèm sửa thông báo của `Customer.EnsureUnique` không nêu SĐT/email (khi `Update` thì lúc kiểm tra trùng khách vẫn mang giá trị cũ).
+  - 05 `booking-service`: `BookingService`, `StayLookup`. `CheckOut` chỉ gọi `AddPoints` khi `PointsEarned > 0` (giá phòng < 1 USD sẽ cho 0 điểm, mà `AddPoints(0)` ném lỗi).
+  - 06 `assignment-strategies`: `LeastLoaded`; `DepartmentMatch` lọc theo phòng ban rồi giao cho một `LeastLoadedStrategy` bên trong; `RoundRobin` nhớ Id lần trước.
+  - 07 `customer-forms`: `CustomerListForm`, `CustomerEditForm` (`LoadCustomer(int)`).
+  - 08 `booking-form`: `BookingForm`; thêm 2 loại phòng (Deluxe Double 120, Family Suite 210) và 4 phòng (305, 306, 501, 502).
+  - 09 `review-fixes` (sau khi tự rà soát): `Room.IsAvailable` với ngày đảo ngược (lệch plan số 14); `BookingForm` không còn xóa danh sách phòng khi đổi ngày và không nạp lại sau khi đặt, để lựa chọn cũ đi xuống service và người dùng thấy cảnh báo đặt chồng/ngày sai (trước đó bước 4 của kiểm tra bằng tay không làm được); "Find rooms" báo khi không còn phòng; ô Notes nhận Enter; handler double-click của lưới đặt `if` vào trong `ErrorHandler.Run`.
+
+  Đã kiểm tra: build 0 lỗi 0 warning; 9 test suất B xanh, 13 đỏ đúng dự kiến; chuỗi patch 01→09 áp sạch lên `origin/develop`. Một script tạm ngoài repo (60 phép thử, đều đạt) chạy service thật trên bản sao `Data/`: trùng SĐT/email (cả khi sửa), sai định dạng, khách không hợp lệ không được lưu, đặt chồng/nối tiếp ngày, ngày đảo ngược trong phòng đã có booking, hủy sai trạng thái, check-in/out cộng điểm và ghi lịch sử, lên thẳng Gold, xóa khách còn ticket, nạp lại JSON giữ nguyên dữ liệu, ba strategy, và ba Form tạo được, nạp lưới, tìm phòng, tìm khách. Chưa kiểm tra: bấm thật trên giao diện, mở Form bằng Designer (chỉ người làm được), `/code-review`.
+- 18/11/2026 — Chép `handoff/stage3-notes.md` (do phiên GĐ 3 viết, chờ `feature/a-ticket` merge) vào file này: đánh lại số các dòng lệch plan 10–13 của ghi chú thành 12–15 vì `develop` đã có dòng 10–11; giữ dòng "patch 01 đã tới B" vì ghi chú viết rằng patch 01 chưa gửi. Chưa xóa ghi chú, chưa chép skill `export-patch`.
+- 17–18/11/2026 — Chốt kế hoạch chuyển lưu trữ JSON → SQLite qua ba vòng hỏi đáp với chủ repo; viết `docs/tasks/stage-3b-sqlite.md` (GĐ 3b, 5 module A1, A2, B1, B2, A3; Mốc 1 ngày 20/11, Mốc 2 ngày 22/11; phương án quay về JSON). Thêm dòng 16–20 vào bảng lệch plan. Chưa sửa code, `CLAUDE.md`, `docs/PLAN.md`, `.claude/rules/` (để Module A1). Chưa commit.
