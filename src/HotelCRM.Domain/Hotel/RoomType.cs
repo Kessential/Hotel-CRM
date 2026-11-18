@@ -74,6 +74,19 @@ public sealed class RoomType : IEntity
     /// <summary>Throws <see cref="ValidationException"/> when the name is empty or price or capacity is not positive.</summary>
     private void Validate()
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            throw new ValidationException("Room type name is required.");
+        }
+
+        if (PricePerNight <= 0)
+        {
+            throw new ValidationException("Price per night must be greater than 0.");
+        }
+
+        if (Capacity <= 0)
+        {
+            throw new ValidationException("Capacity must be greater than 0.");
+        }
     }
 }

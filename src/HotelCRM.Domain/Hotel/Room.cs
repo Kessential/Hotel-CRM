@@ -55,14 +55,23 @@ public sealed class Room : IEntity
     /// <param name="bookings">Existing bookings; bookings of other rooms are ignored.</param>
     public bool IsAvailable(DateTime checkInDate, DateTime checkOutDate, IEnumerable<Booking> bookings)
     {
-        throw new NotImplementedException();
+        DateTime start = checkInDate.Date;
+        DateTime end = checkOutDate.Date;
+        return !bookings.Any(b => b.Room.Id == Id
+            && b.BlocksRoom
+            && start < b.CheckOutDate
+            && b.CheckInDate < end);
     }
 
     /// <summary>Rule 7: stops a booking when <see cref="IsAvailable"/> returns false.</summary>
     /// <exception cref="BusinessRuleException">The room is already booked for part of the requested dates.</exception>
     public void EnsureAvailable(DateTime checkInDate, DateTime checkOutDate, IEnumerable<Booking> bookings)
     {
-        throw new NotImplementedException();
+        if (!IsAvailable(checkInDate, checkOutDate, bookings))
+        {
+            throw new BusinessRuleException(
+                $"Room {Number} is already booked for part of {checkInDate:yyyy-MM-dd} to {checkOutDate:yyyy-MM-dd}.");
+        }
     }
 
     /// <summary>Returns the room number, so the room can be shown directly in lists.</summary>
@@ -80,6 +89,19 @@ public sealed class Room : IEntity
     /// <summary>Throws <see cref="ValidationException"/> when the number is empty, the floor is not positive or the room type is missing.</summary>
     private void Validate()
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(Number))
+        {
+            throw new ValidationException("Room number is required.");
+        }
+
+        if (Floor <= 0)
+        {
+            throw new ValidationException("Floor must be greater than 0.");
+        }
+
+        if (RoomType is null)
+        {
+            throw new ValidationException("Room type is required.");
+        }
     }
 }
