@@ -140,6 +140,7 @@ partial class CustomerEditForm
         //
         // txtNotes
         //
+        txtNotes.AcceptsReturn = true;
         txtNotes.Location = new Point(150, 199);
         txtNotes.MaxLength = 500;
         txtNotes.Multiline = true;

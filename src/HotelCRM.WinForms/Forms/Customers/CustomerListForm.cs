@@ -47,10 +47,13 @@ public partial class CustomerListForm : Form
 
     private void dgvCustomers_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
     {
-        if (e.RowIndex >= 0)
+        ErrorHandler.Run(() =>
         {
-            ErrorHandler.Run(EditSelectedCustomer);
-        }
+            if (e.RowIndex >= 0)
+            {
+                EditSelectedCustomer();
+            }
+        });
     }
 
     private void btnDelete_Click(object? sender, EventArgs e)

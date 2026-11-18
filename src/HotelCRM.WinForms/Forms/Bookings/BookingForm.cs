@@ -55,15 +55,20 @@ public partial class BookingForm : Form
         });
     }
 
-    private void dtpStayDates_ValueChanged(object? sender, EventArgs e)
-    {
-        // The rooms found earlier may not be free for the new dates.
-        ErrorHandler.Run(cboRoom.Items.Clear);
-    }
-
     private void btnFindRooms_Click(object? sender, EventArgs e)
     {
-        ErrorHandler.Run(LoadAvailableRooms);
+        ErrorHandler.Run(() =>
+        {
+            LoadAvailableRooms();
+            if (cboRoom.Items.Count == 0)
+            {
+                MessageBox.Show(
+                    "No room is free for the chosen dates. Check that the check-out date is after the check-in date.",
+                    Text,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+        });
     }
 
     private void btnBook_Click(object? sender, EventArgs e)
@@ -82,9 +87,10 @@ public partial class BookingForm : Form
                 return;
             }
 
+            // The room list is not refreshed here: it shows the result of the last search, and the
+            // service checks the room again on every booking.
             Booking booking = _bookingService.Book(customer.Id, room.Id, dtpCheckIn.Value.Date, dtpCheckOut.Value.Date);
             LoadBookings();
-            LoadAvailableRooms();
             MessageBox.Show(
                 $"Booking {booking.Id} created: room {booking.Room.Number}, {booking.Nights} night(s), {booking.TotalAmount:0.00} USD.",
                 Text,
@@ -146,7 +152,7 @@ public partial class BookingForm : Form
         ErrorHandler.Run(Close);
     }
 
-    /// <summary>Fills the room list with the rooms that are free for the chosen dates.</summary>
+    /// <summary>Fills the room list with the rooms that are free for the chosen dates; empty for invalid dates.</summary>
     private void LoadAvailableRooms()
     {
         cboRoom.Items.Clear();

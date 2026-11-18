@@ -109,7 +109,6 @@ partial class BookingForm
         dtpCheckIn.Name = "dtpCheckIn";
         dtpCheckIn.Size = new Size(120, 23);
         dtpCheckIn.TabIndex = 5;
-        dtpCheckIn.ValueChanged += dtpStayDates_ValueChanged;
         //
         // lblCheckOut
         //
@@ -127,7 +126,6 @@ partial class BookingForm
         dtpCheckOut.Name = "dtpCheckOut";
         dtpCheckOut.Size = new Size(120, 23);
         dtpCheckOut.TabIndex = 7;
-        dtpCheckOut.ValueChanged += dtpStayDates_ValueChanged;
         //
         // btnFindRooms
         //

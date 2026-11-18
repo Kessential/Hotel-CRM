@@ -49,6 +49,8 @@ public sealed class Room : IEntity
     /// <paramref name="checkOutDate"/>. Only bookings of this room that block it
     /// (<see cref="Booking.BlocksRoom"/>: Reserved or CheckedIn) are considered. Two stays overlap when
     /// each starts before the other ends, so a guest may check in on the day another one checks out.
+    /// A range whose check-out is not after its check-in overlaps nothing, so the date error is reported
+    /// by the <see cref="Booking"/> constructor rather than as a double booking.
     /// </summary>
     /// <param name="checkInDate">First night of the requested stay.</param>
     /// <param name="checkOutDate">Departure day of the requested stay.</param>
@@ -57,6 +59,11 @@ public sealed class Room : IEntity
     {
         DateTime start = checkInDate.Date;
         DateTime end = checkOutDate.Date;
+        if (end <= start)
+        {
+            return true;
+        }
+
         return !bookings.Any(b => b.Room.Id == Id
             && b.BlocksRoom
             && start < b.CheckOutDate
