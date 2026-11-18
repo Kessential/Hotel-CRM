@@ -103,7 +103,7 @@ public sealed class BookingService
 
     /// <summary>
     /// Returns the rooms for which <see cref="Room.IsAvailable"/> is true for the given dates, ordered
-    /// by room number. Returns an empty list when the check-out date is not after the check-in date.
+    /// by floor, then by room number (shorter numbers first, so "99" comes before "305"). Returns an empty list when the check-out date is not after the check-in date.
     /// </summary>
     public IReadOnlyList<Room> GetAvailableRooms(DateTime checkInDate, DateTime checkOutDate)
     {
@@ -115,7 +115,9 @@ public sealed class BookingService
         IReadOnlyList<Booking> bookings = _bookings.GetAll();
         return _rooms.GetAll()
             .Where(r => r.IsAvailable(checkInDate, checkOutDate, bookings))
-            .OrderBy(r => r.Number, StringComparer.Ordinal)
+            .OrderBy(r => r.Floor)
+            .ThenBy(r => r.Number.Length)
+            .ThenBy(r => r.Number, StringComparer.Ordinal)
             .ToList();
     }
 }

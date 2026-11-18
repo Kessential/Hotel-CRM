@@ -10,7 +10,7 @@ namespace HotelCRM.Domain.Hotel;
 /// </summary>
 public sealed class Booking : IEntity
 {
-    /// <summary>Creates a new booking with status Reserved.</summary>
+    /// <summary>Creates a new booking with status Reserved and registers it in the customer's <see cref="Customer.Bookings"/>.</summary>
     /// <param name="id">Id obtained from the booking repository.</param>
     /// <param name="customer">Guest; required.</param>
     /// <param name="room">Room; required. The service checks its availability with <see cref="Room.EnsureAvailable"/> first.</param>
@@ -20,12 +20,18 @@ public sealed class Booking : IEntity
     /// Customer or room is missing, or the check-out date is not after the check-in date (rule 7).
     /// </exception>
     public Booking(int id, Customer customer, Room room, DateTime checkInDate, DateTime checkOutDate)
-        : this(id, customer, room, checkInDate.Date, checkOutDate.Date, BookingStatus.Reserved)
+        : this(id, customer, room, checkInDate.Date, checkOutDate.Date, BookingStatus.Reserved, validate: true)
     {
-        ValidateNewBooking();
     }
 
-    private Booking(int id, Customer customer, Room room, DateTime checkInDate, DateTime checkOutDate, BookingStatus status)
+    private Booking(
+        int id,
+        Customer customer,
+        Room room,
+        DateTime checkInDate,
+        DateTime checkOutDate,
+        BookingStatus status,
+        bool validate)
     {
         Id = id;
         Customer = customer;
@@ -33,6 +39,13 @@ public sealed class Booking : IEntity
         CheckInDate = checkInDate;
         CheckOutDate = checkOutDate;
         Status = status;
+
+        if (validate)
+        {
+            ValidateNewBooking();
+        }
+
+        customer.AddBooking(this);
     }
 
     /// <summary>Identifier assigned by the repository.</summary>
@@ -101,7 +114,7 @@ public sealed class Booking : IEntity
         Status = BookingStatus.Cancelled;
     }
 
-    /// <summary>Rebuilds a booking from stored data, including its status.</summary>
+    /// <summary>Rebuilds a booking from stored data, including its status, and registers it in the customer.</summary>
     internal static Booking Restore(
         int id,
         Customer customer,
@@ -110,7 +123,7 @@ public sealed class Booking : IEntity
         DateTime checkOutDate,
         BookingStatus status)
     {
-        return new Booking(id, customer, room, checkInDate, checkOutDate, status);
+        return new Booking(id, customer, room, checkInDate, checkOutDate, status, validate: false);
     }
 
     /// <summary>Throws <see cref="ValidationException"/> when customer or room is missing or the dates are not in order.</summary>
