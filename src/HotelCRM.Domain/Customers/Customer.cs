@@ -99,18 +99,17 @@ public sealed class Customer : Person
     {
         if (phoneTaken && emailTaken)
         {
-            throw new BusinessRuleException(
-                $"Another customer already uses phone number {Phone} and email address {Email}.");
+            throw new BusinessRuleException("Another customer already uses this phone number and this email address.");
         }
 
         if (phoneTaken)
         {
-            throw new BusinessRuleException($"Another customer already uses phone number {Phone}.");
+            throw new BusinessRuleException("Another customer already uses this phone number.");
         }
 
         if (emailTaken)
         {
-            throw new BusinessRuleException($"Another customer already uses email address {Email}.");
+            throw new BusinessRuleException("Another customer already uses this email address.");
         }
     }
 
