@@ -10,7 +10,7 @@ namespace HotelCRM.Domain.Hotel;
 /// </summary>
 public sealed class Booking : IEntity
 {
-    /// <summary>Creates a new booking with status Reserved.</summary>
+    /// <summary>Creates a new booking with status Reserved and registers it in the customer's <see cref="Customer.Bookings"/>.</summary>
     /// <param name="id">Id obtained from the booking repository.</param>
     /// <param name="customer">Guest; required.</param>
     /// <param name="room">Room; required. The service checks its availability with <see cref="Room.EnsureAvailable"/> first.</param>
@@ -20,12 +20,18 @@ public sealed class Booking : IEntity
     /// Customer or room is missing, or the check-out date is not after the check-in date (rule 7).
     /// </exception>
     public Booking(int id, Customer customer, Room room, DateTime checkInDate, DateTime checkOutDate)
-        : this(id, customer, room, checkInDate.Date, checkOutDate.Date, BookingStatus.Reserved)
+        : this(id, customer, room, checkInDate.Date, checkOutDate.Date, BookingStatus.Reserved, validate: true)
     {
-        ValidateNewBooking();
     }
 
-    private Booking(int id, Customer customer, Room room, DateTime checkInDate, DateTime checkOutDate, BookingStatus status)
+    private Booking(
+        int id,
+        Customer customer,
+        Room room,
+        DateTime checkInDate,
+        DateTime checkOutDate,
+        BookingStatus status,
+        bool validate)
     {
         Id = id;
         Customer = customer;
@@ -33,6 +39,13 @@ public sealed class Booking : IEntity
         CheckInDate = checkInDate;
         CheckOutDate = checkOutDate;
         Status = status;
+
+        if (validate)
+        {
+            ValidateNewBooking();
+        }
+
+        customer.AddBooking(this);
     }
 
     /// <summary>Identifier assigned by the repository.</summary>
@@ -54,39 +67,54 @@ public sealed class Booking : IEntity
     public BookingStatus Status { get; private set; }
 
     /// <summary>Number of nights: days between <see cref="CheckInDate"/> and <see cref="CheckOutDate"/>.</summary>
-    public int Nights => throw new NotImplementedException();
+    public int Nights => (CheckOutDate - CheckInDate).Days;
 
     /// <summary>Price of the stay in USD: <see cref="Nights"/> x <see cref="RoomType.PricePerNight"/> of the room.</summary>
-    public decimal TotalAmount => throw new NotImplementedException();
+    public decimal TotalAmount => Nights * Room.RoomType.PricePerNight;
 
     /// <summary>Rule 8: loyalty points awarded at check-out, 1 point per whole USD of <see cref="TotalAmount"/>.</summary>
-    public int PointsEarned => throw new NotImplementedException();
+    public int PointsEarned => (int)decimal.Floor(TotalAmount);
 
     /// <summary>Rule 7: whether this booking keeps its room occupied: true for Reserved and CheckedIn.</summary>
-    public bool BlocksRoom => throw new NotImplementedException();
+    public bool BlocksRoom => Status is BookingStatus.Reserved or BookingStatus.CheckedIn;
 
     /// <summary>Reserved to CheckedIn: the guest arrives and the stay becomes active.</summary>
     /// <exception cref="BusinessRuleException">The booking is not Reserved.</exception>
     public void CheckIn()
     {
-        throw new NotImplementedException();
+        if (Status != BookingStatus.Reserved)
+        {
+            throw new BusinessRuleException($"Booking {Id} is {Status}; only a Reserved booking can be checked in.");
+        }
+
+        Status = BookingStatus.CheckedIn;
     }
 
     /// <summary>CheckedIn to CheckedOut: the guest leaves. The service then awards <see cref="PointsEarned"/>.</summary>
     /// <exception cref="BusinessRuleException">The booking is not CheckedIn.</exception>
     public void CheckOut()
     {
-        throw new NotImplementedException();
+        if (Status != BookingStatus.CheckedIn)
+        {
+            throw new BusinessRuleException($"Booking {Id} is {Status}; only a CheckedIn booking can be checked out.");
+        }
+
+        Status = BookingStatus.CheckedOut;
     }
 
     /// <summary>Rule 7: Reserved to Cancelled. A booking that was checked in or out cannot be cancelled.</summary>
     /// <exception cref="BusinessRuleException">The booking is not Reserved.</exception>
     public void Cancel()
     {
-        throw new NotImplementedException();
+        if (Status != BookingStatus.Reserved)
+        {
+            throw new BusinessRuleException($"Booking {Id} is {Status}; only a Reserved booking can be cancelled.");
+        }
+
+        Status = BookingStatus.Cancelled;
     }
 
-    /// <summary>Rebuilds a booking from stored data, including its status.</summary>
+    /// <summary>Rebuilds a booking from stored data, including its status, and registers it in the customer.</summary>
     internal static Booking Restore(
         int id,
         Customer customer,
@@ -95,12 +123,25 @@ public sealed class Booking : IEntity
         DateTime checkOutDate,
         BookingStatus status)
     {
-        return new Booking(id, customer, room, checkInDate, checkOutDate, status);
+        return new Booking(id, customer, room, checkInDate, checkOutDate, status, validate: false);
     }
 
     /// <summary>Throws <see cref="ValidationException"/> when customer or room is missing or the dates are not in order.</summary>
     private void ValidateNewBooking()
     {
-        throw new NotImplementedException();
+        if (Customer is null)
+        {
+            throw new ValidationException("A booking needs a customer.");
+        }
+
+        if (Room is null)
+        {
+            throw new ValidationException("A booking needs a room.");
+        }
+
+        if (CheckOutDate <= CheckInDate)
+        {
+            throw new ValidationException("Check-out date must be after check-in date.");
+        }
     }
 }

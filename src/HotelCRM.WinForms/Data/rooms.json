@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "Id": 1,
+    "Number": "305",
+    "Floor": 3,
+    "RoomTypeId": 1
+  },
+  {
+    "Id": 2,
+    "Number": "306",
+    "Floor": 3,
+    "RoomTypeId": 1
+  },
+  {
+    "Id": 3,
+    "Number": "501",
+    "Floor": 5,
+    "RoomTypeId": 2
+  },
+  {
+    "Id": 4,
+    "Number": "502",
+    "Floor": 5,
+    "RoomTypeId": 2
+  }
+]

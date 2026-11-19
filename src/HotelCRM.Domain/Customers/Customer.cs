@@ -1,4 +1,5 @@
 using HotelCRM.Domain.Common;
+using HotelCRM.Domain.Hotel;
 
 namespace HotelCRM.Domain.Customers;
 
@@ -9,6 +10,8 @@ namespace HotelCRM.Domain.Customers;
 /// </summary>
 public sealed class Customer : Person
 {
+    private readonly List<Booking> _bookings = new();
+
     /// <summary>Creates a new customer in the Standard tier with 0 points and an empty history.</summary>
     /// <param name="id">Id obtained from the customer repository.</param>
     /// <param name="fullName">Full name; required.</param>
@@ -72,6 +75,9 @@ public sealed class Customer : Person
     /// <summary>Interaction history owned by this customer.</summary>
     public InteractionHistory History { get; }
 
+    /// <summary>Bookings made by this customer, in any status. Each <see cref="Booking"/> registers itself here.</summary>
+    public IReadOnlyList<Booking> Bookings => _bookings.AsReadOnly();
+
     /// <summary>Replaces the editable fields; nothing changes if one of them is invalid.</summary>
     /// <exception cref="ValidationException">Same conditions as the constructor.</exception>
     public void UpdateProfile(
@@ -82,7 +88,13 @@ public sealed class Customer : Person
         string nationality,
         string notes)
     {
-        throw new NotImplementedException();
+        string newIdentityNumber = ValidateIdentityNumber(identityNumber);
+        string newNationality = ValidateNationality(nationality);
+        ChangeContact(fullName, phone, email);
+
+        IdentityNumber = newIdentityNumber;
+        Nationality = newNationality;
+        Notes = NormalizeNotes(notes);
     }
 
     /// <summary>Rule 6: stops a registration or update that would duplicate another customer's phone or email.</summary>
@@ -91,15 +103,43 @@ public sealed class Customer : Person
     /// <exception cref="BusinessRuleException">Either flag is true.</exception>
     public void EnsureUnique(bool phoneTaken, bool emailTaken)
     {
-        throw new NotImplementedException();
+        if (phoneTaken && emailTaken)
+        {
+            throw new BusinessRuleException("Another customer already uses this phone number and this email address.");
+        }
+
+        if (phoneTaken)
+        {
+            throw new BusinessRuleException("Another customer already uses this phone number.");
+        }
+
+        if (emailTaken)
+        {
+            throw new BusinessRuleException("Another customer already uses this email address.");
+        }
     }
 
-    /// <summary>Rule 10: stops the deletion of a customer who still has tickets that are not closed.</summary>
+    /// <summary>
+    /// Stops the deletion of a customer who still has tickets that are not closed (rule 10), or who has
+    /// any booking in <see cref="Bookings"/>, whatever its status: stored bookings refer to their customer.
+    /// </summary>
     /// <param name="hasOpenTickets">Result of <c>ITicketQuery.HasOpenTickets</c> for this customer.</param>
-    /// <exception cref="BusinessRuleException"><paramref name="hasOpenTickets"/> is true.</exception>
+    /// <exception cref="BusinessRuleException">
+    /// <paramref name="hasOpenTickets"/> is true, or the customer has at least one booking.
+    /// </exception>
     public void EnsureCanBeDeleted(bool hasOpenTickets)
     {
-        throw new NotImplementedException();
+        if (hasOpenTickets)
+        {
+            throw new BusinessRuleException(
+                $"Customer {FullName} still has tickets that are not closed and cannot be deleted.");
+        }
+
+        if (_bookings.Count > 0)
+        {
+            throw new BusinessRuleException(
+                $"Customer {FullName} has {_bookings.Count} booking(s) on record and cannot be deleted.");
+        }
     }
 
     /// <summary>
@@ -111,7 +151,16 @@ public sealed class Customer : Person
     /// <exception cref="ValidationException"><paramref name="amount"/> is zero or negative.</exception>
     public void AddPoints(int amount)
     {
-        throw new NotImplementedException();
+        if (amount <= 0)
+        {
+            throw new ValidationException("Points to add must be greater than 0.");
+        }
+
+        Points += amount;
+        while (Tier.Next() is { } next && Points >= next.MinPoints)
+        {
+            Tier = next;
+        }
     }
 
     /// <summary>Appends an entry to <see cref="History"/> and returns it.</summary>
@@ -122,7 +171,16 @@ public sealed class Customer : Person
     /// <exception cref="ValidationException">The summary is empty.</exception>
     public Interaction LogInteraction(ContactChannel channel, string summary, DateTime occurredAt, int? ticketId)
     {
-        throw new NotImplementedException();
+        return History.Add(channel, summary, occurredAt, ticketId);
+    }
+
+    /// <summary>Called by <see cref="Booking"/> when a booking of this customer is created or restored.</summary>
+    internal void AddBooking(Booking booking)
+    {
+        if (!_bookings.Contains(booking))
+        {
+            _bookings.Add(booking);
+        }
     }
 
     /// <summary>Rebuilds a customer from stored data, including tier, points and history.</summary>
@@ -144,6 +202,33 @@ public sealed class Customer : Person
     /// <summary>Throws <see cref="ValidationException"/> when identity number or nationality is empty.</summary>
     private void ValidateProfile()
     {
-        throw new NotImplementedException();
+        IdentityNumber = ValidateIdentityNumber(IdentityNumber);
+        Nationality = ValidateNationality(Nationality);
+        Notes = NormalizeNotes(Notes);
+    }
+
+    private static string ValidateIdentityNumber(string identityNumber)
+    {
+        if (string.IsNullOrWhiteSpace(identityNumber))
+        {
+            throw new ValidationException("Identity number is required.");
+        }
+
+        return identityNumber.Trim();
+    }
+
+    private static string ValidateNationality(string nationality)
+    {
+        if (string.IsNullOrWhiteSpace(nationality))
+        {
+            throw new ValidationException("Nationality is required.");
+        }
+
+        return nationality.Trim();
+    }
+
+    private static string NormalizeNotes(string notes)
+    {
+        return (notes ?? string.Empty).Trim();
     }
 }

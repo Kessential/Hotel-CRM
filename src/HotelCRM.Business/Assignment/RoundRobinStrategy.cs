@@ -10,9 +10,23 @@ namespace HotelCRM.Business.Assignment;
 /// </summary>
 public sealed class RoundRobinStrategy : IAssignmentStrategy
 {
+    private int _lastPickedId;
+
     /// <inheritdoc />
     public Agent? Pick(string departmentCode, IReadOnlyList<AgentWorkload> candidates)
     {
-        throw new NotImplementedException();
+        if (candidates.Count == 0)
+        {
+            return null;
+        }
+
+        Agent? next = candidates
+            .Select(c => c.Agent)
+            .Where(a => a.Id > _lastPickedId)
+            .MinBy(a => a.Id);
+        Agent picked = next ?? candidates.Select(c => c.Agent).MinBy(a => a.Id)!;
+
+        _lastPickedId = picked.Id;
+        return picked;
     }
 }

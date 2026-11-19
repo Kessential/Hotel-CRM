@@ -21,13 +21,22 @@ public sealed class CustomerDirectory : ICustomerDirectory
     /// <inheritdoc />
     public IReadOnlyList<CustomerSummary> Search(string keyword)
     {
-        throw new NotImplementedException();
+        string trimmed = (keyword ?? string.Empty).Trim();
+        return _customers.GetAll()
+            .Where(c => trimmed.Length == 0
+                || c.FullName.Contains(trimmed, StringComparison.OrdinalIgnoreCase)
+                || c.Phone.Contains(trimmed, StringComparison.OrdinalIgnoreCase)
+                || c.Email.Contains(trimmed, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(c => c.FullName, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(c => c.Id)
+            .Select(ToSummary)
+            .ToList();
     }
 
     /// <inheritdoc />
     public CustomerSummary GetSummary(int customerId)
     {
-        throw new NotImplementedException();
+        return ToSummary(_customers.GetRequired(customerId));
     }
 
     /// <summary>
@@ -37,6 +46,12 @@ public sealed class CustomerDirectory : ICustomerDirectory
     /// </summary>
     public CustomerSlaProfile GetSlaProfile(int customerId)
     {
-        throw new NotImplementedException();
+        MembershipTier tier = _customers.GetRequired(customerId).Tier;
+        return new CustomerSlaProfile(tier.SlaFactor, tier.PriorityBoost);
+    }
+
+    private static CustomerSummary ToSummary(Customer customer)
+    {
+        return new CustomerSummary(customer.Id, customer.FullName, customer.Phone, customer.Tier.Name);
     }
 }

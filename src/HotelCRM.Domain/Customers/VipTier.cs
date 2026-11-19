@@ -10,17 +10,17 @@ public sealed class VipTier : MembershipTier
     public override string Name => TierName;
 
     /// <summary>0.5.</summary>
-    public override double SlaFactor => throw new NotImplementedException();
+    public override double SlaFactor => 0.5;
 
     /// <summary>2.</summary>
-    public override int PriorityBoost => throw new NotImplementedException();
+    public override int PriorityBoost => 2;
 
     /// <summary>15000.</summary>
-    public override int MinPoints => throw new NotImplementedException();
+    public override int MinPoints => 15000;
 
     /// <summary>Returns null: there is no tier above VIP.</summary>
     public override MembershipTier? Next()
     {
-        throw new NotImplementedException();
+        return null;
     }
 }

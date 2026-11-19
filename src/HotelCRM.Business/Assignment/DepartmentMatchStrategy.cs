@@ -9,9 +9,15 @@ namespace HotelCRM.Business.Assignment;
 /// </summary>
 public sealed class DepartmentMatchStrategy : IAssignmentStrategy
 {
+    private readonly LeastLoadedStrategy _leastLoaded = new();
+
     /// <inheritdoc />
     public Agent? Pick(string departmentCode, IReadOnlyList<AgentWorkload> candidates)
     {
-        throw new NotImplementedException();
+        List<AgentWorkload> inDepartment = candidates
+            .Where(c => string.Equals(c.Agent.Department.Code, departmentCode, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        return _leastLoaded.Pick(departmentCode, inDepartment.Count > 0 ? inDepartment : candidates);
     }
 }

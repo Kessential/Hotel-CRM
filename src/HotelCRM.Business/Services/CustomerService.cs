@@ -38,7 +38,12 @@ public sealed class CustomerService
         string nationality,
         string notes)
     {
-        throw new NotImplementedException();
+        Customer customer = new(_customers.NextId(), fullName, phone, email, identityNumber, nationality, notes);
+        customer.EnsureUnique(
+            IsPhoneTaken(customer.Phone, customer.Id),
+            IsEmailTaken(customer.Email, customer.Id));
+        _customers.Save(customer);
+        return customer;
     }
 
     /// <summary>
@@ -57,7 +62,12 @@ public sealed class CustomerService
         string nationality,
         string notes)
     {
-        throw new NotImplementedException();
+        Customer customer = _customers.GetRequired(customerId);
+        customer.EnsureUnique(
+            IsPhoneTaken(phone, customerId),
+            IsEmailTaken(email, customerId));
+        customer.UpdateProfile(fullName, phone, email, identityNumber, nationality, notes);
+        _customers.Save(customer);
     }
 
     /// <summary>
@@ -67,7 +77,9 @@ public sealed class CustomerService
     /// <exception cref="BusinessRuleException">The customer does not exist, or still has a ticket that is not closed.</exception>
     public void Delete(int customerId)
     {
-        throw new NotImplementedException();
+        Customer customer = _customers.GetRequired(customerId);
+        customer.EnsureCanBeDeleted(_tickets.HasOpenTickets(customerId));
+        _customers.Delete(customerId);
     }
 
     /// <summary>
@@ -76,20 +88,43 @@ public sealed class CustomerService
     /// </summary>
     public IReadOnlyList<Customer> Search(string keyword)
     {
-        throw new NotImplementedException();
+        string trimmed = (keyword ?? string.Empty).Trim();
+        return _customers.GetAll()
+            .Where(c => trimmed.Length == 0
+                || c.FullName.Contains(trimmed, StringComparison.OrdinalIgnoreCase)
+                || c.Phone.Contains(trimmed, StringComparison.OrdinalIgnoreCase)
+                || c.Email.Contains(trimmed, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(c => c.FullName, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(c => c.Id)
+            .ToList();
     }
 
     /// <summary>Returns one customer for the edit and history forms.</summary>
     /// <exception cref="BusinessRuleException">The customer does not exist.</exception>
     public Customer GetById(int customerId)
     {
-        throw new NotImplementedException();
+        return _customers.GetRequired(customerId);
     }
 
     /// <summary>UC9: returns the customer's interactions, newest first.</summary>
     /// <exception cref="BusinessRuleException">The customer does not exist.</exception>
     public IReadOnlyList<Interaction> GetHistory(int customerId)
     {
-        throw new NotImplementedException();
+        return _customers.GetRequired(customerId).History.Items.Reverse().ToList();
+    }
+
+    /// <summary>Whether a customer other than <paramref name="exceptCustomerId"/> already has this phone.</summary>
+    private bool IsPhoneTaken(string phone, int exceptCustomerId)
+    {
+        string trimmed = (phone ?? string.Empty).Trim();
+        return _customers.GetAll().Any(c => c.Id != exceptCustomerId && c.Phone == trimmed);
+    }
+
+    /// <summary>Whether a customer other than <paramref name="exceptCustomerId"/> already has this email (case-insensitive).</summary>
+    private bool IsEmailTaken(string email, int exceptCustomerId)
+    {
+        string trimmed = (email ?? string.Empty).Trim();
+        return _customers.GetAll().Any(c => c.Id != exceptCustomerId
+            && string.Equals(c.Email, trimmed, StringComparison.OrdinalIgnoreCase));
     }
 }
