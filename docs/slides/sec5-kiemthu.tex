@@ -1,0 +1,150 @@
+% ================= 5. KIỂM THỬ =================
+\section{Kiểm thử}
+
+\newcommand{\pass}{\textcolor{okc}{\textbf{PASS}}}
+\newcommand{\fail}{\textcolor{warn}{\textbf{FAIL}}}
+
+\begin{frame}{Chiến lược kiểm thử và kết quả chạy (19/11/2026)}
+\begin{columns}[T]
+\column{0.55\textwidth}
+\scriptsize
+\begin{itemize}
+  \item \textbf{Unit test xUnit} trên tầng Domain và Business; giao diện kiểm tra bằng tay theo checklist.
+  \item \textbf{Cô lập}: \code{InMemoryRepository<T>} thay file JSON; lớp giả viết tay thay phân hệ bạn: TV1 dùng \code{FakeCustomerDirectory}, \code{FakeStayLookup} (giả TV2); TV2 dùng \code{FakeTicketQuery} (giả TV1) $\Rightarrow$ mỗi người chạy test được khi code của bạn chưa xong.
+  \item \textbf{Thời điểm cố định} (\code{now} truyền vào), không gọi \code{DateTime.Now} $\Rightarrow$ test lặp lại được.
+  \item Cấu trúc \textbf{AAA} (Arrange -- Act -- Assert); tên \code{Hàm_TìnhHuống_KếtQuả}; assert đúng loại ngoại lệ (\code{ValidationException} / \code{BusinessRuleException}) hoặc giá trị cụ thể.
+  \item Kỹ thuật thiết kế ca: phân lớp tương đương (EP), giá trị biên (BVA), chuyển trạng thái, ngoại lệ, phân quyền.
+\end{itemize}
+\column{0.43\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[xbar stacked, width=6.2cm, height=3.6cm, bar width=9pt, xmin=0, xmax=12,
+  symbolic y coords={TV2,TV1}, ytick=data, xlabel={\scriptsize số ca}, ticklabel style={font=\scriptsize},
+  legend style={font=\tiny, at={(0.5,1.03)}, anchor=south, legend columns=2, draw=none},
+  nodes near coords, every node near coord/.append style={font=\tiny, text=white}]
+\addplot[fill=okc, draw=okc] coordinates {(11,TV1) (9,TV2)};
+\addplot[fill=warn, draw=warn] coordinates {(0,TV1) (2,TV2)};
+\legend{PASS, FAIL}
+\end{axis}
+\end{tikzpicture}
+
+\vspace{1mm}
+\begin{block}{\code{dotnet test HotelCRM.sln}}
+\scriptsize
+Total \textbf{22} -- Passed \textbf{20} -- Failed \textbf{2}\\
+2 ca đỏ: \code{SurveyServiceTests} vì \code{SurveyService} (UC8) còn \code{NotImplementedException} -- làm ở GĐ 4. Test viết trước code (khung GĐ 1), \textbf{không sửa test}.
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Checklist ca kiểm thử tự động -- TV1 (phân hệ Ticket)}
+\tiny
+\begin{tabularx}{\textwidth}{@{}L{0.72cm}L{1.62cm}L{5.45cm}L{1.25cm}L{0.35cm}YL{0.6cm}@{}}
+\toprule
+\textbf{TC-ID} & \textbf{Lớp test} & \textbf{Hàm test} & \textbf{Kỹ thuật} & \textbf{QT} & \textbf{Đầu vào $\to$ mong đợi} & \textbf{KQ} \\
+\midrule
+TC-A01 & \code{TicketStateTests} & \code{Start_OpenTicketWithAgent_MovesToInProgress} & Chuyển TT & 1 & có Agent $\to$ InProgress & \pass \\
+TC-A02 & \code{TicketStateTests} & \code{Resolve_InProgressWithNote_MovesToResolved} & Chuyển TT & 1 & có ghi chú $\to$ Resolved & \pass \\
+TC-A03 & \code{TicketStateTests} & \code{Close_ResolvedTicket_MovesToClosed} & Chuyển TT & 1 & Resolved $\to$ Closed & \pass \\
+TC-A04 & \code{TicketStateTests} & \code{Start_WithoutAgent_ThrowsBusinessRule} & Ngoại lệ & 1 & Open chưa giao $\to$ lỗi & \pass \\
+TC-A05 & \code{TicketStateTests} & \code{Resolve_ClosedTicket_ThrowsBusinessRule} & Chuyển cấm & 1 & Closed + Resolve $\to$ lỗi & \pass \\
+TC-A06 & \code{TicketStateTests} & \code{Reopen_AfterReopenDays_ThrowsBusinessRule} & BVA & 2 & \code{ReopenDays + 1} ngày $\to$ lỗi & \pass \\
+TC-A07 & \code{TicketRuleTests} & \code{AssignTo_AgentAtMaxActive_ThrowsBusinessRule} & BVA (= trần) & 3 & đủ \code{MaxActive} $\to$ lỗi & \pass \\
+TC-A08 & \code{TicketRuleTests} & \code{CalculateDueAt_ComplaintBoostedToHighFactor075_Returns9Hours} & EP, tính toán & 4 & Medium, khách Gold $\to$ +9 giờ & \pass \\
+TC-A09 & \code{TicketServiceTests} & \code{CreateTicket_MaintenanceRoomNotInActiveStay_ThrowsBusinessRule} & Ngoại lệ, \textbf{giả TV2} & 5 & phòng không có khách $\to$ lỗi & \pass \\
+TC-A10 & \code{TicketServiceTests} & \code{Close_ByAgent_ThrowsBusinessRule} & Phân quyền & 11 & Agent gọi Close $\to$ lỗi & \pass \\
+TC-A11 & \code{TicketFactoryTests} & \code{Create_EachFactory_ReturnsMatchingSubclass} & Đa hình & -- & 3 factory $\to$ đúng 3 lớp con & \pass \\
+\bottomrule
+\end{tabularx}
+\end{frame}
+
+\begin{frame}{Checklist ca kiểm thử tự động -- TV2 (phân hệ Khách hàng/Lưu trú)}
+\tiny
+\begin{tabularx}{\textwidth}{@{}L{0.72cm}L{2.0cm}L{4.95cm}L{1.25cm}L{0.35cm}YL{0.6cm}@{}}
+\toprule
+\textbf{TC-ID} & \textbf{Lớp test} & \textbf{Hàm test} & \textbf{Kỹ thuật} & \textbf{QT} & \textbf{Đầu vào $\to$ mong đợi} & \textbf{KQ} \\
+\midrule
+TC-B01 & \code{CustomerTests} & \code{Constructor_InvalidEmail_ThrowsValidation} & EP (lớp sai) & 6 & email sai định dạng $\to$ \code{ValidationException} & \pass \\
+TC-B02 & \code{CustomerTests} & \code{Constructor_InvalidPhone_ThrowsValidation} & EP (lớp sai) & 6 & SĐT sai định dạng $\to$ \code{ValidationException} & \pass \\
+TC-B03 & \code{CustomerTests} & \code{AddPoints_PositiveAmount_IncreasesPoints} & EP (lớp đúng) & 8 & +120 điểm $\to$ \code{Points = 120} & \pass \\
+TC-B04 & \code{CustomerTests} & \code{AddPoints_CrossingThresholds_UpgradesTier} & BVA (vượt 2 ngưỡng) & 8 & +6000 từ Standard $\to$ Gold (lên 2 bậc) & \pass \\
+TC-B05 & \code{CustomerServiceTests} & \code{Register_DuplicatePhone_ThrowsBusinessRule} & Ngoại lệ & 6 & SĐT đã có $\to$ lỗi & \pass \\
+TC-B06 & \code{CustomerServiceTests} & \code{Delete_CustomerWithOpenTicket_ThrowsBusinessRule} & Ngoại lệ, \textbf{giả TV1} & 10 & còn ticket mở $\to$ lỗi & \pass \\
+TC-B07 & \code{BookingTests} & \code{Constructor_CheckOutNotAfterCheckIn_ThrowsValidation} & BVA (trả = nhận) & 7 & cùng ngày $\to$ \code{ValidationException} & \pass \\
+TC-B08 & \code{BookingServiceTests} & \code{Book_OverlappingDates_ThrowsBusinessRule} & Ngoại lệ & 7 & ngày chồng nhau $\to$ lỗi & \pass \\
+TC-B09 & \code{SurveyServiceTests} & \code{Submit_TicketNotResolved_ThrowsBusinessRule} & Ngoại lệ, \textbf{giả TV1} & 9 & ticket chưa Resolved $\to$ lỗi & \fail$^*$ \\
+TC-B10 & \code{SurveyServiceTests} & \code{Submit_SecondSurveyForTicket_ThrowsBusinessRule} & Ngoại lệ & 9 & khảo sát lần 2 $\to$ lỗi & \fail$^*$ \\
+TC-B11 & \code{AssignmentStrategyTests} & \code{LeastLoaded_Pick_ReturnsAgentWithFewestActive} & EP (Strategy) & -- & Agent ít tải nhất & \pass \\
+\bottomrule
+\end{tabularx}
+
+\vspace{1mm}
+{\tiny $^*$ Đỏ do \code{NotImplementedException}: \code{SurveyService.Submit()} và \code{SatisfactionSurvey.Create()} thuộc GĐ 4 (hạn 25/11).\par}
+\end{frame}
+
+\begin{frame}{Checklist kiểm thử bằng tay trên giao diện}
+\tiny
+\begin{tabularx}{\textwidth}{@{}L{0.9cm}YL{3.0cm}L{2.4cm}@{}}
+\toprule
+\textbf{ID} & \textbf{Bước kiểm tra $\to$ kết quả mong đợi} & \textbf{Form} & \textbf{Kết quả} \\
+\midrule
+UI-01 & Mở 3 Form ticket bằng Designer của Visual Studio: hiển thị, không lỗi & Ticket List/Edit/Detail & \textcolor{okc}{Đạt} (17/11, TV1) \\
+UI-02 & Đăng nhập, mở 3 Form ticket từ menu; Search trên danh sách rỗng: không lỗi & như trên & \textcolor{okc}{Đạt} (17/11) \\
+UI-03 & Đăng nhập bằng Agent: không thấy Auto Assign / Assign & \code{TicketListForm} & \textcolor{okc}{Đạt} (17/11) \\
+UI-04 & Mở 3 Form khách hàng/đặt phòng bằng Designer & Customer List/Edit, Booking & \textcolor{okc}{Đạt} (18/11, TV2) \\
+UI-05 & Đăng ký khách; khách thứ 2 trùng SĐT $\to$ cảnh báo, không lưu; email sai $\to$ cảnh báo & \code{CustomerEditForm} & \textcolor{okc}{Đạt} (18/11) \\
+UI-06 & Sửa khách, tìm theo tên, xóa khách: lưới cập nhật đúng & \code{CustomerListForm} & \textcolor{okc}{Đạt} (18/11) \\
+UI-07 & Đặt 3 đêm; đặt chồng ngày cùng phòng $\to$ cảnh báo; ngày trả trước ngày nhận $\to$ cảnh báo & \code{BookingForm} & \textcolor{okc}{Đạt} (18/11) \\
+UI-08 & Check-in, check-out: trạng thái đổi; điểm tăng = số đêm $\times$ giá; hủy booking đã check-in $\to$ cảnh báo & \code{BookingForm} & \textcolor{okc}{Đạt} (18/11) \\
+UI-09 & Thoát app, mở lại: dữ liệu còn nguyên & toàn bộ & \textcolor{okc}{Đạt} (18/11) \\
+UI-10 & Xóa khách đã có booking $\to$ cảnh báo (sửa sau \code{/code-review} 18/11) & \code{CustomerListForm} & \textcolor{midc}{Chưa bấm lại sau khi sửa} \\
+UI-11 & Kịch bản UC2--UC5 đầy đủ trên dữ liệu đã ghép 2 phân hệ & Ticket + Customer & \textcolor{midc}{Điểm duyệt đầu GĐ 4} \\
+UI-12 & Khảo sát (UC8), lịch sử (UC9), báo cáo (UC10); Designer 3 Form còn lại & Survey, History, Report & \textcolor{warn}{GĐ 4} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{1mm}
+{\tiny Nguồn bước kiểm tra: \code{docs/tasks/stage-2-ticket.md}, \code{stage-3-customer.md}; kết quả ghi trong \code{docs/PROGRESS.md}. Ảnh màn hình ở phần 3 chụp từ chính các Form này.\par}
+\end{frame}
+
+\begin{frame}{Truy vết Quy tắc $\leftrightarrow$ Test và tự soát chất lượng bộ test}
+\begin{columns}[T]
+\column{0.44\textwidth}
+\tiny
+\begin{tabular}{@{}L{0.5cm}L{0.6cm}L{2.6cm}L{1.0cm}@{}}
+\toprule
+\textbf{QT} & \textbf{TV} & \textbf{Ca kiểm thử} & \textbf{Phủ} \\
+\midrule
+1 & TV1 & A01--A05 & \textcolor{okc}{có} \\
+2 & TV1 & A06 & \textcolor{okc}{có} \\
+3 & TV1 & A07 & \textcolor{okc}{có} \\
+4 & TV1 & A08 & \textcolor{okc}{có} \\
+5 & TV1 & A09 (giả TV2) & \textcolor{okc}{có} \\
+6 & TV2 & B01, B02, B05 & \textcolor{okc}{có} \\
+7 & TV2 & B07, B08 & \textcolor{okc}{có} \\
+8 & TV2 & B03, B04 & \textcolor{okc}{có} \\
+9 & TV2 & B09, B10 (giả TV1) & \textcolor{warn}{đỏ} \\
+10 & TV2 & B06 (giả TV1) & \textcolor{okc}{có} \\
+11 & Chung & A10 & \textcolor{okc}{có} \\
+\bottomrule
+\end{tabular}
+
+\vspace{1mm}
+11/11 quy tắc có ít nhất 1 ca; pattern State (A01--A06), Factory (A11), Strategy (B11) đều có test.
+\column{0.54\textwidth}
+\scriptsize
+\textbf{5 cổng chất lượng test (theo rubric) -- tự soát:}
+\begin{itemize}
+  \item[\textcolor{okc}{\checkmark}] Truy vết quy tắc $\leftrightarrow$ TC $\leftrightarrow$ code (bảng bên trái)
+  \item[\textcolor{okc}{\checkmark}] AAA, tên rõ, thời gian cố định, không phụ thuộc file/CSDL
+  \item[\textcolor{okc}{\checkmark}] Assert thực chất: loại ngoại lệ cụ thể, giá trị cụ thể (9 giờ, \code{GoldTier}, \code{Points = 120})
+  \item[\textcolor{okc}{\checkmark}] Cô lập qua Fake: TV1 giả 2 interface của TV2, TV2 giả 1 interface của TV1
+  \item[\textcolor{warn}{$\times$}] Chưa chạy thử đột biến (mutation check: đổi \code{>} thành \code{>=}, bỏ kiểm tra quyền\ldots)
+\end{itemize}
+\textbf{Thiếu so với checklist:}
+\begin{itemize}
+  \item 22 test $<$ 26; \textbf{0 integration test} (cần $\ge$ 8: luồng liên phân hệ, rollback, đối chiếu báo cáo tính tay, RBAC)
+  \item Chưa có ca biên đúng mốc (Reopen đúng \code{ResolvedAt + 7}, Agent ở \code{MaxActive - 1}); TV2 mới có 1 lớp giả
+\end{itemize}
+\end{columns}
+\end{frame}

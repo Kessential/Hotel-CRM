@@ -1,0 +1,344 @@
+% ================= 4. CÀI ĐẶT - 2 DESIGN PATTERN =================
+\section{Cài đặt -- 02 Design Pattern}
+
+\begin{frame}{Kiến trúc cài đặt và các mẫu thiết kế trong code}
+\begin{columns}[T]
+\column{0.4\textwidth}
+\centering
+\begin{tikzpicture}[
+  a/.style={-{Stealth[length=2mm]}, draw=black!65, thick}]
+\node[pk=navy] (ui) at (0,4.2) {\textbf{HotelCRM.WinForms} \ {\tiny(giao diện)}\\{\tiny Form, Program.cs, ErrorHandler}};
+\node[pk=tvA] (bl) at (0,2.85) {\textbf{HotelCRM.Business} \ {\tiny(nghiệp vụ)}\\{\tiny Services, Queries, Strategy, Factory}};
+\node[pk=tvB] (dm) at (0,1.5) {\textbf{HotelCRM.Domain} \ {\tiny(lõi)}\\{\tiny thực thể, State, quy tắc, interface}};
+\node[pk=common] (da) at (0,0.15) {\textbf{HotelCRM.Data} \ {\tiny(dữ liệu)}\\{\tiny JsonRepository, Record, Mapper}};
+\draw[a] (ui) -- (bl); \draw[a] (bl) -- (dm); \draw[a] (da) -- (dm);
+\draw[a,dashed] (ui.east) -- ++(0.35,0) |- node[pos=0.25,right,font=\tiny,align=left]{chỉ\\\code{Program.cs}} (da.east);
+\end{tikzpicture}
+
+\vspace{1mm}
+{\tiny Domain không tham chiếu project nào $\Rightarrow$ không có SQL/UI trong lõi. \code{HotelCRM.Tests} tham chiếu Domain, Business, Data và chạy không cần giao diện.\par}
+\column{0.58\textwidth}
+\tiny
+\begin{tabularx}{\linewidth}{@{}L{1.9cm}L{0.75cm}YL{1.3cm}@{}}
+\toprule
+\textbf{Mẫu (nhóm GoF)} & \textbf{TV} & \textbf{Lớp tham gia} & \textbf{Trạng thái} \\
+\midrule
+\rowcolor{tvA!10} \textbf{State} (hành vi) & TV1 & \code{SupportTicket}, \code{TicketState} + 4 state & \stOK \\
+Factory Method (khởi tạo) & TV1 & \code{TicketFactory} + 3 factory & \stOK \\
+\rowcolor{tvB!10} \textbf{Strategy} (hành vi) & TV2 & \code{IAssignmentStrategy} + 3 strategy; Context \code{TicketService} (TV1) & \stOK \ cầu nối \\
+Observer (hành vi) & TV1/TV2 & Subject \code{SupportTicket}; 3 observer & Subject \stOK; observer: GĐ 4 \\
+Singleton (khởi tạo) & Chung & \code{AppConfig.Instance} & \stOK \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2mm}
+\begin{block}{Hai mẫu trình bày chi tiết}
+\scriptsize
+\textbf{State} (TV1): vòng đời ticket. \textbf{Strategy} (TV2): thuật toán phân công -- là \textbf{cầu nối} vì Context nằm ở phân hệ TV1, các ConcreteStrategy nằm ở phân hệ TV2.
+\end{block}
+\end{columns}
+\end{frame}
+
+% ---------- STATE ----------
+\begin{frame}{Pattern 1 -- State (TV1): bài toán và sơ đồ trạng thái ticket}
+\begin{columns}[c]
+\column{0.42\textwidth}
+\scriptsize
+\textbf{Bài toán.} Ticket có 4 trạng thái; mỗi thao tác (Start, Resolve, Close, Reopen) hợp lệ ở trạng thái này nhưng bị cấm ở trạng thái khác (quy tắc 1, 2).\\[1mm]
+\textbf{Nếu không dùng mẫu:} mỗi hàm của \code{SupportTicket} là một chuỗi \code{if/switch} theo trạng thái; thêm trạng thái mới phải sửa cả 4 hàm.\\[1mm]
+\textbf{Giải pháp:} mỗi trạng thái là một lớp. \code{SupportTicket} ủy quyền thao tác cho đối tượng \code{State} hiện tại; lớp trạng thái tự quyết định chuyển sang đâu hoặc ném \code{BusinessRuleException}.
+\column{0.56\textwidth}
+\centering
+\begin{tikzpicture}[
+  s/.style={draw=tvA, fill=tvA!10, rounded corners=6pt, minimum width=2.2cm, minimum height=0.8cm, font=\scriptsize\bfseries},
+  t/.style={-{Stealth[length=2mm]}, draw=black!70, font=\tiny}]
+\node[circle, fill=black, inner sep=2.5pt] (i) at (-1.6,2.2) {};
+\node[s] (o) at (0,2.2) {Open};
+\node[s] (p) at (3.6,2.2) {InProgress};
+\node[s] (r) at (3.6,0) {Resolved};
+\node[s] (c) at (0,0) {Closed};
+\node[circle, draw=black, inner sep=1.5pt] (e) at (-1.6,0) {}; \fill (e) circle (1.6pt);
+\draw[t] (i) -- node[above]{CreateTicket} (o);
+\draw[t] (o) -- node[above]{Start [có Agent]} node[below]{Agent được giao} (p);
+\draw[t] (p) -- node[right,align=left]{Resolve\\{}[ghi chú không rỗng]} (r);
+\draw[t] (r.west) -- node[above]{Close} node[below]{Manager} (c.east);
+\draw[t] (r.north west) to[bend left=35] node[left,align=right,pos=0.45]{Reopen [now $\le$ ResolvedAt\\+ ReopenDays] -- Manager} (p.south west);
+\draw[t] (c) -- (e);
+\draw[t] (o.north) to[out=110,in=70,looseness=6] node[above]{AssignTo (Manager)} (o.north east);
+\draw[t] (p.north) to[out=110,in=70,looseness=6] node[above]{AssignTo (gán lại)} (p.north east);
+\end{tikzpicture}
+
+\vspace{1mm}
+{\tiny Mọi mũi tên không vẽ (ví dụ Resolve khi Closed) $\Rightarrow$ lớp cha \code{TicketState} ném \code{BusinessRuleException}.\par}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Pattern 1 -- State: vai trò các lớp}
+\begin{columns}[c]
+\column{0.5\textwidth}
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[every node/.append style={anchor=north}]
+\path (0,4) node[umlcls=tvA] (ctx) {{\centering\textbf{SupportTicket} \textcolor{warn}{«Context»}\par}\nodepart{second}-State: TicketState\nodepart{third}+Start(now)\\+Resolve(note, now)\\+Close(now)\\+Reopen(now, reopenDays)\\\textasciitilde MoveTo(next, now)};
+\path (5.0,4) node[umlcls=tvA] (st) {{\centering\textbf{\textit{TicketState}} \textcolor{warn}{«State»}\par}\nodepart{second}+Name, IsActive, IsClosed\nodepart{third}\textasciitilde Start(t, now)\\\textasciitilde Resolve(t, note, now)\\\textasciitilde Close(t, now)\\\textasciitilde Reopen(t, now, days)};
+\foreach \x/\n/\m in {2.4/Open/Start, 4.3/InProgress/Resolve, 6.2/Resolved/{Close, Reopen}, 8.1/Closed/--}{
+  \path (\x,0.6) node[umlcls=tvA,minimum width=1.75cm] (z\n) {{\centering\textbf{\n State}\par}\nodepart{second}~\nodepart{third}\m};
+  \draw[thick,black!70] (z\n.north) -- ++(0,0.3);}
+\draw[thick,black!70] (2.4,0.9) -- (8.1,0.9);
+\draw[inh] (5.0,0.9) -- (st.south);
+\draw[comp] (ctx.east |- 0,3.5) -- node[mult,above,pos=0.8]{1} (st.west |- 0,3.5);
+\node[font=\tiny, text=warn] at (6.2,-1.0) {«ConcreteState»};
+\end{tikzpicture}}
+\column{0.48\textwidth}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}L{1.7cm}Y@{}}
+\toprule
+\textbf{Vai trò GoF} & \textbf{Lớp trong code} \\
+\midrule
+Context & \code{SupportTicket} -- giữ \code{State}, ủy quyền 4 thao tác \\
+State & \code{TicketState} (abstract) -- mặc định \textbf{từ chối} mọi thao tác \\
+ConcreteState & \code{OpenState}, \code{InProgressState}, \code{ResolvedState}, \code{ClosedState} -- chỉ override thao tác hợp lệ \\
+Chuyển trạng thái & ConcreteState gọi \code{ticket.MoveTo(new XxxState(), now)} \\
+Khôi phục từ file & \code{TicketState.FromName(name)} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2mm}
+\textbf{Cơ chế phối hợp:} đa hình (gọi \code{State.Start()} không biết lớp cụ thể) + ủy quyền (Context chuyển việc cho State) + State tạo State kế tiếp.
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Pattern 1 -- State: cài đặt trong code}
+\lstset{basicstyle=\ttfamily\tiny}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\textbf{\scriptsize Context -- \code{Domain/Tickets/SupportTicket.cs}}
+\begin{lstlisting}
+public void Start(DateTime now)
+{
+    State.Start(this, now);   // delegate to the state
+}
+
+internal void MoveTo(TicketState next, DateTime now)
+{
+    TicketState previous = State;
+    State = next;
+    UpdatedAt = now;
+    Notify(previous, next);   // Observer hook
+}
+\end{lstlisting}
+\textbf{\scriptsize State -- \code{States/TicketState.cs}}
+\begin{lstlisting}
+internal virtual void Start(SupportTicket ticket, DateTime now)
+{
+    throw new BusinessRuleException(
+        $"A ticket that is {Name} cannot be started.");
+}
+\end{lstlisting}
+\column{0.48\textwidth}
+\textbf{\scriptsize ConcreteState -- \code{States/OpenState.cs}}
+\begin{lstlisting}
+internal override void Start(SupportTicket ticket, DateTime now)
+{
+    if (ticket.AssignedAgent is null)
+    {
+        throw new BusinessRuleException(
+            "The ticket must be assigned to an agent "
+            + "before it can be started.");
+    }
+    ticket.MoveTo(new InProgressState(), now);
+}
+\end{lstlisting}
+\textbf{\scriptsize ConcreteState -- \code{States/ResolvedState.cs}}
+\begin{lstlisting}
+internal override void Reopen(SupportTicket ticket,
+    DateTime now, int reopenDays)
+{
+    DateTime resolvedAt = ticket.ResolvedAt ?? ticket.UpdatedAt;
+    DateTime deadline = resolvedAt.AddDays(reopenDays);
+    if (now > deadline) { throw new BusinessRuleException(...); }
+    ticket.MoveTo(new InProgressState(), now);
+}
+\end{lstlisting}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Pattern 1 -- State: đánh giá và bài mở rộng}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\begin{block}{Hiệu quả}
+\scriptsize
+\begin{itemize}
+  \item Quy tắc 1, 2 nằm đúng một chỗ cho mỗi trạng thái; \code{SupportTicket} không có \code{switch} theo trạng thái.
+  \item Trạng thái cấm bị chặn \textbf{trong Domain}, kể cả khi gọi Service không qua giao diện.
+  \item 6 test \code{TicketStateTests} kiểm tra cả chuyển hợp lệ và chuyển cấm.
+\end{itemize}
+\end{block}
+\begin{block}{Nhược điểm / đánh đổi}
+\scriptsize
+\begin{itemize}
+  \item Thêm 5 lớp cho 4 trạng thái; người đọc phải mở nhiều file để thấy toàn bộ máy trạng thái.
+  \item Lưu file chỉ lưu tên trạng thái, cần bảng \code{FromName} để dựng lại.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Bài mở rộng: thêm \code{OnHoldState} (chờ khách phản hồi)}
+\scriptsize
+\begin{enumerate}
+  \item Tạo lớp \code{OnHoldState : TicketState}, override \code{Start()} để quay lại InProgress.
+  \item Thêm thao tác \code{Hold()} vào \code{TicketState} (mặc định ném lỗi) và override trong \code{InProgressState}.
+  \item Thêm \textbf{1 dòng} vào \code{TicketState.FromName()} để nạp lại từ file.
+\end{enumerate}
+Các ConcreteState cũ không phải sửa; đúng tinh thần ``thêm lớp mới + đăng ký 1 dòng'' (OCP).
+\end{block}
+\end{columns}
+\end{frame}
+
+% ---------- STRATEGY ----------
+\begin{frame}{Pattern 2 -- Strategy (TV2): bài toán và vai trò các lớp}
+\begin{columns}[c]
+\column{0.4\textwidth}
+\scriptsize
+\textbf{Bài toán.} Manager bấm \emph{Auto Assign}: hệ thống chọn Agent cho ticket. Có nhiều cách chọn và khách sạn muốn đổi cách chọn \textbf{không cần sửa code}:
+\begin{itemize}
+  \item \code{LeastLoaded}: Agent ít ticket đang mở nhất
+  \item \code{DepartmentMatch}: ưu tiên Agent thuộc bộ phận xử lý của loại ticket (\code{GUEST}/\code{HOUSE}/\code{ENG}), không còn ai thì chọn trong toàn bộ
+  \item \code{RoundRobin}: xoay vòng theo Id
+\end{itemize}
+\textbf{Cầu nối 2 phân hệ:} Context \code{TicketService} (TV1) chỉ biết interface; 3 lớp cụ thể do TV2 viết.
+\column{0.58\textwidth}
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[every node/.append style={anchor=north}]
+\path (0,4.2) node[umlcls=tvA] (ctx) {{\centering\textbf{TicketService} \textcolor{warn}{«Context»}\par}\nodepart{second}-\_strategy: IAssignmentStrategy\nodepart{third}+AutoAssign(actor, ticketId): Agent};
+\path (6.0,4.2) node[umlcls=navy] (ist) {{\centering\textit{«interface»} \textbf{IAssignmentStrategy} \textcolor{warn}{«Strategy»}\par}\nodepart{second}~\nodepart{third}+Pick(departmentCode, candidates): Agent?};
+\path (3.0,1.4) node[umlcls=tvB] (s1) {{\centering\textbf{LeastLoadedStrategy}\par}\nodepart{second}~\nodepart{third}+Pick(...)};
+\path (6.0,1.4) node[umlcls=tvB] (s2) {{\centering\textbf{DepartmentMatchStrategy}\par}\nodepart{second}-\_leastLoaded\nodepart{third}+Pick(...)};
+\path (9.0,1.4) node[umlcls=tvB] (s3) {{\centering\textbf{RoundRobinStrategy}\par}\nodepart{second}-\_lastPickedId: int\nodepart{third}+Pick(...)};
+\path (0,1.4) node[umlcls=common] (wl) {{\centering\textit{«record»} \textbf{AgentWorkload}\par}\nodepart{second}+Agent, ActiveCount\nodepart{third}~};
+\path (9.0,-0.6) node[draw=navy, fill=navy!8, font=\scriptsize, align=center] (pr) {\code{Program.cs}: bảng \code{tên -> strategy}\\chọn theo \code{appsettings.json}};
+\draw[aggr] (ctx.east |- 0,3.6) -- node[mult,pos=0.85,above]{1} (ist.west |- 0,3.6);
+\coordinate (j) at (6.0,1.75);
+\draw[impl] (j) -- (ist.south);
+\foreach \s in {s1,s2,s3}{\draw[dashed,black!70] (\s.north) |- (j);}
+\draw[comp] (s2.south) -- ++(0,-0.4) -| node[mult,pos=0.3,below]{dùng lại} (s1.south);
+\draw[dep] (ctx.south) -- node[mult,right]{tạo} (wl.north);
+\draw[dep] (pr.north) -- (s3.south);
+\node[font=\tiny, text=warn] at (6.0,-0.3) {«ConcreteStrategy» (TV2)};
+\end{tikzpicture}}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Pattern 2 -- Strategy: cài đặt trong code}
+\lstset{basicstyle=\ttfamily\tiny}
+\begin{columns}[T]
+\column{0.53\textwidth}
+\textbf{\scriptsize Context -- \code{Business/Services/TicketService.cs} (TV1)}
+\begin{lstlisting}
+public Agent AutoAssign(Employee actor, int ticketId)
+{
+    actor.EnsureCanAssign();                  // rule 11
+    SupportTicket ticket = _tickets.GetRequired(ticketId);
+    List<AgentWorkload> candidates = new();
+    foreach (Agent agent in GetAgents())
+    {
+        int activeCount = CountActiveTickets(agent.Id, ticket.Id);
+        if (agent.CanTake(activeCount, _settings.MaxActiveTickets))
+            candidates.Add(new AgentWorkload(agent, activeCount));
+    }
+    Agent? chosen = _strategy.Pick(ticket.HandlingDepartmentCode,
+                                   candidates);   // polymorphic call
+    ...
+    ticket.AssignTo(chosen, chosenCount, _settings.MaxActiveTickets);
+    _tickets.Save(ticket);
+    return ticket.AssignedAgent!;
+}
+\end{lstlisting}
+\column{0.45\textwidth}
+\textbf{\scriptsize ConcreteStrategy -- \code{Business/Assignment/} (TV2)}
+\begin{lstlisting}
+public sealed class DepartmentMatchStrategy
+    : IAssignmentStrategy
+{
+    private readonly LeastLoadedStrategy
+        _leastLoaded = new();
+
+    public Agent? Pick(string departmentCode,
+        IReadOnlyList<AgentWorkload> candidates)
+    {
+        List<AgentWorkload> inDepartment = candidates
+            .Where(c => string.Equals(
+                c.Agent.Department.Code, departmentCode,
+                StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        return _leastLoaded.Pick(departmentCode,
+            inDepartment.Count > 0 ? inDepartment : candidates);
+    }
+}
+\end{lstlisting}
+\textbf{\scriptsize Chọn strategy -- \code{Program.cs} + \code{appsettings.json}}
+\begin{lstlisting}
+["LeastLoaded"]     = new LeastLoadedStrategy(),
+["DepartmentMatch"] = new DepartmentMatchStrategy(),
+["RoundRobin"]      = new RoundRobinStrategy(),
+// appsettings.json: "DefaultAssignmentStrategy": "LeastLoaded"
+\end{lstlisting}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Pattern 2 -- Strategy: luồng chạy Auto Assign (xuyên 2 phân hệ)}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  msg/.style={-{Stealth[length=2mm]}, draw=black!75, font=\tiny},
+  ret/.style={dashed,-{Stealth[length=1.6mm]}, draw=black!55, font=\tiny}]
+\foreach \x/\n/\t/\c in {0/f/{:TicketListForm}/navy, 3.2/s/{:TicketService}/tvA, 6.4/g/{:IAssignmentStrategy}/tvB, 9.6/t/{:SupportTicket}/tvA, 12.8/a/{:Agent}/common, 16.0/r/{:IRepository}/common}{
+  \node[ll=\c] (\n) at (\x,0) {\t};
+  \draw[black!40, dashed] (\n.south) -- (\x,-6.0);}
+\node[font=\scriptsize] (m) at (-2.2,0) {Manager};
+\draw[msg] (-2.2,-0.9) -- node[above]{bấm Auto Assign} (0,-0.9);
+\draw[msg] (0,-1.4) -- node[above]{\code{AutoAssign(actor, id)}} (3.2,-1.4);
+\draw[msg] (3.2,-1.8) to[out=0,in=0,looseness=4] node[right,align=left]{\code{EnsureCanAssign()}, đếm tải,\\lọc \code{Agent.CanTake()}} (3.2,-2.4);
+\draw[msg] (3.2,-2.9) -- node[above]{\code{Pick(dept, candidates)}} (6.4,-2.9);
+\draw[ret] (6.4,-3.4) -- node[above]{\code{Agent?}} (3.2,-3.4);
+\draw[msg] (3.2,-3.9) -- node[above]{\code{AssignTo(agent, active, max)}} (9.6,-3.9);
+\draw[msg] (9.6,-4.4) -- node[above]{\code{EnsureCanTake()}} (12.8,-4.4);
+\draw[msg] (3.2,-5.0) -- node[above,pos=0.8]{\code{Save(ticket)}} (16.0,-5.0);
+\draw[ret] (3.2,-5.6) -- node[above]{Agent được chọn} (0,-5.6);
+\node[draw=tvB, fill=tvB!8, font=\tiny, align=left, anchor=north west] at (5.4,-0.45) {lớp cụ thể do \code{Program.cs} chọn:\\\code{LeastLoaded} | \code{DepartmentMatch} | \code{RoundRobin}};
+\end{tikzpicture}}
+
+\vspace{1mm}
+{\scriptsize Strategy chỉ \textbf{chọn}; quyết định cuối vẫn ở Domain: \code{SupportTicket.AssignTo()} kiểm tra trạng thái và \code{Agent.EnsureCanTake()} kiểm tra giới hạn tải (quy tắc 1, 3). Strategy trả \code{null} $\Rightarrow$ Domain ném ``No agent is available''.\par}
+\end{frame}
+
+\begin{frame}{Pattern 2 -- Strategy: đánh giá và bài mở rộng}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\begin{block}{Hiệu quả}
+\scriptsize
+\begin{itemize}
+  \item Đổi thuật toán bằng 1 dòng trong \code{appsettings.json}, không build lại.
+  \item TV1 viết và test \code{TicketService} với strategy giả; TV2 test strategy không cần code ticket (\code{AgentWorkload} chỉ chứa \code{Agent} và số đếm).
+  \item Test \code{LeastLoaded_Pick_ReturnsAgentWithFewestActive}.
+\end{itemize}
+\end{block}
+\begin{block}{Nhược điểm / đánh đổi}
+\scriptsize
+\begin{itemize}
+  \item Thêm 1 interface + 3 lớp cho một hàm chọn; với 1 thuật toán duy nhất thì là thừa.
+  \item \code{RoundRobinStrategy} có trạng thái (\code{_lastPickedId}) nên không dùng chung an toàn giữa nhiều luồng; mất khi tắt app.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Bài mở rộng: thêm \code{SkillBasedStrategy}}
+\scriptsize
+\begin{enumerate}
+  \item Tạo lớp \code{SkillBasedStrategy : IAssignmentStrategy}, cài \code{Pick()} (ví dụ ưu tiên Agent có kỹ năng ngôn ngữ của khách, hòa thì ít tải nhất).
+  \item Đăng ký \textbf{1 dòng} trong bảng của \code{Program.cs}: \code{["SkillBased"] = new SkillBasedStrategy()}.
+  \item Đổi \code{DefaultAssignmentStrategy} thành \code{SkillBased}.
+\end{enumerate}
+\code{TicketService} và 3 strategy cũ không sửa dòng nào (OCP). Tên lạ trong cấu hình $\to$ báo lỗi lúc khởi động, liệt kê tên hợp lệ.
+\end{block}
+\end{columns}
+\end{frame}
