@@ -21,12 +21,12 @@
 \column{0.54\textwidth}
 \scriptsize
 \begin{itemize}
-  \item \textbf{Một Main Shell} (\code{MainForm}): menu Tickets / Customers / Bookings / Reports / Account, thanh trạng thái nhận thông báo từ \code{UiNotificationObserver}.
+  \item \textbf{Một Main Shell} (\code{MainForm}): menu Tickets / Customers / Bookings / Reports / Account, thanh trạng thái sẽ nhận thông báo từ \code{UiNotificationObserver} (GĐ 4; hiện observer còn thân rỗng).
   \item \textbf{Menu theo vai trò}: Reports chỉ Manager thấy; Record Survey chỉ Agent thấy; nút Auto Assign/Assign ẩn với Agent. Quyền vẫn được kiểm tra lại ở tầng nghiệp vụ.
   \item \textbf{Form chỉ gọi Service}, không chứa quy tắc nghiệp vụ; mọi handler bọc trong \code{ErrorHandler.Run()} $\to$ lỗi nghiệp vụ hiện hộp thoại cảnh báo, lỗi khác ghi log.
   \item Form con mở dạng hộp thoại (\code{ShowDialog}); \code{*.Designer.cs} chỉ tạo control nên mở được bằng Designer của Visual Studio.
   \item \textbf{Quy ước tên control}: \code{txt}, \code{cbo}, \code{btn}, \code{dgv}, \code{col}, \code{num}, \code{dtp}, \code{lbl}, \code{mnu}, \code{sts}.
-  \item Ngày hiển thị \code{yyyy-MM-dd HH:mm}; tiền USD 2 chữ số thập phân; chữ trên giao diện bằng tiếng Anh.
+  \item Ngày giờ hiển thị \code{yyyy-MM-dd HH:mm} (ngày đặt phòng: \code{yyyy-MM-dd}); tiền USD 2 chữ số thập phân; chữ trên giao diện bằng tiếng Anh.
 \end{itemize}
 \end{columns}
 \end{frame}
@@ -74,7 +74,7 @@
 \column{0.6\textwidth}
 \centering
 \includegraphics[width=\linewidth]{img/02-main.png}\\[1mm]
-{\scriptsize \code{MainForm} của Manager: thấy menu Reports; Agent thì thấy Record Survey. Thanh trạng thái ``Ready'' nhận thông báo đổi trạng thái ticket.\par}
+{\scriptsize \code{MainForm} của Manager: thấy menu Reports; Agent thì thấy Record Survey. Thanh trạng thái ``Ready'' sẽ hiện thông báo đổi trạng thái ticket ở GĐ 4.\par}
 \end{columns}
 \end{frame}
 
@@ -103,7 +103,7 @@
 \column{0.56\textwidth}
 \centering
 \includegraphics[height=0.6\textheight]{img/05-ticket-detail.png}\\[1mm]
-{\tiny \code{TicketDetailForm}: đủ trường của phiếu theo dõi (BM2). Agent được giao thấy Start/Resolve, Manager thấy Close Ticket/Reopen; State quyết định thao tác nào hợp lệ.\par}
+{\tiny \code{TicketDetailForm}: đủ trường của phiếu theo dõi (BM2). Agent thấy Start/Resolve (chỉ Agent được giao mới làm được, \code{EnsureAssignedTo()} chặn người khác), Manager thấy Close Ticket/Reopen; State quyết định thao tác nào hợp lệ.\par}
 \end{columns}
 \end{frame}
 

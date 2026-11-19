@@ -46,7 +46,7 @@ Singleton (khởi tạo) & Chung & \code{AppConfig.Instance} & \stOK \\
 \scriptsize
 \textbf{Bài toán.} Ticket có 4 trạng thái; mỗi thao tác (Start, Resolve, Close, Reopen) hợp lệ ở trạng thái này nhưng bị cấm ở trạng thái khác (quy tắc 1, 2).\\[1mm]
 \textbf{Nếu không dùng mẫu:} mỗi hàm của \code{SupportTicket} là một chuỗi \code{if/switch} theo trạng thái; thêm trạng thái mới phải sửa cả 4 hàm.\\[1mm]
-\textbf{Giải pháp:} mỗi trạng thái là một lớp. \code{SupportTicket} ủy quyền thao tác cho đối tượng \code{State} hiện tại; lớp trạng thái tự quyết định chuyển sang đâu hoặc ném \code{BusinessRuleException}.
+\textbf{Giải pháp:} mỗi trạng thái là một lớp. \code{SupportTicket} ủy quyền thao tác cho đối tượng \code{State} hiện tại; lớp trạng thái tự quyết định chuyển sang đâu hoặc ném ngoại lệ (\code{BusinessRuleException}; Resolve thiếu ghi chú thì \code{ValidationException}).
 \column{0.56\textwidth}
 \centering
 \begin{tikzpicture}[
@@ -186,10 +186,10 @@ internal override void Reopen(SupportTicket ticket,
 \scriptsize
 \begin{enumerate}
   \item Tạo lớp \code{OnHoldState : TicketState}, override \code{Start()} để quay lại InProgress.
-  \item Thêm thao tác \code{Hold()} vào \code{TicketState} (mặc định ném lỗi) và override trong \code{InProgressState}.
+  \item Thêm thao tác \code{Hold()} vào \code{TicketState} (mặc định ném lỗi), override trong \code{InProgressState}; thêm \code{SupportTicket.Hold(now)} ủy quyền cho \code{State}.
   \item Thêm \textbf{1 dòng} vào \code{TicketState.FromName()} để nạp lại từ file.
 \end{enumerate}
-Các ConcreteState cũ không phải sửa; đúng tinh thần ``thêm lớp mới + đăng ký 1 dòng'' (OCP).
+\code{OpenState}, \code{ResolvedState}, \code{ClosedState} không phải sửa: thêm trạng thái chủ yếu là thêm lớp mới (OCP). Đánh đổi: thao tác mới (\code{Hold}) vẫn phải sửa lớp cha, Context và trạng thái nguồn.
 \end{block}
 \end{columns}
 \end{frame}

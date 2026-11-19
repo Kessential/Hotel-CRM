@@ -76,7 +76,7 @@ F7 Chăm sóc, báo cáo & UC8, UC10 & \code{SurveyForm}, \code{ReportForm} & \c
 \textcolor{warn}{- - -} tham chiếu chéo phân hệ chỉ bằng Id\\
 \textbf{Lớp liên kết n--n có thuộc tính:}\\
 \textbf{Booking} (Customer--Room: ngày, trạng thái)\\
-\textbf{Interaction} (Customer--Ticket: kênh, thời điểm, nội dung)};
+\textbf{Interaction}: thực thể yếu của Customer (không có PK riêng), tham chiếu tùy chọn tới Ticket};
 \end{tikzpicture}}
 \end{frame}
 
@@ -91,7 +91,7 @@ F7 Chăm sóc, báo cáo & UC8, UC10 & \code{SurveyForm}, \code{ReportForm} & \c
 \path (1.95,2.85) node[umlcls=common] (agt) {{\centering\textbf{Agent}\par}\nodepart{second}~\nodepart{third}+CanTake(active, max): bool\\+EnsureCanTake(active, max)\\+CanAssign(): false ...};
 \path (1.95,0.3) node[umlcls=common] (dep) {{\centering\textbf{Department}\par}\nodepart{second}+Code, Name: string\\+Agents: IReadOnlyList<Agent>\nodepart{third}~};
 \path (8.2,8.4) node[umlcls=tvA] (tk) {{\centering\textbf{\textit{SupportTicket}} \ (Context của State, Subject của Observer)\par}\nodepart{second}+Id, CustomerId: int\\+Title, Description: string\\+Priority: TicketPriority\\+CreatedAt, DueAt, UpdatedAt: DateTime\\+State: TicketState\\+AssignedAgent: Agent?\\+ResolvedAt, ResolutionNote, ClosedAt\\+BaseSlaHours, HandlingDepartmentCode \{abstract\}\nodepart{third}+AssignTo(agent, active, max)\\+Start(now), Resolve(note, now)\\+Close(now), Reopen(now, reopenDays)\\+CalculateDueAt(slaFactor): DateTime\\+IsOverdue(now): bool\\+Validate(roomInActiveStay) \{virtual\}\\+EnsureAssignedTo(actor), Attach(observer)\\\textasciitilde MoveTo(next, now) \quad -Notify(from, to)};
-\path (5.3,1.15) node[umlcls=tvA] (c1) {{\centering\textbf{ComplaintTicket}\par}\nodepart{second}~\nodepart{third}BaseSlaHours = 24\\Dept = GUEST\\Goodwill = 50};
+\path (5.3,1.15) node[umlcls=tvA] (c1) {{\centering\textbf{ComplaintTicket}\par}\nodepart{second}~\nodepart{third}BaseSlaHours = 24\\Dept = GUEST\\Goodwill = 50\\+Validate(roomInActiveStay)};
 \path (8.2,1.15) node[umlcls=tvA] (c2) {{\centering\textbf{ServiceRequestTicket}\par}\nodepart{second}~\nodepart{third}BaseSlaHours = 8\\Dept = HOUSE};
 \path (11.75,1.15) node[umlcls=tvA] (c3) {{\centering\textbf{MaintenanceTicket}\par}\nodepart{second}+RoomId: int\nodepart{third}BaseSlaHours = 12, Dept = ENG\\+Validate(roomInActiveStay)};
 \path (15.6,8.4) node[umlcls=tvA] (st) {{\centering\textbf{\textit{TicketState}}\par}\nodepart{second}+Name, IsActive, IsClosed \{abstract\}\nodepart{third}\textasciitilde Start/Resolve/Close/Reopen()\\\quad \{virtual, mặc định ném lỗi\}\\+FromName(name) \{static\}};
@@ -175,8 +175,8 @@ F7 Chăm sóc, báo cáo & UC8, UC10 & \code{SurveyForm}, \code{ReportForm} & \c
 \node[sbox=tvB,minimum width=5.6cm] (r1) at (12.2,4.4) {\code{CustomerDirectory}};
 \node[sbox=tvB,minimum width=5.6cm] (r2) at (12.2,3.4) {\code{StayLookup}};
 \node[sbox=tvB,minimum width=5.6cm] (r3) at (12.2,2.4) {\code{LeastLoaded}, \code{DepartmentMatch}, \code{RoundRobin}};
-\node[sbox=tvB,minimum width=5.6cm] (r4) at (12.2,1.4) {\code{InteractionLogger}, \code{LoyaltyObserver}};
-\node[sbox=tvB,minimum width=5.6cm] (r5) at (12.2,0.0) {\code{CustomerService}, \code{SurveyService}};
+\node[sbox=tvB,minimum width=5.6cm] (r4) at (12.2,1.4) {\code{InteractionLogger}, \code{LoyaltyObserver},\\\code{UiNotificationObserver}};
+\node[sbox=tvB,minimum width=5.6cm] (r5) at (12.2,0.0) {\code{CustomerService}, \code{SurveyService},\\\code{ReportService}};
 \draw[use] (ts.east) -- node[above,pos=0.55]{dùng} (i1.west);
 \draw[use] (ts.east) -- (i2.west);
 \draw[use] (ts.east) -- (i3.west);
@@ -201,7 +201,7 @@ Service của phân hệ này không gọi service của phân hệ kia; \code{D
 \midrule
 Kế thừa (5 cây) & \code{Customer}, \code{Employee} $\to$ \code{Person}; \code{Agent}, \code{Manager} $\to$ \code{Employee}; 3 ticket $\to$ \code{SupportTicket}; 4 state $\to$ \code{TicketState}; 4 hạng $\to$ \code{MembershipTier} & \code{override} \\
 Thực thi & \code{JsonRepository}, \code{InMemoryRepository} $\to$ \code{IRepository<T>}; 3 strategy $\to$ \code{IAssignmentStrategy}; observer $\to$ \code{ITicketObserver}; \code{CustomerDirectory}, \code{StayLookup}, \code{TicketQuery} & \code{class X : IY} \\
-Hợp thành \compo & \code{Customer} \compo-- \code{InteractionHistory} \compo-- \code{Interaction}; \code{SupportTicket} \compo-- \code{TicketState} & tạo bên trong, constructor \code{internal} \\
+Hợp thành \compo & \code{Customer} \compo-- \code{InteractionHistory} \compo-- \code{Interaction}; \code{SupportTicket} \compo-- \code{TicketState} & tạo bên trong lớp chủ; \code{InteractionHistory}, \code{Interaction} có constructor \code{internal} \\
 Kết tập \aggre & \code{Department} \aggre-- \code{Agent}; \code{RoomType} \aggre-- \code{Room}; \code{SupportTicket} \aggre-- \code{Agent} (người được giao) & \code{Agents}, \code{Rooms} chỉ đọc \\
 Kết hợp & \code{Booking} -- \code{Customer}, \code{Room}; \code{Customer} $\to$ \code{MembershipTier} & thuộc tính tham chiếu \\
 Phụ thuộc & \code{TicketService} $\dashrightarrow$ \code{IAssignmentStrategy}, \code{TicketFactory}; Form $\dashrightarrow$ Service & tham số constructor \\
@@ -209,5 +209,5 @@ Phụ thuộc & \code{TicketService} $\dashrightarrow$ \code{IAssignmentStrategy
 \end{tabularx}
 
 \vspace{2mm}
-{\scriptsize Thống kê: \textbf{30 lớp} trong \code{HotelCRM.Domain} (26 lớp thực thể/nghiệp vụ + 3 ngoại lệ + \code{BusinessSettings}), 4 enum, 6 interface, 3 record; \code{HotelCRM.Business}: 25 kiểu (21 lớp, 1 interface, 3 record).\par}
+{\scriptsize Thống kê: \textbf{31 lớp} trong \code{HotelCRM.Domain} (26 lớp thực thể/nghiệp vụ + 3 ngoại lệ + \code{BusinessSettings} + \code{RepositoryExtensions}), 4 enum, 6 interface, 3 record; \code{HotelCRM.Business}: 24 kiểu (20 lớp, 1 interface, 3 record).\par}
 \end{frame}

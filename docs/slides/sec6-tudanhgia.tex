@@ -47,7 +47,7 @@ GoF & $\ge$ 3 mẫu, $\ge$ 1 cầu nối & State, Factory Method, Strategy (cầ
 Seed data & $\ge$ 120 bản ghi liên thông & 13 bản ghi (4 phòng ban, 3 NV, 2 loại phòng, 4 phòng) & \stNO \\
 Sơ đồ tuần tự/trạng thái & $\ge$ 4 ($\ge$ 2/TV, 1 xuyên PH) & 2 (trạng thái ticket, tuần tự Auto Assign -- trong slide) & \stNO \\
 Test & $\ge$ 26 ($\ge$ 18 unit, $\ge$ 8 integration) & 22 unit (11/TV), 0 integration; 20 PASS & \stNO \\
-Git & $\ge$ 24 commit, $\ge$ 3 tuần, 40--60\%/TV & 41 commit (15--18/11); TV1 28, TV2 13 (68\% / 32\%) & \stPART \\
+Git & $\ge$ 24 commit, $\ge$ 3 tuần, 40--60\%/TV & 44 commit (15--19/11); TV1 28, TV2 16 (64\% / 36\%); mã logic theo \code{git blame} (bỏ comment, docs, Designer): TV1 79\%, TV2 21\% & \stPART \\
 \bottomrule
 \end{tabularx}
 \end{frame}
@@ -61,7 +61,7 @@ Git & $\ge$ 24 commit, $\ge$ 3 tuần, 40--60\%/TV & 41 commit (15--18/11); TV1 
 1.1 & Quy mô \& hoàn thiện chức năng liên PH & \gC & 0.250 & BFD 7 nhánh, 10 UC nhưng 7 UC chạy; 9 Form (6 chạy, TV1 có 3 $<$ 4); chỉ 2 vai trò \\
 1.2 & Master-Detail, lọc đa tiêu chí, báo cáo & \gD & 0.125 & Có lọc 5 tiêu chí (ticket) và tìm khách; 0 Form M-D, 0 báo cáo, chưa xuất Excel/PDF \\
 1.3 & Seed data liên thông $\ge$ 120 & \gD & 0.125 & 13 bản ghi; dữ liệu đầy đủ (15 khách, 20 booking, 25 ticket) dự kiến ở GĐ 4 vẫn $<$ 120 \\
-1.4 & Đóng gói clean-room, hồ sơ, Git nhóm & \gC & 0.250 & README, \code{.gitignore}, cấu hình ngoài, nhánh \code{main/develop/feature}, merge \code{--no-ff}; chưa publish thử, chưa video, chưa PR GitHub, commit dồn 4 ngày, 68/32 \\
+1.4 & Đóng gói clean-room, hồ sơ, Git nhóm & \gC & 0.250 & README, \code{.gitignore}, cấu hình ngoài, nhánh \code{main/develop/feature}, merge \code{--no-ff}; chưa publish thử, chưa video, chưa PR GitHub, commit dồn 5 ngày; số commit 64/36, mã logic 79/21 \\
 2.1 & UI/UX đồng nhất, validation 2 lớp & \gC & 0.250 & 1 Main Shell, bố cục 2 PH giống nhau; validation chủ yếu ở Domain, Form chưa có \code{ErrorProvider}; ngày \code{yyyy-MM-dd}, tiền chưa \texttt{\#,\#\#0} \\
 2.2 & Ổn định, ngoại lệ, bảo mật, ACID & \gC & 0.250 & Cây \code{DomainException}, 0 \code{catch} rỗng, PBKDF2; lưu JSON nên chưa có transaction/rollback, chưa SQL tham số hóa \\
 2.3 & Hiệu năng, cấu hình thống nhất, tái lập & \gC & 0.250 & 1 tệp \code{appsettings.json}, đường dẫn tương đối, 0 hard-code; chưa CSDL/JOIN, chưa script tái lập \\
@@ -79,7 +79,7 @@ Git & $\ge$ 24 commit, $\ge$ 3 tuần, 40--60\%/TV & 41 commit (15--18/11); TV1 
 \textbf{Mã} & \textbf{Tiêu chí} & \textbf{Chữ} & \textbf{Điểm} & \textbf{Minh chứng / lý do} \\
 \midrule
 3.1 & Khảo sát 4W+1H, biểu mẫu, BFD, UC $\leftrightarrow$ code & \gB & 0.375 & Phần 1--2 của slide: 4W+1H, 5 biểu mẫu, BFD 7 nhánh, bảng BFD$\to$UC$\to$Form$\to$Service; chưa vào báo cáo \\
-3.2 & ERD ($\ge$ 3 n--n) $\leftrightarrow$ $\ge$ 13 Entity & \gB & 0.375 & ERD + 26 lớp có hành vi; mới 2 lớp liên kết n--n (Booking, Interaction) \\
+3.2 & ERD ($\ge$ 3 n--n) $\leftrightarrow$ $\ge$ 13 Entity & \gB & 0.375 & ERD + 26 lớp có hành vi; mới 1 lớp liên kết n--n (Booking); Interaction là thực thể yếu của Customer \\
 3.3 & $\ge$ 8 quy tắc \& RBAC $\ge$ 3 vai trò & \gB & 0.375 & 11 quy tắc trong Domain (không Anemic), quyền kiểm tra ở Domain/Service; chỉ 2 vai trò \\
 4.1 & UML tổng $\ge$ 20 lớp, 6 quan hệ, CSDL 3NF & \gC & 0.250 & Biểu đồ lớp khớp code, đủ các quan hệ; chưa có schema $\ge$ 11 bảng, chưa file UML chính thức \\
 4.2 & $\ge$ 4 sơ đồ Sequence/State & \gD & 0.125 & Mới 2 sơ đồ (trạng thái ticket, tuần tự Auto Assign) \\
@@ -123,13 +123,13 @@ Cổng 2 G\_Epistemic (3.5 $\ge$ 3.0) & \textcolor{okc}{\textbf{PASS}} (trần 1
 Điểm nhóm sau cổng & 5.375 \\
 \textbf{Điểm chốt (bước 0.5)} & \textbf{5.5 -- loại C, Trung bình} \\
 \midrule
-Hệ số TV1 / TV2 (Git 68\% / 32\%) & 1.00 / \textcolor{warn}{0.85} \\
+Hệ số TV1 / TV2 (mã logic 79\% / 21\%) & 1.00 / \textcolor{warn}{0.85} \\
 Điểm cá nhân TV1 / TV2 & 5.5 / 4.5 \\
 \bottomrule
 \end{tabular}
 
 \vspace{2mm}
-{\tiny WARN\_SCOPE vì thiếu $>$ 20\% khối lượng lõi: Master-Detail, báo cáo, CSDL 3NF, seed data, integration test. Hệ số 0.85 của TV2 là rủi ro theo số commit hiện tại, rubric đo bằng \code{git blame} mã logic.\par}
+{\tiny WARN\_SCOPE vì thiếu $>$ 20\% khối lượng lõi: Master-Detail, báo cáo, CSDL 3NF, seed data, integration test. TV2 có 36\% số commit, nhưng rubric đo \code{git blame} mã logic (bỏ docs/Designer): TV2 mới 21\%; nếu TV2 không tự code GĐ 3b--4, hệ số có thể bị hạ xuống 0.70--0.50.\par}
 \end{columns}
 \end{frame}
 
@@ -146,7 +146,7 @@ Hệ số TV1 / TV2 (Git 68\% / 32\%) & 1.00 / \textcolor{warn}{0.85} \\
 5 & Test: +$\ge$ 4 unit, $\ge$ 8 integration (luồng liên PH, rollback, báo cáo khớp tính tay, RBAC 3 vai trò); TV2 thêm Fake thứ 2; tự chạy mutation check & 5.1, 5.2, 5.3 & 2 TV chia đều & 26/11 \\
 6 & UML: $\ge$ 4 sơ đồ tuần tự/trạng thái ($\ge$ 2/TV, 1 xuyên PH), Package Diagram, biểu đồ lớp tổng \code{.puml} & 4.1, 4.2, 4.3 & 2/TV & 27/11 \\
 7 & UI: ngày \code{dd/MM/yyyy}, tiền \texttt{\#,\#\#0},\code{ErrorProvider} ở Form (validation 2 lớp) & 2.1 & mỗi TV Form của mình & 27/11 \\
-8 & Đóng gói: publish 1 file chạy máy sạch, README, video 3--5 phút, PR trên GitHub; TV2 tự code phần còn lại để cân bằng Git (mục tiêu $\ge$ 40\%) & 1.4, hệ số TV2 & cả nhóm & 29/11 \\
+8 & Đóng gói: publish 1 file chạy máy sạch, README, video 3--5 phút, PR trên GitHub; TV2 tự code phần còn lại để cân bằng Git (mục tiêu $\ge$ 40\% mã logic theo \code{git blame}) & 1.4, hệ số TV2 & cả nhóm & 29/11 \\
 9 & Ôn vấn đáp: mỗi TV tự làm Live OCP (\code{OnHoldState}, \code{SkillBasedStrategy}), debug Call Stack xuyên PH, giải thích code của bạn & 4.6, 5.3 & mỗi TV & 29/11 \\
 \bottomrule
 \end{tabularx}

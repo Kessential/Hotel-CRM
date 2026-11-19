@@ -103,12 +103,15 @@
 \newcommand{\enty}[4][]{\node[ent,#1] (#2) {{\centering\textbf{#3}\par}\nodepart{second}#4};}
 
 % ---------- Thông tin chung ----------
-\title{Hotel CRM -- Hệ thống quản lý chăm sóc khách hàng khách sạn}
-\subtitle{Bài tập lớn LTHĐT (MI4090) -- HTTTQL nhóm 2 người \\ Báo cáo: Khảo sát -- Phân tích -- Thiết kế -- Cài đặt -- Kiểm thử \& Tự đánh giá lần 1}
-\author{\textcolor{tvA}{TV1 (Suất A -- phân hệ Ticket)}: \dotfill\ \quad
-        \textcolor{tvB}{TV2 (Suất B -- phân hệ Khách hàng/Lưu trú)}: \dotfill}
-\date{19/11/2026 \quad|\quad C\# / .NET 10 · WinForms · xUnit \quad|\quad \code{github.com/Kessential/Hotel-CRM}}
-\institute{}
+\title{Hotel CRM}
+\subtitle{Hệ thống quản lý chăm sóc khách hàng trong khách sạn}
+\author[Phạm Minh Khánh, Vũ Thị Thanh Hằng]{%
+  \textbf{GVHD:} TS. Trần Ngọc Thăng\\[3mm]
+  \textbf{Thành viên:}\\[1mm]
+  \textcolor{tvA}{\textbf{Phạm Minh Khánh}} -- 202418924 \ (Phân hệ Ticket)\\[1mm]
+  \textcolor{tvB}{\textbf{Vũ Thị Thanh Hằng}} -- 202418892 \ (Phân hệ Khách hàng/Lưu trú)}
+\date{}
+\institute{\small\textbf{GitHub:} \href{https://github.com/Kessential/Hotel-CRM}{\texttt{github.com/Kessential/Hotel-CRM}}}
 
 \begin{document}
 
@@ -129,7 +132,7 @@
 \begin{block}{Hiện trạng dự án (19/11/2026)}
 \small
 \begin{itemize}
-  \item GĐ 1 (khung), GĐ 2 (Ticket -- TV1), GĐ 3 (Khách hàng/Lưu trú -- TV2): \textbf{xong}
+  \item GĐ 1 (khung), GĐ 2 (Ticket -- TV1), GĐ 3 (Khách hàng/Lưu trú -- TV2): \textbf{xong}; GĐ 3 đã push \code{feature/b-customer}, chờ merge \code{develop}
   \item Build 0 lỗi, 0 warning; \textbf{22 test: 20 xanh, 2 đỏ} (UC8 làm ở GĐ 4)
   \item Còn lại: GĐ 3b (SQLite), GĐ 4 (ghép nối, khảo sát, lịch sử, báo cáo), GĐ 5--6 (UML, báo cáo, đóng gói) -- hạn 29/11
 \end{itemize}
