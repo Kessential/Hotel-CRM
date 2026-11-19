@@ -1,6 +1,6 @@
 Hotel CRM - Slide bao cao (Beamer) va tu danh gia lan 1 (19/11/2026)
 
-HotelCRM_Slides.pdf      Slide da bien dich (51 trang, 43 slide)
+HotelCRM_Slides.pdf      Slide da bien dich (khong dua len git, tu bien dich lai)
 HotelCRM_Slides.tex      File chinh (theme metropolis, font Segoe UI / Consolas)
 sec1-khaosat.tex         1. Khao sat - 4 output
 sec2-phantich.tex        2. Phan tich - BFD, so do thuc the lien ket, bieu do lop
