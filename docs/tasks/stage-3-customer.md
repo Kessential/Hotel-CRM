@@ -41,7 +41,7 @@ Khung đã có sẵn từ GĐ 1. Việc của giai đoạn này là thay `throw 
 | # | Quy tắc | Ngoại lệ khi vi phạm |
 |---|---|---|
 | 6 | SĐT đúng 10 chữ số, bắt đầu bằng `0`; email có đúng một `@`, có dấu chấm sau `@`, không có khoảng trắng (đã cài trong `Person`). SĐT và email không trùng với khách khác; email so không phân biệt hoa thường | Sai định dạng, bỏ trống trường bắt buộc: `ValidationException`. Trùng: `BusinessRuleException` |
-| 7 | Ngày trả phòng phải sau ngày nhận phòng. Một phòng không bị đặt chồng: chỉ booking Reserved và CheckedIn chặn phòng; hai lần ở chồng nhau khi `checkIn < b.CheckOutDate && b.CheckInDate < checkOut` (nhận phòng đúng ngày khách trước trả phòng thì được). Chỉ hủy được booking Reserved. Reserved→CheckedIn→CheckedOut | Ngày sai: `ValidationException`. Đặt chồng, hủy/nhận/trả sai trạng thái: `BusinessRuleException` |
+| 7 | Ngày trả phòng phải sau ngày nhận phòng. Một phòng không bị đặt chồng: chỉ booking Reserved và CheckedIn chặn phòng; hai lần ở chồng nhau khi `checkIn < b.CheckOutDate && b.CheckInDate < checkOut` (nhận phòng đúng ngày khách trước trả phòng thì được). Chỉ hủy được booking Reserved. Chỉ check-in khi `CheckInDate` ≤ ngày của `now` < `CheckOutDate` (thêm 19/11, xem bảng lệch plan dòng 22 trong `PROGRESS.md`). Reserved→CheckedIn→CheckedOut | Ngày sai: `ValidationException`. Đặt chồng, hủy/nhận/trả sai trạng thái, check-in ngoài khoảng ngày: `BusinessRuleException` |
 | 8 | Cộng điểm khi checkout: 1 điểm cho mỗi USD chẵn của `TotalAmount` (= số đêm × `PricePerNight`). Sau khi cộng, lên hạng cao nhất đã đủ `MinPoints`; có thể lên nhiều bậc một lần; không hạ hạng. `AddPoints` nhận số > 0 | Số điểm ≤ 0: `ValidationException` |
 | 10 | Không xóa khách còn ticket chưa Closed | `BusinessRuleException` |
 
@@ -71,7 +71,7 @@ Test phải xanh (4): cả `CustomerTests`.
 - `RoomType.Validate`, `Room.Validate`: trường bắt buộc và số dương, theo chú thích XML.
 - `Booking.ValidateNewBooking`: thiếu khách hoặc phòng, hoặc `CheckOutDate <= CheckInDate` thì `ValidationException`.
 - `Nights`, `TotalAmount`, `PointsEarned` (làm tròn xuống), `BlocksRoom`.
-- `CheckIn`, `CheckOut`, `Cancel`: kiểm tra trạng thái hiện tại rồi đổi.
+- `CheckIn(now)`, `CheckOut`, `Cancel`: kiểm tra trạng thái hiện tại rồi đổi; `CheckIn(now)` kiểm tra thêm ngày của `now` nằm trong `[CheckInDate, CheckOutDate)`.
 - `Room.IsAvailable`: chỉ xét booking của chính phòng này và có `BlocksRoom`. `Room.EnsureAvailable`: ném khi `IsAvailable` sai.
 
 Test phải xanh (1): `BookingTests.Constructor_CheckOutNotAfterCheckIn_ThrowsValidation`.
@@ -89,7 +89,7 @@ Test phải xanh (2): cả `CustomerServiceTests`.
 
 ### Module 4 — `BookingService` và `StayLookup` (UC7)
 - `Book`: `room.EnsureAvailable(checkIn, checkOut, _bookings.GetAll())` trước, rồi tạo `Booking`, `Save`.
-- `CheckIn`: `booking.CheckIn()`; `customer.LogInteraction(ContactChannel.FrontDesk, "Checked in to room 305.", now, null)`; lưu cả booking và khách.
+- `CheckIn`: `booking.CheckIn(now)`; `customer.LogInteraction(ContactChannel.FrontDesk, "Checked in to room 305.", now, null)`; lưu cả booking và khách.
 - `CheckOut`: `booking.CheckOut()`; `customer.AddPoints(booking.PointsEarned)`; ghi một tương tác FrontDesk nêu số điểm được cộng; lưu cả hai.
 - `GetAvailableRooms`: ngày không hợp lệ thì trả danh sách rỗng, không ném.
 - `StayLookup`: lần lưu trú đang diễn ra = booking có `Status == CheckedIn`. `GetRoomNumber` trả chuỗi rỗng khi không có phòng.
