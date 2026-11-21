@@ -41,16 +41,18 @@ public sealed class BookingService
     }
 
     /// <summary>
-    /// UC7: checks the guest in. Steps: <see cref="Booking.CheckIn"/>; record a FrontDesk interaction
-    /// on the customer with <see cref="Customer.LogInteraction"/>; save booking and customer.
+    /// UC7: checks the guest in. Steps: <see cref="Booking.CheckIn"/> with <paramref name="now"/>; record a
+    /// FrontDesk interaction on the customer with <see cref="Customer.LogInteraction"/>; save booking and customer.
     /// </summary>
     /// <param name="bookingId">Id of the booking.</param>
-    /// <param name="now">Current time, supplied by the form; used for the interaction.</param>
-    /// <exception cref="BusinessRuleException">The booking does not exist or is not Reserved.</exception>
+    /// <param name="now">Current time, supplied by the form; checked against the stay dates and used for the interaction.</param>
+    /// <exception cref="BusinessRuleException">
+    /// The booking does not exist, is not Reserved, or the date of <paramref name="now"/> is outside its stay.
+    /// </exception>
     public void CheckIn(int bookingId, DateTime now)
     {
         Booking booking = _bookings.GetRequired(bookingId);
-        booking.CheckIn();
+        booking.CheckIn(now);
         booking.Customer.LogInteraction(
             ContactChannel.FrontDesk, $"Checked in to room {booking.Room.Number}.", now, null);
         _bookings.Save(booking);

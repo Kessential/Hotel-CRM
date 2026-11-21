@@ -191,7 +191,7 @@ Cách đặt quy tắc: **service tra cứu, lớp Domain quyết định.** Quy
 | 4 | A | Mức ưu tiên được nâng theo `PriorityBoost` của hạng khách lúc tạo ticket và lưu vào ticket. Hạn SLA = `BaseSlaHours` × hệ số Priority × `SlaFactor` | constructor của `SupportTicket` (nâng mức ưu tiên), `SupportTicket.CalculateDueAt(slaFactor)`; `TicketService` lấy `CustomerSlaProfile` từ `ICustomerDirectory` |
 | 5 | A | `MaintenanceTicket` phải gắn phòng khách đang ở (booking CheckedIn) | `MaintenanceTicket.Validate(roomInActiveStay)`; `TicketService` tra `IStayLookup` |
 | 6 | B | SĐT/Email đúng định dạng, không trùng | định dạng: `Person` (cài ở GĐ 1 vì đăng nhập cần); không trùng: `Customer.EnsureUnique(phoneTaken, emailTaken)`, `CustomerService.Register()`/`Update()` tra cứu |
-| 7 | B | CheckOut > CheckIn; phòng không bị đặt chồng (booking Reserved và CheckedIn chặn); chỉ hủy được booking Reserved | constructor của `Booking`; `Room.IsAvailable(checkInDate, checkOutDate, bookings)` và `Room.EnsureAvailable(...)` (ném lỗi); `Booking.CheckIn()`/`CheckOut()`/`Cancel()` |
+| 7 | B | CheckOut > CheckIn; phòng không bị đặt chồng (booking Reserved và CheckedIn chặn); chỉ hủy được booking Reserved; chỉ check-in khi `CheckInDate` ≤ ngày hiện tại < `CheckOutDate` | constructor của `Booking`; `Room.IsAvailable(checkInDate, checkOutDate, bookings)` và `Room.EnsureAvailable(...)` (ném lỗi); `Booking.CheckIn(now)`/`CheckOut()`/`Cancel()` |
 | 8 | B | Cộng điểm khi checkout và khi ticket Closed; tự nâng hạng theo ngưỡng, có thể nâng nhiều bậc một lần, không hạ | `Customer.AddPoints()`, `MembershipTier.Next()` |
 | 9 | B | Khảo sát chỉ cho ticket Resolved/Closed, điểm 1–5, mỗi ticket một lần | `SatisfactionSurvey.Create(score, ticketResolvedOrClosed, alreadySurveyed)`; `SurveyService.Submit()` tra `ITicketQuery` và repository |
 | 10 | B | Không xóa khách còn ticket chưa đóng | `Customer.EnsureCanBeDeleted(hasOpenTickets)`; `CustomerService.Delete()` tra `ITicketQuery` |
@@ -258,7 +258,7 @@ Vi phạm ném `ValidationException` hoặc `BusinessRuleException` (con của `
 
 **5. Loại ngoại lệ theo quy tắc.**
 - `ValidationException` (dữ liệu của một đối tượng không hợp lệ): sai định dạng SĐT/Email (6), CheckOut ≤ CheckIn (7), điểm khảo sát ngoài 1–5 (9), ghi chú giải quyết rỗng (1), trường bắt buộc bỏ trống.
-- `BusinessRuleException` (vi phạm quy tắc giữa các đối tượng hoặc sai trạng thái): chuyển trạng thái sai, chưa có Agent, phân công sai trạng thái (1); Reopen quá hạn (2); vượt `MaxActiveTickets` (3); phòng không thuộc booking đang ở (5); trùng SĐT/Email (6); đặt chồng phòng, hủy booking không ở Reserved (7); khảo sát sai trạng thái hoặc lần hai (9); xóa khách còn ticket (10); thao tác sai quyền (11).
+- `BusinessRuleException` (vi phạm quy tắc giữa các đối tượng hoặc sai trạng thái): chuyển trạng thái sai, chưa có Agent, phân công sai trạng thái (1); Reopen quá hạn (2); vượt `MaxActiveTickets` (3); phòng không thuộc booking đang ở (5); trùng SĐT/Email (6); đặt chồng phòng, hủy booking không ở Reserved, check-in ngoài khoảng ngày của booking (7); khảo sát sai trạng thái hoặc lần hai (9); xóa khách còn ticket (10); thao tác sai quyền (11).
 - Quy tắc 4 và 8 là phép tính, không ném lỗi.
 
 **6. Lưu trữ.**

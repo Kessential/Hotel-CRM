@@ -78,13 +78,32 @@ public sealed class Booking : IEntity
     /// <summary>Rule 7: whether this booking keeps its room occupied: true for Reserved and CheckedIn.</summary>
     public bool BlocksRoom => Status is BookingStatus.Reserved or BookingStatus.CheckedIn;
 
-    /// <summary>Reserved to CheckedIn: the guest arrives and the stay becomes active.</summary>
-    /// <exception cref="BusinessRuleException">The booking is not Reserved.</exception>
-    public void CheckIn()
+    /// <summary>
+    /// Reserved to CheckedIn: the guest arrives and the stay becomes active. Allowed only from
+    /// <see cref="CheckInDate"/> up to the day before <see cref="CheckOutDate"/>.
+    /// </summary>
+    /// <param name="now">Current time; only its date is compared with the stay.</param>
+    /// <exception cref="BusinessRuleException">
+    /// The booking is not Reserved, or <paramref name="now"/> is before <see cref="CheckInDate"/>
+    /// or on or after <see cref="CheckOutDate"/>.
+    /// </exception>
+    public void CheckIn(DateTime now)
     {
         if (Status != BookingStatus.Reserved)
         {
             throw new BusinessRuleException($"Booking {Id} is {Status}; only a Reserved booking can be checked in.");
+        }
+
+        if (now.Date < CheckInDate)
+        {
+            throw new BusinessRuleException(
+                $"Booking {Id} starts on {CheckInDate:yyyy-MM-dd}; the guest cannot check in before that day.");
+        }
+
+        if (now.Date >= CheckOutDate)
+        {
+            throw new BusinessRuleException(
+                $"Booking {Id} ended on {CheckOutDate:yyyy-MM-dd}; cancel it instead of checking in.");
         }
 
         Status = BookingStatus.CheckedIn;
