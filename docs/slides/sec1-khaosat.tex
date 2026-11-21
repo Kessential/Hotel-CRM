@@ -143,7 +143,7 @@ UC10 & Báo cáo hiệu suất Agent / theo bộ phận & M & \TB & \checkmark \
 4 & \TA & Nâng ưu tiên theo hạng khách; \code{DueAt = BaseSlaHours x hệ số Priority x SlaFactor} & \code{SupportTicket.CalculateDueAt()}, qua \code{ICustomerDirectory} \\
 5 & \TA & Ticket sửa chữa phải gắn phòng khách đang ở (booking CheckedIn) & \code{MaintenanceTicket.Validate()}, qua \code{IStayLookup} \\
 6 & \TB & SĐT 10 số bắt đầu 0, email hợp lệ; không trùng SĐT/email & \code{Person}, \code{Customer.EnsureUnique()} \\
-7 & \TB & Ngày trả > ngày nhận; không đặt chồng phòng; chỉ hủy booking Reserved & \code{Booking}, \code{Room.EnsureAvailable()}, \code{Booking.Cancel()} \\
+7 & \TB & Ngày trả > ngày nhận; không đặt chồng phòng; chỉ check-in trong khoảng ngày đã đặt; chỉ hủy booking Reserved & \code{Booking}, \code{Room.EnsureAvailable()}, \code{Booking.CheckIn(now)}, \code{Booking.Cancel()} \\
 8 & \TB & Cộng điểm khi trả phòng (1 USD = 1 điểm) và khi ticket Closed; tự nâng hạng, có thể nhiều bậc, không hạ & \code{Customer.AddPoints()}, \code{MembershipTier.Next()} \\
 9 & \TB & Khảo sát chỉ cho ticket Resolved/Closed, điểm 1--5, mỗi ticket 1 lần & \code{SatisfactionSurvey.Create()}, qua \code{ITicketQuery} \\
 10 & \TB & Không xóa khách còn ticket chưa đóng hoặc đã có booking & \code{Customer.EnsureCanBeDeleted()}, qua \code{ITicketQuery} \\

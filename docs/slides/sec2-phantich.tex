@@ -136,7 +136,7 @@ F7 Chăm sóc, báo cáo & UC8, UC10 & \code{SurveyForm}, \code{ReportForm} & \c
   \draw[thick,black!70] (t\n.north) -- ++(0,0.3);}
 \draw[thick,black!70] (4.6,6.7) -- (9.4,6.7);
 \draw[inh] (7.0,6.7) -- (mt.south);
-\path (6.0,4.6) node[umlcls=tvB] (bk) {{\centering\textbf{Booking}\par}\nodepart{second}+Customer, Room\\+CheckInDate, CheckOutDate\\+Status: BookingStatus\\+Nights, TotalAmount, PointsEarned\nodepart{third}+CheckIn(), CheckOut(), Cancel()};
+\path (6.0,4.6) node[umlcls=tvB] (bk) {{\centering\textbf{Booking}\par}\nodepart{second}+Customer, Room\\+CheckInDate, CheckOutDate\\+Status: BookingStatus\\+Nights, TotalAmount, PointsEarned\nodepart{third}+CheckIn(now), CheckOut(), Cancel()};
 \path (10.6,4.6) node[umlcls=tvB] (rm) {{\centering\textbf{Room}\par}\nodepart{second}+Number: string, Floor: int\\+RoomType: RoomType\nodepart{third}+IsAvailable(in, out, bookings): bool\\+EnsureAvailable(in, out, bookings)};
 \path (10.6,1.3) node[umlcls=tvB] (rt) {{\centering\textbf{RoomType}\par}\nodepart{second}+Name, PricePerNight, Capacity\\+Rooms: IReadOnlyList<Room>\nodepart{third}~};
 \path (6.0,1.3) node[umlcls=tvB] (sv) {{\centering\textbf{SatisfactionSurvey}\par}\nodepart{second}+TicketId, Score, Comment\\+SubmittedAt\nodepart{third}+Create(id, ticketId, score, comment, at,\\\quad resolvedOrClosed, alreadySurveyed) \{static\}};
