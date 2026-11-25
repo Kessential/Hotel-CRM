@@ -1,23 +1,14 @@
-# 06. Thiết kế CSDL (ERD)
+# 06. Sơ đồ thực thể liên kết và CSDL
 
-Module M5 của P1. [TV1] viết khung sơ đồ, 7 bảng của TV1 và giải thích 3NF chung; [TV2] viết 10 bảng của TV2 và giải thích thuộc tính lịch sử.
+Module M5 của P1 (`docs/tasks/v2-p1-analysis.md` mục 3.4). Sơ đồ: `diagrams/erd.puml` (TV1) `!include` `erd-tv1.iuml` và `erd-tv2.iuml`. Khóa ngoại xuất phát từ bảng của ai thì người đó vẽ.
 
-## 1. Quy ước [TV1; TV2 đề xuất]
-TV2 dùng các quy ước dưới đây cho 10 bảng của mình; TV1 chốt khi viết khung `schema.sql`.
+## 1. ERD tổng (ảnh) [Chung – TV1]
+_[Chung – TV1] chưa điền._
 
-- **Tên:** bảng là danh từ số nhiều, `snake_case` (`room_types`); cột là `PascalCase` trùng tên thuộc tính C# (`RatePerNight`). Khóa chính `Id INTEGER PRIMARY KEY` (tự tăng), trừ bảng n–n thuần dùng khóa ghép.
-- **Kiểu SQLite:**
-  - Tiền VND: `INTEGER` (đồng, không có phần lẻ; C# đọc thành `decimal`).
-  - Ngày: `TEXT 'yyyy-MM-dd'`. Thời điểm: `TEXT 'yyyy-MM-dd HH:mm:ss'`.
-  - Đúng/sai: `INTEGER` 0/1 có `CHECK`.
-  - Trạng thái, hạng, lý do: `TEXT` có `CHECK (… IN (…))`, giá trị là tên hằng trong code (`GoldTier.TierName`, tên enum).
-- **Khóa ngoại:** bật `PRAGMA foreign_keys = ON` mỗi kết nối; mỗi cột khóa ngoại có index. `ON DELETE` khớp UML: hợp thành (◆) → `CASCADE`; còn lại → `RESTRICT`.
-- **Sơ đồ:** `diagrams/erd.puml` (TV1) gồm `!include erd-tv1.iuml` và `!include erd-tv2.iuml`. Khóa ngoại xuất phát từ bảng của ai thì người đó vẽ.
+## 2. Bảng phân hệ CSKH (7 bảng) [TV1]
+_[TV1] chưa điền._
 
-## 2. 7 bảng TV1 và giải thích 3NF chung [TV1]
-> TV1 viết `departments`, `employees`, `tickets`, `ticket_logs`, `survey_criteria`, `surveys`, `survey_answers`.
-
-## 3. 10 bảng TV2 [TV2]
+## 3. Bảng phân hệ quan hệ khách hàng (10 bảng) [TV2]
 Sơ đồ: `diagrams/erd-tv2.iuml`.
 
 | Bảng | Loại | Lớp Domain | Ghi chú |
@@ -33,7 +24,16 @@ Sơ đồ: `diagrams/erd-tv2.iuml`.
 | `campaigns` | giao dịch | `Campaign` | |
 | `campaign_targets` | **n–n** chiến dịch–khách, có thuộc tính | `CampaignTarget` | khóa ghép |
 
-### 3.1 Chi tiết cột và ràng buộc
+### 3.1 Quy ước tên và kiểu (TV2 đề xuất, TV1 chốt khi viết khung `schema.sql`)
+- **Tên:** bảng là danh từ số nhiều, `snake_case` (`room_types`); cột là `PascalCase` trùng tên thuộc tính C# (`RatePerNight`). Khóa chính `Id INTEGER PRIMARY KEY` (tự tăng), trừ bảng n–n thuần dùng khóa ghép.
+- **Kiểu SQLite:**
+  - Tiền VND: `INTEGER` (đồng, không có phần lẻ; C# đọc thành `decimal`).
+  - Ngày: `TEXT 'yyyy-MM-dd'`. Thời điểm: `TEXT 'yyyy-MM-dd HH:mm:ss'`.
+  - Đúng/sai: `INTEGER` 0/1 có `CHECK`.
+  - Trạng thái, hạng, lý do: `TEXT` có `CHECK (… IN (…))`, giá trị là tên hằng trong code (`GoldTier.TierName`, tên enum).
+- **Khóa ngoại:** bật `PRAGMA foreign_keys = ON` mỗi kết nối; mỗi cột khóa ngoại có index. `ON DELETE` khớp UML: hợp thành (◆) → `CASCADE`; còn lại → `RESTRICT`.
+
+### 3.2 Chi tiết cột và ràng buộc
 
 **`customers`**
 
@@ -143,7 +143,7 @@ CREATE UNIQUE INDEX ux_points_goodwill ON point_transactions(TicketId)  WHERE Re
 
 Khóa ghép `(CampaignId, CustomerId)` chính là quy tắc "mỗi khách một lần trong một chiến dịch" (Q11), lớp chặn thứ hai sau `Campaign.AddTarget`.
 
-### 3.2 Quan hệ
+### 3.3 Quan hệ trong phân hệ
 
 | Quan hệ | Bản số | UML | ON DELETE |
 |---|---|---|---|
@@ -155,22 +155,7 @@ Khóa ghép `(CampaignId, CustomerId)` chính là quy tắc "mỗi khách một 
 | `bookings` – `point_transactions` (Lưu trú) | 1 – 0..1 | kết hợp | RESTRICT |
 | `reward_redemptions` – `point_transactions` | 1 – 1..2 (trừ, hoàn) | kết hợp | RESTRICT |
 
-**Khóa ngoại nối hai phân hệ:**
-- Từ bảng TV2 sang TV1: `interactions.TicketId` → `tickets`; `point_transactions.TicketId` → `tickets`. Các cột `…ById` và `EmployeeId` → `employees`.
-- Từ bảng TV1 sang TV2 (TV1 vẽ): `tickets.CustomerId` → `customers`; `tickets.RoomId` → `rooms`; `surveys.BookingId` → `bookings`.
-- Các khóa này chỉ tồn tại ở CSDL. Trong code, hai phân hệ vẫn chỉ giữ Id và nói chuyện qua interface.
-
-### 3.3 Thuộc tính lịch sử [TV2]
-Thuộc tính lịch sử là giá trị được **chép** từ bảng khác vào lúc giao dịch xảy ra và giữ nguyên về sau, dù giá trị gốc thay đổi.
-
-| Cột | Chép từ | Lúc | Vì sao không đọc thẳng giá trị gốc |
-|---|---|---|---|
-| `bookings.RatePerNight` | `room_types.PricePerNight` | đặt phòng | Giá phòng đổi theo mùa. Đọc giá hiện tại thì thành tiền, điểm đã cộng (Q9) và báo cáo chi tiêu (R3, R5) của các lần ở cũ đều sai. Biểu mẫu BM5 ghi đơn giá trên phiếu. |
-| `reward_redemptions.PointsSpent` | `rewards.PointsCost` | đổi quà | Quà có thể tăng hoặc giảm giá điểm. Đọc giá hiện tại thì không giải thích được số dư của khách, và khi hủy lượt đổi sẽ hoàn sai số điểm (Q10). Code chốt trong `Reward.Redeem`. |
-
-**Đây không phải vi phạm 3NF.** 3NF cấm thuộc tính không khóa phụ thuộc bắc cầu vào khóa chính. `RatePerNight` phụ thuộc vào chính booking ("giá đã thỏa thuận cho lần đặt này"), không phụ thuộc vào `RoomId` → `RoomTypeId` → `PricePerNight`. Bằng chứng: cùng một phòng, hai booking ở hai thời điểm có thể có hai giá khác nhau. Phụ thuộc bắc cầu thì không thể như vậy.
-
-### 3.4 Kiểm tra 3NF các bảng TV2 [TV2]
+### 3.4 Chuẩn hóa các bảng TV2
 - **1NF:** mọi cột là giá trị đơn. Lịch sử tương tác, các lần ở, các giao dịch điểm, danh sách khách của chiến dịch đều tách thành bảng riêng, không gộp vào một cột của `customers`.
 - **2NF:** chỉ `campaign_targets` có khóa ghép. `Channel`, `SentAt`, `Response`, `RespondedAt`, `RecordedById` phụ thuộc vào cả cặp (chiến dịch, khách), không phụ thuộc vào một nửa khóa.
 - **3NF:**
@@ -183,10 +168,41 @@ Thuộc tính lịch sử là giá trị được **chép** từ bảng khác v�
   - Ngoài ra, phân hệ TV1 hỏi hạng theo lô để tính SLA (`ICustomerDirectory`). Có cột `Tier` thì không phải tính tổng sổ điểm cho từng khách.
   - Cột chỉ được ghi ở một chỗ: `Customer.EarnPoints`, sau khi cộng điểm.
 
-## 4. Câu hỏi còn mở [TV2]
+### 3.5 Câu hỏi còn mở
 1. **Xóa khách chỉ có trong chiến dịch.** Q13 chỉ chặn khách có lưu trú hoặc ticket. Khách chưa ở lần nào vẫn có thể nằm trong chiến dịch "Sinh nhật trong tháng". Khi xóa khách này, khóa ngoại `campaign_targets.CustomerId` (RESTRICT) sẽ chặn ở CSDL với một lỗi khó hiểu.
    - **Đề xuất:** mở rộng Q13 thành "không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch", để Domain báo lỗi rõ ràng.
    - **Cách khác:** dùng `CASCADE` cho cột này, nhưng như vậy làm mất số liệu của báo cáo R4.
 
    Cần TV1 đồng ý.
-2. **Quy ước kiểu dữ liệu ở mục 1** (tiền là `INTEGER`, ngày là `TEXT`) do TV2 đề xuất; TV1 chốt khi viết khung `schema.sql`.
+2. **Quy ước kiểu dữ liệu ở mục 3.1** (tiền là `INTEGER`, ngày là `TEXT`) do TV2 đề xuất; TV1 chốt khi viết khung `schema.sql`.
+
+## 4. Khóa ngoại nối hai phân hệ [Chung – TV1 + TV2]
+
+### Khóa đi từ bảng TV2 (TV2 vẽ trong `erd-tv2.iuml`)
+
+| Khóa ngoại | Trỏ tới | NULL? | ON DELETE | Ý nghĩa |
+|---|---|---|---|---|
+| `interactions.TicketId` | `tickets` | có | RESTRICT | tương tác sinh ra khi đóng ticket (Q12, L2) |
+| `point_transactions.TicketId` | `tickets` | có | RESTRICT | dòng điểm thiện chí của ticket (Q12, L2) |
+| `interactions.EmployeeId`, `bookings.CreatedById`, `reward_redemptions.ProcessedById`, `campaigns.CreatedById`, `campaign_targets.RecordedById` | `employees` | theo bảng ở mục 3.2 | RESTRICT | nhân viên đã làm (ghi người làm) |
+
+Các khóa này chỉ tồn tại ở CSDL. Trong code, hai phân hệ vẫn chỉ giữ Id và nói chuyện qua interface; repository của TV2 không đọc bảng `tickets`, `employees`.
+
+### Khóa đi từ bảng TV1
+_[TV1] chưa điền (`tickets.CustomerId`, `tickets.RoomId`, `surveys.BookingId`)._
+
+## 5. Chuẩn hóa 3NF [Chung – TV1]
+_[Chung – TV1] chưa điền._
+
+## 6. Thuộc tính lịch sử [TV2]
+Thuộc tính lịch sử là giá trị được **chép** từ bảng khác vào lúc giao dịch xảy ra và giữ nguyên về sau, dù giá trị gốc thay đổi.
+
+| Cột | Chép từ | Lúc | Vì sao không đọc thẳng giá trị gốc |
+|---|---|---|---|
+| `bookings.RatePerNight` | `room_types.PricePerNight` | đặt phòng | Giá phòng đổi theo mùa. Đọc giá hiện tại thì thành tiền, điểm đã cộng (Q9) và báo cáo chi tiêu (R3, R5) của các lần ở cũ đều sai. Biểu mẫu BM5 ghi đơn giá trên phiếu. |
+| `reward_redemptions.PointsSpent` | `rewards.PointsCost` | đổi quà | Quà có thể tăng hoặc giảm giá điểm. Đọc giá hiện tại thì không giải thích được số dư của khách, và khi hủy lượt đổi sẽ hoàn sai số điểm (Q10). Code chốt trong `Reward.Redeem`. |
+
+**Đây không phải vi phạm 3NF.** 3NF cấm thuộc tính không khóa phụ thuộc bắc cầu vào khóa chính. `RatePerNight` phụ thuộc vào chính booking ("giá đã thỏa thuận cho lần đặt này"), không phụ thuộc vào `RoomId` → `RoomTypeId` → `PricePerNight`. Bằng chứng: cùng một phòng, hai booking ở hai thời điểm có thể có hai giá khác nhau. Phụ thuộc bắc cầu thì không thể như vậy.
+
+## 7. Đối chiếu định mức (PLAN 5.10) [Chung – TV1]
+_[Chung – TV1] chưa điền._
