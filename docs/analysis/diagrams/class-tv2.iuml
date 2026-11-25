@@ -1,0 +1,214 @@
+' [TV2] Class diagram of the customer relationship and loyalty subsystem.
+' Included by class.puml (TV1), which declares Person, Employee and the boundary interfaces
+' declared by TV1 (ICustomerDirectory, IStayLookup, ITicketObserver). Members are the planned v2 design;
+' classes marked "đã có" already exist in code (PR #2).
+
+package "Domain.Customers" {
+  class Customer {
+    - IdentityNumber : string
+    - Nationality : string
+    - DateOfBirth : DateTime?
+    - MarketingConsent : bool
+    - Tier : MembershipTier
+    - LifetimePoints : int
+    - Notes : string
+    - CreatedAt : DateTime
+    + Customer(id, fullName, phone, email, identityNumber, nationality, dateOfBirth, marketingConsent, notes, now)
+    + UpdateProfile(...) : void
+    + EnsureUnique(phoneTaken, emailTaken, identityTaken) : void
+    + EnsureCanBeDeleted(hasStays, hasTickets) : void
+    + EarnPoints(points) : bool
+  }
+  abstract class MembershipTier <<đã có>> {
+    + {abstract} Name : string
+    + {abstract} SlaFactor : double
+    + {abstract} PriorityBoost : int
+    + {abstract} MinPoints : int
+    + {abstract} EarnRate : decimal
+    + PointsFor(amountVnd) : int
+    + IsAtLeast(other) : bool
+    + {abstract} Next() : MembershipTier?
+  }
+  class StandardTier
+  class SilverTier
+  class GoldTier
+  class VipTier
+  class Interaction {
+    + Id : int
+    + CustomerId : int
+    + OccurredAt : DateTime
+    + Channel : ContactChannel
+    + Summary : string
+    + EmployeeId : int?
+    + TicketId : int?
+  }
+  enum ContactChannel {
+    FrontDesk
+    Phone
+    Email
+    System
+  }
+}
+
+package "Domain.Hotel" {
+  class RoomType {
+    + Name : string
+    + PricePerNight : decimal
+    + Capacity : int
+  }
+  class Room {
+    + Number : string
+    + Floor : int
+    + EnsureAvailable(from, to, bookings) : void
+  }
+  class Booking {
+    + CustomerId : int
+    + RoomId : int
+    + CheckInDate : DateTime
+    + CheckOutDate : DateTime
+    + RatePerNight : decimal
+    + Status : BookingStatus
+    + Nights : int
+    + TotalAmount : decimal
+    + Booking(id, customerId, room, checkIn, checkOut, createdById, now)
+    + CheckIn(now) : void
+    + CheckOut(now) : void
+    + Cancel() : void
+  }
+  enum BookingStatus {
+    Reserved
+    CheckedIn
+    CheckedOut
+    Cancelled
+  }
+}
+
+package "Domain.Loyalty" <<đã có>> {
+  class PointTransaction {
+    + CustomerId : int
+    + Points : int
+    + Reason : PointReason
+    + {static} ForStay(...) : PointTransaction
+    + {static} ForGoodwill(...) : PointTransaction
+    + {static} ForRedemption(id, redemption) : PointTransaction
+    + {static} ForRefund(id, redemption, now) : PointTransaction
+  }
+  enum PointReason {
+    Stay
+    Goodwill
+    Redemption
+  }
+  class Reward {
+    + PointsCost : int
+    + MinTier : MembershipTier
+    + Quantity : int
+    + IsActive : bool
+    + EnsureCanRedeem(tier, balance) : void
+    + Redeem(...) : RewardRedemption
+    + CancelRedemption(redemption) : void
+  }
+  class RewardRedemption {
+    + CustomerId : int
+    + RewardId : int
+    + PointsSpent : int
+    + Status : RedemptionStatus
+  }
+  enum RedemptionStatus {
+    Completed
+    Cancelled
+  }
+}
+
+package "Domain.Campaigns" <<đã có>> {
+  class Campaign {
+    + SegmentCode : string
+    + StartDate : DateTime
+    + EndDate : DateTime
+    + Targets : IReadOnlyList<CampaignTarget>
+    + ResponseRate : decimal
+    + {static} IsEligible(consent, hasOpenComplaint) : bool
+    + AddTarget(...) : CampaignTarget
+    + EnsureHasTargets() : void
+    + RecordResponse(customerId, response, employeeId, now) : void
+  }
+  class CampaignTarget {
+    + CustomerId : int
+    + Channel : ContactChannel
+    + Response : CampaignResponse?
+  }
+  enum CampaignResponse {
+    Interested
+    Booked
+    Declined
+  }
+}
+
+package "Domain.Staff" {
+  class Receptionist
+}
+
+package "BLL.Segments" <<đã có>> {
+  interface ISegmentStrategy {
+    + Code : string
+    + DisplayName : string
+    + Includes(customer, referenceDate) : bool
+  }
+  class VipSegment
+  class LapsedGuestSegment
+  class BirthdayMonthSegment
+  class SegmentCandidate <<record>>
+}
+
+package "BLL.Services (TV2)" {
+  class CustomerService
+  class StayService
+  class LoyaltyService
+  class CampaignService
+  class CustomerReportService
+  class DashboardService
+}
+
+package "BLL.Queries + Observers (TV2 cài interface của TV1)" {
+  class CustomerDirectory
+  class StayLookup
+  class GoodwillPointsObserver
+  class InteractionLogger
+}
+
+package "Domain.Interfaces (TV2 khai báo)" {
+  interface ITicketQuery
+  interface ISurveyScheduler
+  interface ICustomerCareStats
+}
+
+' Inheritance
+Person <|-- Customer
+Employee <|-- Receptionist
+MembershipTier <|-- StandardTier
+MembershipTier <|-- SilverTier
+MembershipTier <|-- GoldTier
+MembershipTier <|-- VipTier
+ISegmentStrategy <|.. VipSegment
+ISegmentStrategy <|.. LapsedGuestSegment
+ISegmentStrategy <|.. BirthdayMonthSegment
+ICustomerDirectory <|.. CustomerDirectory
+IStayLookup <|.. StayLookup
+ITicketObserver <|.. GoodwillPointsObserver
+ITicketObserver <|.. InteractionLogger
+
+' Structure
+Customer --> "1" MembershipTier : Tier
+Reward --> "1" MembershipTier : MinTier
+RoomType "1" o-- "0..*" Room
+Campaign "1" *-- "1..*" CampaignTarget
+Reward ..> RewardRedemption : <<create>>
+PointTransaction ..> RewardRedemption
+Booking ..> Room : giá chốt lúc tạo
+
+' Services
+CampaignService --> "*" ISegmentStrategy : Strategy
+CampaignService --> ITicketQuery : L4
+CustomerService --> ITicketQuery : L5
+StayService --> ISurveyScheduler : L3
+DashboardService --> ICustomerCareStats : L6
+GoodwillPointsObserver ..> PointTransaction : ForGoodwill
