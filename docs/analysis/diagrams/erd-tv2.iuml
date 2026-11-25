@@ -1,0 +1,143 @@
+' [TV2] ERD: the 10 tables of the customer relationship and loyalty subsystem.
+' Included by erd.puml (TV1). Foreign keys that start in a TV2 table are drawn here;
+' those that start in a TV1 table (tickets.CustomerId, tickets.RoomId, surveys.BookingId) are drawn in erd-tv1.iuml.
+' Notation: * = NOT NULL, <<PK>>, <<FK>>, <<UQ>> = UNIQUE.
+
+package "TV2 - Quan hệ khách hàng & khách hàng thân thiết" {
+
+entity customers {
+  * Id : INTEGER <<PK>>
+  --
+  * FullName : TEXT
+  * Phone : TEXT <<UQ>>
+  * Email : TEXT <<UQ>>
+  * IdentityNumber : TEXT <<UQ>>
+  * Nationality : TEXT
+  DateOfBirth : TEXT
+  * MarketingConsent : INTEGER
+  * Tier : TEXT
+  * Notes : TEXT
+  * CreatedAt : TEXT
+}
+
+entity interactions {
+  * Id : INTEGER <<PK>>
+  --
+  * CustomerId : INTEGER <<FK>>
+  * OccurredAt : TEXT
+  * Channel : TEXT
+  * Summary : TEXT
+  EmployeeId : INTEGER <<FK>>
+  TicketId : INTEGER <<FK>>
+}
+
+entity room_types {
+  * Id : INTEGER <<PK>>
+  --
+  * Name : TEXT <<UQ>>
+  * PricePerNight : INTEGER
+  * Capacity : INTEGER
+}
+
+entity rooms {
+  * Id : INTEGER <<PK>>
+  --
+  * Number : TEXT <<UQ>>
+  * Floor : INTEGER
+  * RoomTypeId : INTEGER <<FK>>
+}
+
+entity bookings {
+  * Id : INTEGER <<PK>>
+  --
+  * CustomerId : INTEGER <<FK>>
+  * RoomId : INTEGER <<FK>>
+  * CheckInDate : TEXT
+  * CheckOutDate : TEXT
+  * RatePerNight : INTEGER
+  * Status : TEXT
+  * CreatedById : INTEGER <<FK>>
+  * CreatedAt : TEXT
+  CheckedInAt : TEXT
+  CheckedOutAt : TEXT
+}
+
+entity point_transactions {
+  * Id : INTEGER <<PK>>
+  --
+  * CustomerId : INTEGER <<FK>>
+  * Points : INTEGER
+  * Reason : TEXT
+  BookingId : INTEGER <<FK>>
+  TicketId : INTEGER <<FK>>
+  RedemptionId : INTEGER <<FK>>
+  * CreatedAt : TEXT
+}
+
+entity rewards {
+  * Id : INTEGER <<PK>>
+  --
+  * Name : TEXT <<UQ>>
+  * PointsCost : INTEGER
+  * MinTier : TEXT
+  * Quantity : INTEGER
+  * IsActive : INTEGER
+}
+
+entity reward_redemptions {
+  * Id : INTEGER <<PK>>
+  --
+  * CustomerId : INTEGER <<FK>>
+  * RewardId : INTEGER <<FK>>
+  * PointsSpent : INTEGER
+  * RedeemedAt : TEXT
+  * Status : TEXT
+  * ProcessedById : INTEGER <<FK>>
+}
+
+entity campaigns {
+  * Id : INTEGER <<PK>>
+  --
+  * Name : TEXT
+  * SegmentCode : TEXT
+  * Offer : TEXT
+  * StartDate : TEXT
+  * EndDate : TEXT
+  * CreatedById : INTEGER <<FK>>
+  * CreatedAt : TEXT
+}
+
+entity campaign_targets {
+  * CampaignId : INTEGER <<PK, FK>>
+  * CustomerId : INTEGER <<PK, FK>>
+  --
+  * Channel : TEXT
+  * SentAt : TEXT
+  Response : TEXT
+  RespondedAt : TEXT
+  RecordedById : INTEGER <<FK>>
+}
+
+}
+
+' Relationships inside TV2
+customers ||--o{ interactions
+customers ||--o{ bookings
+room_types ||--o{ rooms
+rooms ||--o{ bookings
+customers ||--o{ point_transactions
+bookings |o--o| point_transactions : "điểm lưu trú"
+reward_redemptions |o--|{ point_transactions : "trừ / hoàn điểm"
+customers ||--o{ reward_redemptions
+rewards ||--o{ reward_redemptions
+campaigns ||--|{ campaign_targets
+customers ||--o{ campaign_targets
+
+' Foreign keys from TV2 tables into TV1 tables
+tickets |o--o{ interactions
+tickets |o--o| point_transactions : "điểm thiện chí"
+employees |o--o{ interactions
+employees ||--o{ bookings
+employees ||--o{ reward_redemptions
+employees ||--o{ campaigns
+employees |o--o{ campaign_targets

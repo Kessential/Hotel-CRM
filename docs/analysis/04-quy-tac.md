@@ -24,7 +24,7 @@ Module M4 của P1. [TV1] viết Q1–Q6 và ma trận quyền; [TV2] viết Q7�
 | Q8 | Đặt phòng, nhận, trả, hủy đúng ngày và trạng thái | | `Booking`, `Room` | có (v1), sửa ở đợt 2 |
 | Q9 | Tích điểm theo hạng, nâng hạng không bao giờ hạ | | `MembershipTier`, `Customer` | `PointsFor` có; `Customer.EarnPoints` đợt 2 |
 | Q10 | Đổi quà đúng điều kiện, điểm chốt lúc đổi | | `Reward`, `RewardRedemption`, `PointTransaction` | có |
-| Q11 | Chọn khách cho chiến dịch, ghi phản hồi đúng hạn | ✓ L4 (`ITicketQuery`) | `Campaign`, `ISegmentStrategy` | có; thiếu `EnsureHasTargets` |
+| Q11 | Chọn khách cho chiến dịch, ghi phản hồi đúng hạn | ✓ L4 (`ITicketQuery`) | `Campaign`, `ISegmentStrategy` | có |
 | Q12 | Đóng ticket → điểm thiện chí, cùng giao dịch | ✓ L2 (`ITicketObserver`) | `GoodwillPointsObserver`, `PointTransaction` | `ForGoodwill` có; observer P3 |
 | Q13 | Không xóa khách đã có lưu trú hoặc ticket | ✓ L5 (`ITicketQuery`) | `Customer` | đợt 2 |
 
@@ -106,9 +106,9 @@ Module M4 của P1. [TV1] viết Q1–Q6 và ma trận quyền; [TV2] viết Q7�
 - **Liên phân hệ (L4):** "khách đang có khiếu nại chưa đóng" lấy từ phân hệ TV1 qua `ITicketQuery`, hỏi một lần cho cả danh sách. Chữ ký chốt ở M6.
 - **Cài đặt:**
   - Đã có: `Campaign.IsEligible`, `Campaign.AddTarget`, `Campaign.RecordResponse`, `ISegmentStrategy` + `VipSegment`, `LapsedGuestSegment`, `BirthdayMonthSegment`.
-  - Cần thêm: `Campaign.EnsureHasTargets()`, gọi trước khi lưu.
+  - `Campaign.EnsureHasTargets()` (đã có, PR #2), service gọi trước khi lưu.
   - Context: `CampaignService`.
-- **Test:** `CampaignTests` (8), `SegmentStrategyTests` (11) đã có; TC2-08 (3 phân khúc chọn đúng khách, BVA ngày), TC2-09 (loại khách có khiếu nại, dùng `FakeTicketQuery`).
+- **Test:** `CampaignTests` (10), `SegmentStrategyTests` (11) đã có; TC2-08 (3 phân khúc chọn đúng khách, BVA ngày), TC2-09 (loại khách có khiếu nại, dùng `FakeTicketQuery`).
 
 ### Q12 – Điểm thiện chí khi đóng ticket
 - **Phát biểu:**
@@ -134,5 +134,5 @@ Module M4 của P1. [TV1] viết Q1–Q6 và ma trận quyền; [TV2] viết Q7�
 - **Test:** TC2-10 (xóa khách có ticket bị chặn, dùng `FakeTicketQuery`).
 
 ## 4. Việc phát sinh cho code [TV2]
-- Thêm `Campaign.EnsureHasTargets()` và test (Q11). Thêm vào PR #2 hoặc làm ở P3.
+- ~~Thêm `Campaign.EnsureHasTargets()` và test (Q11)~~: đã thêm vào PR #2 (`c8bdebf`).
 - Đợt 2 (`Customer`, `Booking`): cài Q7 theo quốc tịch, Q9 `EarnPoints`, Q13 theo `hasStays`/`hasTickets`, `Booking.CheckOut(now)`.
