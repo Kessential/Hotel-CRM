@@ -1,13 +1,20 @@
-# Hotel CRM
+# Hotel CRM (v2)
 
-Bài tập lớn OOP nhóm 2 người: hệ thống quản lý chăm sóc khách hàng cho khách sạn. C# / .NET 10, WinForms, lưu JSON, test xUnit.
+Bài tập lớn môn HTTTQL (MI4090), nhóm 2 người: CRM (quản lý dịch vụ chăm sóc khách hàng) áp dụng cho khách sạn. C# / .NET 10, WinForms, SQLite, test xUnit. Chấm theo sheet "Nhóm 02 người" của `Checklist_BTL_HTTTQL_v2026.xlsx`.
 
 ## Đọc trước khi làm
-1. `docs/PROGRESS.md` — giai đoạn nào đã xong, việc đang dở, cách commit của suất B, quyết định lệch khỏi plan.
+1. `docs/PROGRESS.md`: giai đoạn nào đã xong, việc đang dở, quyết định lệch khỏi plan.
 2. File task của giai đoạn đang làm trong `docs/tasks/`.
-3. `docs/PLAN.md` — chỉ mở những mục mà file task nêu tên. Không đọc cả file.
+3. `docs/PLAN.md`: chỉ mở những mục mà file task nêu tên. Không đọc cả file.
 
-Quy ước riêng từng tầng nằm trong `.claude/rules/`. Các file này chỉ tự nạp khi đã có file khớp đường dẫn; khi tạo file đầu tiên trong một thư mục thì tự đọc file rules tương ứng trước.
+Giai đoạn chuyển tiếp:
+- Nếu `docs/PLAN.md` vẫn là bản v1 (lưu JSON, giao diện tiếng Anh, phân công "suất A/suất B") thì kế hoạch v2 chưa được đưa vào repo. Dừng và hỏi người dùng file kế hoạch v2. Bản v1 chuyển vào `docs/archive/`, chỉ để tra cứu.
+- `.claude/rules/*` còn viết cho v1 tới khi TV1 sửa ở P2. Chỗ nào rules mâu thuẫn với file này thì theo file này. Rules chỉ tự nạp khi đã có file khớp đường dẫn; khi tạo file đầu tiên trong một thư mục thì tự đọc file rules tương ứng trước.
+
+## Người đang dùng phiên
+- Xem `git config user.name`: `Kessential` là TV1, `munn8726` là TV2. Tên khác thì hỏi.
+- Mỗi phiên chỉ viết code và tài liệu thuộc phần của người đang dùng phiên (mục "Phân công"). Phần của người kia chỉ đọc, review, góp ý; không sửa, không viết hộ. Làm hộ có thể đưa hệ số cá nhân về 0 (Khóa 3 của checklist).
+- Code ai commit thì người đó phải giải thích được và tự viết lại được khi tắt AI. Khi viết code, nói rõ lý do thiết kế; giữ thiết kế tối giản, chỉ thêm thứ phục vụ một tiêu chí của checklist (không code chết, không pattern giả, không lớp rỗng).
 
 ## Lệnh
 ```
@@ -16,35 +23,86 @@ dotnet test HotelCRM.sln
 dotnet run --project src/HotelCRM.WinForms
 dotnet publish src/HotelCRM.WinForms -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 dotnet run tools/HashPassword.cs -- <mật khẩu>
+java -jar tools/plantuml.jar -tpng docs/analysis/diagrams/*.puml
 ```
-
-Lệnh cuối sinh `PasswordHash` và `Salt` cho `employees.json`. Tài khoản mẫu nằm trong `README.md`.
+- Từ P2, project đổi tên: `HotelCRM.WinForms` → `HotelCRM.GUI`, `HotelCRM.Business` → `HotelCRM.BLL`, `HotelCRM.Data` → `HotelCRM.DAL`. Lệnh `run`/`publish` đổi theo.
+- `HashPassword` sinh `PasswordHash` và `Salt` (PBKDF2) cho tài khoản trong `Database/seed.sql`. Tài khoản mẫu ghi trong `README.md`.
 
 ## Kiến trúc
-- Tham chiếu project: `WinForms → Business → Domain`, `Data → Domain`. `WinForms` tham chiếu `Data` chỉ để `Program.cs` khởi tạo. `Domain` không tham chiếu project nào. `Tests` tham chiếu `Domain`, `Business`, `Data`.
-- Hai phân hệ (Ticket và Khách hàng/Lưu trú) chỉ nối với nhau qua 5 interface: `ICustomerDirectory`, `IStayLookup`, `ITicketQuery`, `ITicketObserver` (trong `Domain/Interfaces`) và `IAssignmentStrategy` (trong `Business/Assignment`). Service của phân hệ này không gọi service của phân hệ kia. `Domain/Tickets` không dùng lớp nào của `Domain/Customers` hay `Domain/Hotel`.
-- Quy tắc nghiệp vụ: service tra cứu, lớp Domain quyết định và ném ngoại lệ.
-- Khởi tạo đối tượng bằng tay trong `Program.cs`. Không dùng thư viện DI.
-- Không thêm gói NuGet ngoài bộ xUnit mặc định. Cần thêm thì dừng và hỏi.
+```
+Database/            schema.sql, seed.sql
+Resource/            icon, logo
+src/HotelCRM.GUI     WinForms; Program.cs = Composition Root
+src/HotelCRM.BLL     Services, Queries, Observers, Segments, Factories, Reporting
+src/HotelCRM.Domain  Common, Staff | Tickets, Surveys (TV1) | Customers, Hotel, Loyalty, Campaigns (TV2) | Interfaces
+src/HotelCRM.DAL     Sqlite (kết nối, UnitOfWork, tạo CSDL), Repositories, ReadModels
+tests/HotelCRM.Tests Unit/, Integration/, Fakes/
+```
+- Chiều phụ thuộc: `GUI → BLL → Domain ← DAL`. `Domain` không tham chiếu project nào. `GUI` tham chiếu `DAL` chỉ để `Program.cs` khởi tạo. `Tests` tham chiếu `Domain`, `BLL`, `DAL`. Form không chứa SQL hay quy tắc nghiệp vụ.
+- Khởi tạo đối tượng bằng tay trong `Program.cs`, không dùng thư viện DI. Thêm loại ticket, phân khúc hay observer mới chỉ cần thêm lớp và một dòng đăng ký ở `Program.cs`; không `switch` cứng theo tên.
+- Cấu hình: một `appsettings.json` (+ `appsettings.example.json`), đọc một lần ở `Program.cs` rồi truyền qua constructor. Không Singleton cấu hình. Lấy thời gian qua `IClock`.
+- Quy tắc nghiệp vụ: service tra cứu, lớp Domain quyết định và ném ngoại lệ. Cây ngoại lệ: `DomainException` → `ValidationException` (sai dữ liệu một đối tượng), `BusinessRuleException` (sai quy tắc giữa các đối tượng hoặc sai trạng thái), `AuthorizationException` (sai quyền). DAL bọc lỗi SQLite thành `DataAccessException`. Không `catch {}` rỗng.
+- Phân quyền ở tầng Service: service nhận `actor` và gọi `actor.EnsureCan…()` trước khi làm. Quyền là hàm đa hình của 4 lớp con `Employee` (`Administrator`, `Manager`, `Receptionist`, `Agent`), không `is`/`as`. Ẩn nút trên Form chỉ là lớp chặn thứ hai.
+- CSDL: SQLite qua `Microsoft.Data.Sqlite` (ADO.NET), mọi câu SQL có tham số. Bật `PRAGMA foreign_keys=ON` mỗi kết nối. `IUnitOfWork.Execute(...)` dùng chung một connection và một transaction; lời gọi lồng nhau tham gia transaction ngoài. Luồng L2 (đóng ticket) và L3 (trả phòng) chạy trọn trong một transaction. Repository đọc CSDL khi cần, không nạp hết vào bộ nhớ. Giữa các aggregate tham chiếu bằng Id. Lưới và báo cáo dùng truy vấn JOIN, không N+1.
+- Gói NuGet: ngoài bộ xUnit mặc định chỉ dùng `Microsoft.Data.Sqlite`, `ClosedXML`, `ScottPlot.WinForms`. Cần gói khác thì dừng và hỏi; phải được cả hai đồng ý.
 
-## Ngôn ngữ
-- Trong sản phẩm, mọi thứ bằng tiếng Anh: tên lớp/hàm, comment, chữ trên giao diện, thông báo lỗi, dữ liệu mẫu.
-- Trả lời người dùng bằng tiếng Việt. Tài liệu trong `docs/` viết tiếng Việt.
+### Ranh giới hai phân hệ
+Hai phân hệ chỉ nói chuyện qua các interface dưới đây (trong `Domain/Interfaces`, tiêm qua constructor). Service của phân hệ này không gọi service hay bảng của phân hệ kia. Lớp Domain của phân hệ này không dùng lớp Domain của phân hệ kia. Phần của bên kia chưa xong thì dùng Fake.
+
+| Interface | Khai báo | Cài đặt |
+|---|---|---|
+| `ICustomerDirectory` | TV1 | TV2 (`CustomerDirectory`) |
+| `IStayLookup` | TV1 | TV2 (`StayLookup`) |
+| `ITicketObserver` | TV1 | TV2 (`GoodwillPointsObserver`, `InteractionLogger`) |
+| `ITicketQuery` | TV2 | TV1 (`TicketQuery`) |
+| `ISurveyScheduler` | TV2 | TV1 (`SurveyScheduler`) |
+| `ICustomerCareStats` | TV2 | TV1 (`CustomerCareStats`) |
+| Dùng chung | `IUnitOfWork`, `IClock` (TV1) | `IReportExporter` (TV2) |
+
+Chữ ký chốt ở M6 (27/11). Sau đó muốn đổi phải được cả hai duyệt trong PR.
+
+## Ngôn ngữ và định dạng
+- Tên lớp/hàm/biến, comment, commit message: tiếng Anh.
+- Chữ trên giao diện, thông báo lỗi, dữ liệu mẫu: tiếng Việt.
+- Tiền VND định dạng `#,##0`, căn phải; ngày `dd/MM/yyyy`.
+- Tên Form theo bảng Form trong `docs/PLAN.md` (`frm000_dang_nhap`, `frm201_dm_khach_hang`, …); chỉnh theo HuongdanXDHTTTQL khi có file.
+- Mọi handler của Form bọc trong `ErrorHandler.Run`. Kiểm tra dữ liệu ở Form (`ErrorProvider`) và ở Domain/Service.
+- Trả lời người dùng bằng tiếng Việt. Tài liệu trong `docs/` viết tiếng Việt; mỗi mục đánh dấu [TV1]/[TV2]; mã F, UC, BM, Q, R, TC dùng thống nhất.
 
 ## Phân công (theo file)
-- **Suất A** (chủ repo), phân hệ Ticket: `Domain/Tickets/**`, hàm `Agent.EnsureCanTake`, `TicketService`, `Queries/TicketQuery`, `Business/Factories/**`, `Forms/Tickets/**`, `tests/HotelCRM.Tests/Tickets/**`, `FakeCustomerDirectory`, `FakeStayLookup`.
-- **Suất B** (thành viên còn lại), phân hệ Khách hàng/Lưu trú: `Domain/Customers/**`, `Domain/Hotel/**`, `CustomerService`, `BookingService`, `SurveyService`, `ReportService`, `Queries/CustomerDirectory`, `Queries/StayLookup`, `Business/Assignment/**`, `Business/Observers/**`, `Forms/Customers/**`, `Forms/Bookings/**`, `Forms/Reports/**`, `UiNotificationObserver`, `tests/HotelCRM.Tests/Customers/**`, `tests/HotelCRM.Tests/Assignment/**`, `FakeTicketQuery`.
-- **Phần chung** (viết xong ở GĐ 1): mọi thứ còn lại, gồm toàn bộ `Data/`, `Program.cs`, `MainForm`, `ErrorHandler`. Sau GĐ 1 không sửa các file này.
+- **TV1** (`Kessential`, chủ repo), Chăm sóc & hỗ trợ khách hàng + nền chung:
+  - Domain: `Common/**`, `Staff/**` (trừ `Receptionist`), `Tickets/**`, `Surveys/**`.
+  - BLL: `AuthService`, `EmployeeService`, `TicketService`, `SurveyService`, `CustomerCareReportService`, `Factories/**`, `TicketQuery`, `SurveyScheduler`, `CustomerCareStats`.
+  - DAL: `Sqlite/**`; repository và truy vấn báo cáo cho 7 bảng `departments`, `employees`, `tickets`, `ticket_logs`, `survey_criteria`, `surveys`, `survey_answers`.
+  - Database: khung `schema.sql`/`seed.sql` + 7 bảng trên.
+  - GUI: `Program.cs` (khung), `ErrorHandler`, frm000, frm001, frm101–frm106.
+  - Tests: test của TV1; `FakeCustomerDirectory`, `FakeStayLookup`.
+  - Tài liệu và slide: phần chung (4W+1H, cây BFD, sơ đồ UC tổng, DFD ngữ cảnh + mức 0, ma trận quyền, kiến trúc/package) + phân hệ TV1.
+- **TV2** (`munn8726`), Quan hệ khách hàng & khách hàng thân thiết:
+  - Domain: `Customers/**`, `Hotel/**`, `Loyalty/**`, `Campaigns/**`, `Staff/Receptionist`.
+  - BLL: `CustomerService`, `StayService`, `LoyaltyService`, `CampaignService`, `CustomerReportService`, `DashboardService`, `CustomerDirectory`, `StayLookup`, `Observers/**`, `Segments/**`, `ExcelReportExporter`.
+  - DAL: repository và truy vấn báo cáo cho 10 bảng `customers`, `interactions`, `room_types`, `rooms`, `bookings`, `point_transactions`, `rewards`, `reward_redemptions`, `campaigns`, `campaign_targets`.
+  - Database: 10 bảng trên trong `schema.sql`/`seed.sql`.
+  - GUI: frm201–frm207; hàm định dạng tiền/ngày, căn phải, `ErrorProvider` dùng chung; hàm vẽ biểu đồ dùng chung.
+  - Tests: test của TV2; `FakeTicketQuery`, `FakeSurveyScheduler`, `FakeCustomerCareStats`.
+  - Tài liệu và slide: phân hệ TV2; biên dịch slide (máy có TeX).
+- **Dùng chung:** `Program.cs` mỗi người thêm dòng đăng ký của mình. Sơ đồ chung (ERD, lớp) tách `-tv1.iuml`, `-tv2.iuml` rồi `!include` vào một file `.puml`. `CLAUDE.md`, `.claude/rules/**`, `docs/PLAN.md` sửa qua PR có cả hai duyệt.
+
+## Git
+- Nhánh tích hợp `v2`. Nhánh việc `tv1/<việc>`, `tv2/<việc>` tạo từ `v2`, mở PR vào `v2`. Người kia đọc, chạy thử, comment rồi mới merge, trong 24 giờ. Mỗi người ≥ 2 PR được merge. Không force-push `v2`. Cuối cùng merge `v2` → `main`.
+- Ai viết code thì người đó commit bằng tài khoản mình. Không dùng patch, không dùng `local/b-work`.
+- Mỗi module một commit, message tiếng Anh. Commit message không kèm dòng `Co-Authored-By` hay dòng quảng cáo công cụ nào; việc dùng Claude được nêu trong README và báo cáo.
+- Mỗi Chủ nhật (29/11, 6/12, 13/12) đo `git blame` (bỏ `*.Designer.cs` và tài liệu): mỗi người phải viết 40–60% code logic.
 
 ## Luật làm việc
-- **Không tự commit.** Đến điểm dừng thì đề xuất danh sách commit; chỉ commit khi người dùng đồng ý.
-- **Commit message không kèm dòng `Co-Authored-By` hay dòng quảng cáo công cụ nào.** Việc dùng Claude được nêu trong README và báo cáo.
-- **Code suất B** làm trên nhánh cục bộ `local/b-work` và xuất patch vào `handoff/` theo mục "Git" của `docs/PLAN.md`, trừ khi `docs/PROGRESS.md` ghi thành viên B tự code. Không bao giờ push `local/b-work`.
-- **Không đổi khung:** không đổi tên lớp, chữ ký public, cấu trúc thư mục; không sửa test có sẵn. Thấy cần đổi thì dừng, ghi lý do vào `docs/PROGRESS.md` và hỏi người dùng.
+- **Không tự commit, không tự push, không tự merge PR.** Đến điểm dừng thì đề xuất danh sách commit; chỉ làm khi người dùng đồng ý.
 - **Dừng sau mỗi module.** Một module là một dòng trong danh sách đánh số của file task. Khi dừng: tóm tắt thiết kế và những điểm cần nhớ khi vấn đáp, chờ duyệt rồi làm tiếp.
+- **Không đổi khung đã chốt** (tên lớp, chữ ký public, interface ranh giới, cấu trúc thư mục, test có sẵn) nếu chưa được duyệt. Thấy cần đổi thì dừng, ghi lý do vào `docs/PROGRESS.md` và hỏi.
+- Test: unit test chạy không cần CSDL, dùng Fake; integration test chạy trên CSDL SQLite tạm có seed; `IClock` cố định thời gian; giá trị kỳ vọng lấy từ bảng tính tay, không chép công thức của code. Không sửa test của người kia.
 - Giao diện WinForms không tự kiểm tra được: nêu rõ Form nào người dùng cần mở và bấm thử.
 
-## Điều kiện xong của một giai đoạn
-- `dotnet build` không lỗi, không warning.
-- Các test mà file task yêu cầu đều xanh.
-- `docs/PROGRESS.md` đã cập nhật.
+## Điều kiện xong một module
+- `dotnet build HotelCRM.sln` không lỗi, không warning.
+- `dotnet test HotelCRM.sln` xanh 100%.
+- `docs/PROGRESS.md` đã cập nhật (trong PR của người làm).
+- PR đã được người kia review và merge; Form đã bấm thử.
