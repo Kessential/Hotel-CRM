@@ -32,3 +32,4 @@ CLAUDE.local.md
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+docs/slides/*.pdf

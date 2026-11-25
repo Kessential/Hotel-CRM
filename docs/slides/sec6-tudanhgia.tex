@@ -1,0 +1,161 @@
+% ================= 6. RÀ SOÁT CHECKLIST & TỰ ĐÁNH GIÁ LẦN 1 =================
+\section{Rà soát checklist \& tự đánh giá lần 1}
+
+\newcommand{\gA}{\textcolor{okc}{\textbf{A}}}
+\newcommand{\gB}{\textcolor{okc!70!black}{\textbf{B}}}
+\newcommand{\gC}{\textcolor{midc}{\textbf{C}}}
+\newcommand{\gD}{\textcolor{warn}{\textbf{D}}}
+\newcommand{\gF}{\textcolor{warn}{\textbf{F}}}
+
+\begin{frame}{Cách rà soát}
+\begin{columns}[T]
+\column{0.55\textwidth}
+\scriptsize
+\begin{itemize}
+  \item File: \code{Checklist_BTL_HTTTQL_v2026.xlsx}, sheet \textbf{``Nhóm 02 người''} (đề tài HTTTQL, nhánh 1 -- doanh nghiệp truyền thống, ``Khách sạn'').
+  \item \textbf{20 tiêu chí}, mỗi tiêu chí 0.5 điểm, chấm chữ A/B/C/D/F = 100/75/50/25/0\%.
+  \item \textbf{Trục I -- Sản phẩm} (8 tiêu chí, 4.0đ) và \textbf{Trục II -- Độ hiểu sâu Phân tích/Thiết kế/Kiểm thử $\leftrightarrow$ Code} (12 tiêu chí, 6.0đ).
+  \item \textbf{2 cổng chặn}: G\_Product (PASS / WARN\_SCOPE trần 6.0 / FAIL\_RUN trần 3.5); G\_Epistemic tự tính từ Trục II.
+  \item Đối chiếu từng tiêu chí với \textbf{code thật} (đếm lớp, test, commit, dữ liệu) ngày 19/11/2026, đầu GĐ 3b; chưa tính phần sẽ làm.
+\end{itemize}
+\column{0.43\textwidth}
+\begin{alertblock}{Lưu ý quan trọng}
+\scriptsize
+Bản checklist v2026 \textbf{khắt khe hơn} bản đã chép vào \code{docs/PLAN.md} khi lập kế hoạch (20 tiêu chí 1 điểm). Các ngưỡng mới: $\ge$ 4 Form Master-Detail, $\ge$ 5 báo cáo xuất Excel/PDF, $\ge$ 11 bảng 3NF, $\ge$ 3 vai trò, $\ge$ 120 bản ghi mẫu, $\ge$ 26 test gồm $\ge$ 8 integration test, Git rải $\ge$ 3 tuần.
+\end{alertblock}
+\vspace{1mm}
+{\tiny Kết quả điền vào bản sao: \code{Checklist_BTL_HTTTQL_v2026_TuDanhGia_L1.xlsx} (cùng thư mục với slide).\par}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Tự kê khai khối lượng so với định mức nhóm 2 người}
+\tiny
+\begin{tabularx}{\textwidth}{@{}L{2.6cm}L{3.4cm}YL{1.2cm}@{}}
+\toprule
+\textbf{Hạng mục} & \textbf{Định mức N2} & \textbf{Hiện có (19/11)} & \textbf{Đánh giá} \\
+\midrule
+BFD cấp 2 & $\ge$ 6 nhánh ($\ge$ 3/TV) & 7 nhánh (TV1: 3, TV2: 3, chung: 1) & \stOK \\
+Use Case & $\ge$ 8 ($\ge$ 2 liên phân hệ) & 10 UC (5 liên PH: UC2, 3, 6, 8, 10); chạy được 7 & \stPART \\
+Form nghiệp vụ & $\ge$ 9 ($\ge$ 4/TV, 1 Shell) & 9 Form (TV1: 3, TV2: 6) + Login, Main; chạy được 6 & \stPART \\
+Form Master-Detail & $\ge$ 4 ($\ge$ 2/TV) & 0 & \stNO \\
+Báo cáo & $\ge$ 5 ($\ge$ 1 tổng hợp), Excel/PDF & 2 thiết kế (UC10), 0 chạy; chưa xuất file & \stNO \\
+Entity / UML & $\ge$ 13 entity, UML $\ge$ 20 lớp & 26 lớp thực thể/nghiệp vụ; biểu đồ lớp $\approx$ 35 lớp (slide) & \stOK \\
+Bảng 3NF & $\ge$ 11 ($\ge$ 3 n--n, $\ge$ 2 FK nối) & 8 tệp JSON; SQLite đang lên kế hoạch (GĐ 3b) & \stNO \\
+Quy tắc nghiệp vụ & $\ge$ 8 ($\ge$ 4/TV, $\ge$ 2 liên PH) & 11 (TV1: 5, TV2: 5, chung: 1; liên PH: QT 4, 5, 9, 10) & \stOK \\
+Vai trò RBAC & $\ge$ 3 & 2 (Manager, Agent) & \stNO \\
+GoF & $\ge$ 3 mẫu, $\ge$ 1 cầu nối & State, Factory Method, Strategy (cầu nối), Observer (dở) + Singleton & \stOK \\
+Seed data & $\ge$ 120 bản ghi liên thông & 13 bản ghi (4 phòng ban, 3 NV, 2 loại phòng, 4 phòng) & \stNO \\
+Sơ đồ tuần tự/trạng thái & $\ge$ 4 ($\ge$ 2/TV, 1 xuyên PH) & 2 (trạng thái ticket, tuần tự Auto Assign -- trong slide) & \stNO \\
+Test & $\ge$ 26 ($\ge$ 18 unit, $\ge$ 8 integration) & 22 unit (11/TV), 0 integration; 20 PASS & \stNO \\
+Git & $\ge$ 24 commit, $\ge$ 3 tuần, 40--60\%/TV & 46 commit (15--21/11); TV1 29, TV2 17 (63\% / 37\%); mã logic theo \code{git blame} (bỏ comment, docs, Designer): TV1 79\%, TV2 21\% & \stPART \\
+\bottomrule
+\end{tabularx}
+\end{frame}
+
+\begin{frame}{Tự chấm Trục I -- Hoàn thiện sản phẩm (8 tiêu chí)}
+\tiny
+\begin{tabularx}{\textwidth}{@{}L{0.45cm}L{3.5cm}C{0.5cm}C{0.65cm}Y@{}}
+\toprule
+\textbf{Mã} & \textbf{Tiêu chí} & \textbf{Chữ} & \textbf{Điểm} & \textbf{Minh chứng / lý do} \\
+\midrule
+1.1 & Quy mô \& hoàn thiện chức năng liên PH & \gC & 0.250 & BFD 7 nhánh, 10 UC nhưng 7 UC chạy; 9 Form (6 chạy, TV1 có 3 $<$ 4); chỉ 2 vai trò \\
+1.2 & Master-Detail, lọc đa tiêu chí, báo cáo & \gD & 0.125 & Có lọc 5 tiêu chí (ticket) và tìm khách; 0 Form M-D, 0 báo cáo, chưa xuất Excel/PDF \\
+1.3 & Seed data liên thông $\ge$ 120 & \gD & 0.125 & 13 bản ghi; dữ liệu đầy đủ (15 khách, 20 booking, 25 ticket) dự kiến ở GĐ 4 vẫn $<$ 120 \\
+1.4 & Đóng gói clean-room, hồ sơ, Git nhóm & \gC & 0.250 & README, \code{.gitignore}, cấu hình ngoài, nhánh \code{main/develop/feature}, merge \code{--no-ff}; chưa publish thử, chưa video, chưa PR GitHub, commit dồn 7 ngày; số commit 63/37, mã logic 79/21 \\
+2.1 & UI/UX đồng nhất, validation 2 lớp & \gC & 0.250 & 1 Main Shell, bố cục 2 PH giống nhau; validation chủ yếu ở Domain, Form chưa có \code{ErrorProvider}; ngày \code{yyyy-MM-dd}, tiền chưa \texttt{\#,\#\#0} \\
+2.2 & Ổn định, ngoại lệ, bảo mật, ACID & \gC & 0.250 & Cây \code{DomainException}, 0 \code{catch} rỗng, PBKDF2; lưu JSON nên chưa có transaction/rollback, chưa SQL tham số hóa \\
+2.3 & Hiệu năng, cấu hình thống nhất, tái lập & \gC & 0.250 & 1 tệp \code{appsettings.json}, đường dẫn tương đối, 0 hard-code; chưa CSDL/JOIN, chưa script tái lập \\
+2.4 & Clean code, naming, đồng nhất 2 TV & \gB & 0.375 & \code{.editorconfig}, \code{TreatWarningsAsErrors}, 0 warning, chú thích XML; tên chưa theo \code{frm_dm_/frm_nv_}; chưa có PR review \\
+\midrule
+ & \textbf{Cộng Trục I} & & \textbf{1.875} & \textbf{/ 4.00 (47\%)} \\
+\bottomrule
+\end{tabularx}
+\end{frame}
+
+\begin{frame}{Tự chấm Trục II -- Độ hiểu sâu $\leftrightarrow$ Code (12 tiêu chí)}
+\tiny
+\begin{tabularx}{\textwidth}{@{}L{0.45cm}L{3.3cm}C{0.5cm}C{0.65cm}Y@{}}
+\toprule
+\textbf{Mã} & \textbf{Tiêu chí} & \textbf{Chữ} & \textbf{Điểm} & \textbf{Minh chứng / lý do} \\
+\midrule
+3.1 & Khảo sát 4W+1H, biểu mẫu, BFD, UC $\leftrightarrow$ code & \gB & 0.375 & Phần 1--2 của slide: 4W+1H, 5 biểu mẫu, BFD 7 nhánh, bảng BFD$\to$UC$\to$Form$\to$Service; chưa vào báo cáo \\
+3.2 & ERD ($\ge$ 3 n--n) $\leftrightarrow$ $\ge$ 13 Entity & \gB & 0.375 & ERD + 26 lớp có hành vi; mới 1 lớp liên kết n--n (Booking); Interaction là thực thể yếu của Customer \\
+3.3 & $\ge$ 8 quy tắc \& RBAC $\ge$ 3 vai trò & \gB & 0.375 & 11 quy tắc trong Domain (không Anemic), quyền kiểm tra ở Domain/Service; chỉ 2 vai trò \\
+4.1 & UML tổng $\ge$ 20 lớp, 6 quan hệ, CSDL 3NF & \gC & 0.250 & Biểu đồ lớp khớp code, đủ các quan hệ; chưa có schema $\ge$ 11 bảng, chưa file UML chính thức \\
+4.2 & $\ge$ 4 sơ đồ Sequence/State & \gD & 0.125 & Mới 2 sơ đồ (trạng thái ticket, tuần tự Auto Assign) \\
+4.3 & Kiến trúc phân tầng, ranh giới 2 module & \gB & 0.375 & 4 project, Domain không tham chiếu gì, 0 phụ thuộc vòng, test chạy không UI; chưa vẽ Package Diagram chuẩn \\
+4.4 & Bất biến, đa hình, Cross-module LSP & \gB & 0.375 & \code{private set}, \code{IReadOnlyList}, validate ở constructor; 5 cây kế thừa; strategy TV2 chạy trong service TV1 qua interface \\
+4.5 & SRP, ISP, DIP/DI, hợp đồng TV1$\leftrightarrow$TV2 & \gB & 0.375 & 5 interface 1--4 hàm, constructor injection, composition root; \code{ITicketQuery} vẫn trả lớp \code{SupportTicket} của TV1 \\
+4.6 & $\ge$ 3 GoF, cầu nối, Live OCP & \gB & 0.375 & State, Factory Method, Strategy chạy thật; Observer mới có phía Subject; chưa tập Live OCP \\
+5.1 & Ma trận TC \& $\ge$ 18 unit test, mock chéo & \gC & 0.250 & 22 unit AAA (11/TV), ma trận TC ở phần 5; 2 đỏ, tổng $<$ 26, TV2 mới 1 Fake \\
+5.2 & $\ge$ 8 integration test, rollback, RBAC & \gF & 0.000 & Chưa có integration test \\
+5.3 & Live fault-injection, debug, hỏi chéo & \gC & 0.250 & Test chạy 1 lệnh; chưa thử tiêm lỗi/mutation, chưa luyện debug Call Stack xuyên PH \\
+\midrule
+ & \textbf{Cộng Trục II} & & \textbf{3.500} & \textbf{/ 6.00 (58\%)} \\
+\bottomrule
+\end{tabularx}
+\end{frame}
+
+\begin{frame}{Tổng hợp điểm tự đánh giá lần 1}
+\begin{columns}[c]
+\column{0.5\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[xbar, width=6.6cm, height=5.0cm, bar width=8pt, xmin=0, xmax=100,
+  symbolic y coords={N5 Kiểm thử,N4 Thiết kế/Pattern,N3 Phân tích,N2 Chất lượng SP,N1 Khối lượng},
+  ytick=data, xlabel={\scriptsize \% điểm tối đa}, ticklabel style={font=\tiny},
+  nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}\%},
+  every node near coord/.append style={font=\tiny}, enlarge y limits=0.15]
+\addplot[fill=tvA!70, draw=tvA] coordinates {(37.5,N1 Khối lượng) (56.25,N2 Chất lượng SP) (75,N3 Phân tích) (62.5,N4 Thiết kế/Pattern) (33.3,N5 Kiểm thử)};
+\draw[warn, dashed] (axis cs:50,{N5 Kiểm thử}) -- (axis cs:50,{N1 Khối lượng});
+\end{axis}
+\end{tikzpicture}
+\column{0.48\textwidth}
+\scriptsize
+\begin{tabular}{@{}lr@{}}
+\toprule
+Trục I -- Sản phẩm & 1.875 / 4.0 \\
+Trục II -- Độ hiểu sâu & 3.500 / 6.0 \\
+\textbf{Tổng thực tính} & \textbf{5.375 / 10} \\
+\midrule
+Cổng 1 G\_Product & \textcolor{warn}{\textbf{WARN\_SCOPE}} (trần 6.0) \\
+Cổng 2 G\_Epistemic (3.5 $\ge$ 3.0) & \textcolor{okc}{\textbf{PASS}} (trần 10) \\
+Điểm nhóm sau cổng & 5.375 \\
+\textbf{Điểm chốt (bước 0.5)} & \textbf{5.5 -- loại C, Trung bình} \\
+\midrule
+Hệ số TV1 / TV2 (mã logic 79\% / 21\%) & 1.00 / \textcolor{warn}{0.85} \\
+Điểm cá nhân TV1 / TV2 & 5.5 / 4.5 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2mm}
+{\tiny WARN\_SCOPE vì thiếu $>$ 20\% khối lượng lõi: Master-Detail, báo cáo, CSDL 3NF, seed data, integration test. TV2 có 37\% số commit, nhưng rubric đo \code{git blame} mã logic (bỏ docs/Designer): TV2 mới 21\%; nếu TV2 không tự code GĐ 3b--4, hệ số có thể bị hạ xuống 0.70--0.50.\par}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Khoảng trống và kế hoạch khắc phục trước hạn nộp 29/11}
+\tiny
+\begin{tabularx}{\textwidth}{@{}L{0.35cm}YL{2.3cm}L{1.2cm}L{1.0cm}@{}}
+\toprule
+\textbf{\#} & \textbf{Việc} & \textbf{Tiêu chí được nâng} & \textbf{Ai} & \textbf{Hạn} \\
+\midrule
+1 & GĐ 3b SQLite: schema 3NF $\ge$ 11 bảng (tách \code{interactions}, thêm bảng lịch sử trạng thái ticket\ldots), $\ge$ 2 FK nối 2 PH, SQL tham số hóa, transaction + rollback, script seed 1 lệnh & 1.3, 2.2, 2.3, 4.1 & TV1 + TV2 & 22/11 \\
+2 & GĐ 4: UC8--UC10, 3 observer, \textbf{$\ge$ 5 báo cáo} (1 báo cáo tổng hợp nối 2 PH), xuất CSV/HTML (Excel/PDF cần thêm gói -- phải hỏi) & 1.1, 1.2, 4.6 & TV2 (+TV1 1 báo cáo) & 25/11 \\
+3 & $\ge$ 4 Form Master-Detail: Khách $\to$ booking/ticket, Phòng ban $\to$ Agent/ticket, Loại phòng $\to$ phòng, Ticket $\to$ lịch sử & 1.2, 2.1 & 2/TV & 25/11 \\
+4 & Seed $\ge$ 120 bản ghi trải 2--3 tháng, đủ trạng thái (Cancelled, quá hạn\ldots); thêm vai trò thứ 3 (vd. Receptionist) & 1.3, 1.1, 3.3 & TV2 / chung & 25/11 \\
+5 & Test: +$\ge$ 4 unit, $\ge$ 8 integration (luồng liên PH, rollback, báo cáo khớp tính tay, RBAC 3 vai trò); TV2 thêm Fake thứ 2; tự chạy mutation check & 5.1, 5.2, 5.3 & 2 TV chia đều & 26/11 \\
+6 & UML: $\ge$ 4 sơ đồ tuần tự/trạng thái ($\ge$ 2/TV, 1 xuyên PH), Package Diagram, biểu đồ lớp tổng \code{.puml} & 4.1, 4.2, 4.3 & 2/TV & 27/11 \\
+7 & UI: ngày \code{dd/MM/yyyy}, tiền \texttt{\#,\#\#0},\code{ErrorProvider} ở Form (validation 2 lớp) & 2.1 & mỗi TV Form của mình & 27/11 \\
+8 & Đóng gói: publish 1 file chạy máy sạch, README, video 3--5 phút, PR trên GitHub; TV2 tự code phần còn lại để cân bằng Git (mục tiêu $\ge$ 40\% mã logic theo \code{git blame}) & 1.4, hệ số TV2 & cả nhóm & 29/11 \\
+9 & Ôn vấn đáp: mỗi TV tự làm Live OCP (\code{OnHoldState}, \code{SkillBasedStrategy}), debug Call Stack xuyên PH, giải thích code của bạn & 4.6, 5.3 & mỗi TV & 29/11 \\
+\bottomrule
+\end{tabularx}
+
+\vspace{1mm}
+{\tiny Mục 1--4, 7 thay đổi khung đã chốt (thêm bảng, thêm vai trò, thêm gói, sửa phần chung): theo \code{CLAUDE.md} phải ghi vào \code{docs/PROGRESS.md} và chờ chủ repo duyệt trước khi làm.\par}
+\end{frame}
+
+\begin{frame}[standout]
+Cảm ơn thầy/cô và các bạn đã lắng nghe!\\[4mm]
+{\normalsize Hỏi -- đáp}
+\end{frame}
