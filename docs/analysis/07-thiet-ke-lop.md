@@ -1,15 +1,20 @@
-# 07. Thiết kế lớp, package và hợp đồng giữa hai phân hệ
+# 07. Thiết kế lớp
 
-Module M6 của P1. [TV1] viết sơ đồ lớp phần chung + TV1, sơ đồ package, khai báo `ICustomerDirectory`, `IStayLookup`, `ITicketObserver`. [TV2] viết sơ đồ lớp TV2, khai báo `ITicketQuery`, `ISurveyScheduler`, `ICustomerCareStats`, `IReportExporter`. **Cả hai chốt bảng hợp đồng ở mục 4.**
+Module M6 của P1 (`docs/tasks/v2-p1-analysis.md` mục 3.5). Sơ đồ: `diagrams/class.puml` (TV1) `!include` `class-common.iuml`, `class-tv1.iuml`, `class-tv2.iuml`; `diagrams/package.puml` (TV1).
 
-## 1. Sơ đồ package và lớp phần chung + TV1 [TV1]
-> TV1 viết: `diagrams/package.puml`, `diagrams/class.puml` (khung, khai báo `Person`, `Employee` và 3 interface phía TV1, rồi `!include class-tv1.iuml`, `!include class-tv2.iuml`).
+## 1. Sơ đồ lớp tổng (ảnh) [Chung – TV1]
+_[Chung – TV1] chưa điền._
 
-## 2. Sơ đồ lớp TV2 [TV2]
-Sơ đồ: `diagrams/class-tv2.iuml`. Đánh dấu «đã có» là lớp đã có code (PR #2); các lớp còn lại là thiết kế cho đợt 2 (P2) và P3.
+## 2. Lớp phần chung [Chung – TV1]
+_[Chung – TV1] chưa điền._
 
-### 2.1 Lớp Domain
+## 3. Lớp phân hệ CSKH [TV1]
+_[TV1] chưa điền._
 
+## 4. Lớp phân hệ quan hệ khách hàng [TV2]
+Sơ đồ: `diagrams/class-tv2.iuml`. Cột "Trạng thái": «đã có» là lớp đã có code (PR #2); các lớp còn lại là thiết kế cho đợt 2 (P2) và P3.
+
+### 4.1 Lớp Domain
 | Lớp | Vai trò | Hành vi chính (quyết định quy tắc) | Trạng thái |
 |---|---|---|---|
 | `Customer` : `Person` | hồ sơ khách | `UpdateProfile`, `EnsureUnique` (Q7), `EnsureCanBeDeleted` (Q13), `EarnPoints` (Q9: cộng điểm đã tích, nâng hạng bằng `Next()`, trả `true` nếu lên hạng) | đợt 2 |
@@ -23,11 +28,11 @@ Sơ đồ: `diagrams/class-tv2.iuml`. Đánh dấu «đã có» là lớp đã c
 | `Receptionist` : `Employee` | vai trò Lễ tân | override các hàm quyền mà TV1 khai báo ở `Employee` | đợt 2, sau khi TV1 viết lại `Employee` |
 | enum `ContactChannel`, `BookingStatus`, `PointReason`, `RedemptionStatus`, `CampaignResponse` | | | |
 
-Hai thay đổi so với plan:
+Một chỗ lệch so với PLAN 5.3 (ghi ở `docs/PROGRESS.md` mục 8, chờ TV1 duyệt trong PR #3) và một ghi chú thiết kế:
 - **Không có `Customer.SpendPoints`.** Quy tắc đổi quà (Q10) đã do `Reward.EnsureCanRedeem(tier, balance)` quyết định. Số dư là tổng sổ điểm (không lưu, mục 3.4 của `06-erd.md`), nên `Customer` không giữ số dư để trừ.
 - **`Customer.LifetimePoints`** (điểm đã tích) không phải cột CSDL. Repository tính bằng tổng các dòng Lưu trú và Thiện chí khi nạp khách. `EarnPoints` cộng vào con số này rồi xét hạng.
 
-### 2.2 Lớp BLL
+### 4.2 Lớp BLL
 
 | Lớp | Vai trò | Phụ thuộc (qua constructor) |
 |---|---|---|
@@ -44,12 +49,19 @@ Hai thay đổi so với plan:
 
 Mọi hàm ghi của service nhận `Employee actor` và gọi kiểm quyền trước (Q6). Service không tự ném lỗi nghiệp vụ.
 
-### 2.3 Cây kế thừa và đa hình (cho LSP)
-- `MembershipTier` có 4 lớp con. Mọi nơi dùng kiểu cha: `Reward.MinTier`, `Customer.Tier`, `VipSegment` (gọi `IsAtLeast`, không `is VipTier`).
-- `ISegmentStrategy` có 3 lớp cài đặt. `CampaignService` chỉ biết interface.
-- `Receptionist` (TV2) đi qua `TicketService` (TV1) dưới kiểu `Employee`, không bị ép kiểu: LSP xuyên phân hệ.
+### 4.3 Câu hỏi còn mở
+1. Tên hàm quyền ở `Employee` v2 (TV1 quyết) để `Receptionist` override.
+2. Q13 mở rộng sang khách đã nằm trong chiến dịch (`06-erd.md` mục 3.5). Nếu đồng ý thì `EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`.
 
-## 3. Interface do TV2 khai báo [TV2]
+## 5. Package diagram và chiều phụ thuộc [Chung – TV1]
+_[Chung – TV1] chưa điền._
+
+## 6. Hợp đồng interface giữa hai phân hệ
+
+### 6.1 Interface TV1 khai báo [TV1]
+_[TV1] chưa điền._
+
+### 6.2 Interface TV2 khai báo [TV2]
 Bên **dùng** khai báo, bên kia cài. Hợp đồng chỉ truyền Id, số và record nhỏ, **không truyền lớp Domain của phân hệ kia**. v1 đang trả `SupportTicket` qua `ITicketQuery`; v2 bỏ cách đó để `Domain/Customers` không phụ thuộc `Domain/Tickets`.
 
 ```csharp
@@ -126,21 +138,47 @@ public sealed record ReportColumn(string Header, ReportColumnKind Kind);
 public enum ReportColumnKind { Text, Number, Money, Date, Percent }
 ```
 
-## 4. Bảng hợp đồng giữa hai phân hệ [TV1][TV2]
+`ISegmentStrategy` không phải interface ranh giới (cả Strategy lẫn các lớp cài đều của TV2), nhưng là chỗ mở rộng của phân hệ (bài Live OCP, mục 7.2). Chữ ký như code PR #2; namespace đổi từ `HotelCRM.Business.Segments` sang `HotelCRM.BLL.Segments` khi TV1 đổi tên project ở P2.
+
+```csharp
+namespace HotelCRM.BLL.Segments;
+
+/// <summary>One way of choosing the customers of a care campaign (Strategy). Context: CampaignService.</summary>
+public interface ISegmentStrategy
+{
+    /// <summary>Short code stored in campaigns.SegmentCode. Unique among the registered strategies.</summary>
+    string Code { get; }
+
+    /// <summary>Name shown in the segment list of the campaign form.</summary>
+    string DisplayName { get; }
+
+    /// <summary>Whether the customer belongs to this segment on <paramref name="referenceDate"/> (campaign start date).</summary>
+    bool Includes(SegmentCandidate customer, DateTime referenceDate);
+}
+
+/// <summary>What a strategy may look at for one customer; filled by CampaignService in one query.</summary>
+public sealed record SegmentCandidate(
+    int CustomerId,
+    MembershipTier Tier,
+    DateTime? DateOfBirth,
+    IReadOnlyList<DateTime> StayCheckOutDates);
+```
+
+#### Đề xuất bảng hợp đồng (để chốt ở 6.3)
 Trạng thái: **TV2 đề xuất, chờ TV1 duyệt** (hạn 27/11). Sau khi chốt, đổi chữ ký phải được cả hai duyệt trong PR.
 
 | Interface | Khai báo | Cài đặt | Hàm | Luồng | Test dùng Fake |
 |---|---|---|---|---|---|
 | `ITicketQuery` | TV2 | TV1 `TicketQuery` | `HasAnyTicket`, `GetCustomersWithOpenComplaints` | L4, L5 | TV2: `FakeTicketQuery` (TC2-09, TC2-10) |
-| `ISurveyScheduler` | TV2 | TV1 `SurveyScheduler` | `ScheduleFor` | L3 | TV2: `FakeSurveyScheduler` (integration L3 rollback) |
-| `ICustomerCareStats` | TV2 | TV1 `CustomerCareStats` | `GetTicketCounts`, `GetSurveyAverages` | L6 | TV2: `FakeCustomerCareStats` |
-| `ICustomerDirectory` | TV1 | TV2 `CustomerDirectory` | TV1 điền (xem 4.1) | L1, R2 | TV1: `FakeCustomerDirectory` |
-| `IStayLookup` | TV1 | TV2 `StayLookup` | TV1 điền (xem 4.1) | L1 (Q4) | TV1: `FakeStayLookup` |
-| `ITicketObserver` | TV1 | TV2 `GoodwillPointsObserver`, `InteractionLogger` | TV1 điền (xem 4.1) | L2 | – (integration TV1) |
+| `ISurveyScheduler` | TV2 | TV1 `SurveyScheduler` | `ScheduleFor` | L3 | TV2: `FakeSurveyScheduler` (TC2-12) |
+| `ICustomerCareStats` | TV2 | TV1 `CustomerCareStats` | `GetTicketCounts`, `GetSurveyAverages` | L6 | TV2: `FakeCustomerCareStats` (TC2-13) |
+| `ICustomerDirectory` | TV1 | TV2 `CustomerDirectory` | TV1 điền (xem yêu cầu bên dưới) | L1, R2 | TV1: `FakeCustomerDirectory` |
+| `IStayLookup` | TV1 | TV2 `StayLookup` | TV1 điền (xem yêu cầu bên dưới) | L1 (Q4) | TV1: `FakeStayLookup` |
+| `ITicketObserver` | TV1 | TV2 `GoodwillPointsObserver`, `InteractionLogger` | TV1 điền (xem yêu cầu bên dưới) | L2 | – (integration TV1) |
 | `IReportExporter` | TV2 | TV2 `ExcelReportExporter` | `Export` | R1–R5 | – |
 | `IUnitOfWork`, `IClock` | TV1 | TV1 | TV1 điền | L2, L3 | – |
 
-### 4.1 Yêu cầu của TV2 với 3 interface phía TV1
+#### Yêu cầu của TV2 với 3 interface phía TV1
 TV1 viết chữ ký; TV2 cần những thông tin sau để cài đặt:
 - **`ICustomerDirectory`:**
   - Tìm khách theo từ khóa: trả Id, tên, SĐT, tên hạng.
@@ -155,7 +193,57 @@ TV1 viết chữ ký; TV2 cần những thông tin sau để cài đặt:
   - tiêu đề ticket (ghi vào tương tác).
 - **Giao dịch:** observer chạy bên trong `IUnitOfWork.Execute` của TV1. Observer ném lỗi thì TV1 rollback cả việc đóng ticket (Q12).
 
-## 5. Câu hỏi còn mở [TV2]
-1. TV1 duyệt bảng hợp đồng mục 4, nhất là: (a) bỏ việc trả `SupportTicket` qua `ITicketQuery`; (b) `ITicketObserver` nhận record thay cho `SupportTicket`; (c) `ICustomerCareStats` hỏi điểm khảo sát theo booking.
-2. Q13 mở rộng sang khách đã nằm trong chiến dịch (câu hỏi ở `06-erd.md` mục 4). Nếu đồng ý thì `EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`.
-3. Tên hàm quyền ở `Employee` v2 (TV1 quyết) để `Receptionist` override.
+TV2 muốn TV1 duyệt ba điểm: (a) bỏ việc trả `SupportTicket` qua `ITicketQuery`; (b) `ITicketObserver` nhận record thay cho `SupportTicket`; (c) `ICustomerCareStats` hỏi điểm khảo sát theo booking.
+
+### 6.3 Biên bản chốt (27/11) [Chung – TV1 + TV2]
+_[Chung – TV1 + TV2] chưa điền (họp chốt 27/11)._
+
+## 7. Mẫu GoF
+
+### 7.1 State, Factory Method [TV1]
+_[TV1] chưa điền._
+
+### 7.2 Strategy [TV2]
+
+| Vai trò trong mẫu | Lớp |
+|---|---|
+| Strategy | `ISegmentStrategy` (`Code`, `DisplayName`, `Includes`) |
+| ConcreteStrategy | `VipSegment` (hạng ≥ VIP, so bằng `MembershipTier.IsAtLeast`), `LapsedGuestSegment` (lần trả phòng gần nhất cách ngày bắt đầu ≥ N ngày, N = 180 đọc từ `appsettings.json`), `BirthdayMonthSegment` (tháng sinh = tháng bắt đầu chiến dịch) |
+| Context | `CampaignService`: nhận danh sách `ISegmentStrategy` qua constructor; `GetSegments` trả danh sách cho `cboSegment`; `PreviewTargets` tìm Strategy theo `Code` người dùng chọn rồi gọi `Includes` cho từng `SegmentCandidate` |
+| Client | `Program.cs` tạo 3 Strategy và đưa vào `CampaignService`; `frm206` cho Quản lý chọn phân khúc lúc chạy |
+
+**Vấn đề giải quyết:** mỗi đợt ưu đãi chọn khách theo một cách khác. Không có Strategy thì `CampaignService` phải `switch (segmentCode)` và mỗi phân khúc mới là một lần sửa service đang chạy đúng. Có Strategy thì service chỉ biết interface, còn mỗi cách chọn khách là một lớp nhỏ test riêng được (`SegmentStrategyTests`, 11 trường hợp, không cần CSDL).
+
+**Live OCP (bài tập khi tắt AI):** thêm `FrequentGuestSegment` (khách có ≥ 3 lần trả phòng trong 365 ngày trước ngày bắt đầu): một lớp mới cài `ISegmentStrategy`, dùng `SegmentCandidate.StayCheckOutDates`, và một dòng đăng ký trong `Program.cs`. Không sửa `CampaignService`, `frm206` hay lớp phân khúc nào đã có; `cboSegment` tự có thêm dòng mới.
+
+**Nhược điểm:**
+1. **`SegmentCandidate` phải đủ dữ liệu cho mọi Strategy.** Phân khúc mới cần dữ liệu chưa có (ví dụ tổng chi tiêu) thì phải sửa cả `SegmentCandidate` lẫn truy vấn nạp nó trong `CampaignService`. Tính "mở để mở rộng" chỉ giữ được khi dữ liệu đã đủ.
+2. **Lọc trong bộ nhớ.** Service nạp mọi khách rồi gọi `Includes` cho từng khách. Với vài trăm khách của bài thì nhanh; với hàng trăm nghìn khách thì nên đẩy điều kiện xuống SQL, khi đó mỗi Strategy phải sinh điều kiện `WHERE` và mất tính đơn giản.
+3. **`Code` phải ổn định.** `campaigns.SegmentCode` lưu `Code` của Strategy; đổi `Code` hoặc gỡ một Strategy thì chiến dịch cũ không còn tên phân khúc để hiển thị (R4 chỉ còn mã).
+
+### 7.3 Observer (cầu nối) [Chung – TV1 phát, TV2 nhận]
+
+#### Phía phát sự kiện [TV1]
+_[TV1] chưa điền._
+
+#### Phía nhận sự kiện [TV2]
+- **Observer:** `GoodwillPointsObserver` và `InteractionLogger` cài `ITicketObserver` (TV1 khai báo). `Program.cs` đăng ký hai observer vào phía ticket của TV1; thêm observer mới chỉ cần một lớp và một dòng đăng ký.
+- **`GoodwillPointsObserver`:** chỉ làm khi trạng thái mới là Đã đóng; ghi `PointTransaction.ForGoodwill` (điểm theo loại ticket do TV1 tính) và gọi `Customer.EarnPoints` (có thể lên hạng; Q9, Q12).
+- **`InteractionLogger`:** ghi một `Interaction` gắn `TicketId`, nội dung là tiêu đề ticket và trạng thái mới.
+- **Giao dịch:** cả hai chạy bên trong `IUnitOfWork.Execute` của `TicketService`; observer ném ngoại lệ thì TV1 rollback cả việc đóng ticket (L2).
+- **Không phụ thuộc ngược:** observer nhận một record (`TicketId`, `CustomerId`, trạng thái, `GoodwillPoints`, tiêu đề) chứ không nhận `SupportTicket`, nên `Domain/Customers` và `Domain/Loyalty` không tham chiếu `Domain/Tickets` (đề xuất ở 6.2, chốt ở 6.3).
+- **Nhược điểm (nhìn từ phía nhận):**
+  1. Thứ tự gọi observer phụ thuộc thứ tự đăng ký. Hai observer của TV2 độc lập nhau nên không sao, nhưng nếu sau này có observer cần kết quả của observer trước thì phải sửa cách đăng ký.
+  2. Lỗi ở observer làm hỏng việc chính (đóng ticket bị rollback). Ở L2 đó là chủ đích (điểm thiện chí phải đi cùng việc đóng), nhưng với một observer chỉ ghi log thì cách này quá chặt.
+  3. Khó lần theo luồng khi đọc code: `TicketService` không gọi tên `GoodwillPointsObserver` ở đâu cả; phải xem `Program.cs` hoặc đặt breakpoint mới thấy ai nhận sự kiện.
+
+## 8. Cây kế thừa và LSP
+
+### 8.1 Cây `Employee`, `SupportTicket`, `TicketState` [TV1]
+_[TV1] chưa điền._
+
+### 8.2 Cây `MembershipTier` [TV2]
+- `MembershipTier` (abstract) có 4 lớp con `StandardTier`, `SilverTier`, `GoldTier`, `VipTier`. Mỗi lớp con chỉ trả số liệu của mình (`Name`, `MinPoints`, `EarnRate`, `SlaFactor`, `PriorityBoost`) và hạng kế tiếp (`Next()`); phép tính dùng chung nằm ở lớp cha (`PointsFor`, `IsAtLeast`).
+- **LSP:** mọi nơi dùng kiểu cha và không ép kiểu: `Customer.Tier`, `Reward.MinTier`, `SegmentCandidate.Tier`, `VipSegment` (gọi `IsAtLeast`, không `is VipTier`), `CustomerDirectory` trả `SlaFactor`/`PriorityBoost` cho TV1. Thay một hạng bằng hạng khác thì mọi hàm vẫn giữ hợp đồng: `PointsFor` không âm, `Next()` của `VipTier` trả `null` (hạng cao nhất).
+- `ISegmentStrategy` có 3 lớp cài đặt; `CampaignService` chỉ biết interface.
+- **LSP xuyên phân hệ:** `Receptionist` (TV2) đi qua `TicketService` (TV1) dưới kiểu `Employee`, không bị ép kiểu.

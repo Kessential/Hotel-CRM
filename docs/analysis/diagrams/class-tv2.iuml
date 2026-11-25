@@ -1,6 +1,6 @@
 ' [TV2] Class diagram of the customer relationship and loyalty subsystem.
-' Included by class.puml (TV1), which declares Person, Employee and the boundary interfaces
-' declared by TV1 (ICustomerDirectory, IStayLookup, ITicketObserver). Members are the planned v2 design;
+' Included by class.puml (TV1) together with class-common.iuml (TV1: Person, Employee, exceptions, IClock, IUnitOfWork)
+' and class-tv1.iuml (TV1); the TV1 boundary interfaces used here (ICustomerDirectory, IStayLookup, ITicketObserver) come from TV1's files. Members are the planned v2 design;
 ' classes marked "đã có" already exist in code (PR #2).
 
 package "Domain.Customers" {
