@@ -1,15 +1,15 @@
 ' [TV2] BFD branches F5-F8 (level 2) and their leaves (level 3).
 ' Included by bfd.puml (TV1) inside @startwbs, right after the root node "* Hệ thống CRM khách sạn".
-' Each leaf maps to one Form (see 02-bfd.md, section 3).
-** F5 Quản lý hồ sơ khách hàng 360
+' Branch names match PLAN 4.2 and the level-0 DFD processes 5.0-8.0; each leaf maps to one Form (02-bfd.md, section 2.2).
+** F5 Hồ sơ khách hàng 360
 *** F5.1 Cập nhật hồ sơ khách\n(frm201)
 *** F5.2 Tra cứu hồ sơ 360 của khách\n(frm201, chi tiết)
-** F6 Quản lý lưu trú
+** F6 Lưu trú
 *** F6.1 Cập nhật danh mục loại phòng và phòng\n(frm202)
 *** F6.2 Đặt phòng, nhận phòng, trả phòng\n(frm203)
-** F7 Quản lý khách hàng thân thiết
+** F7 Khách hàng thân thiết
 *** F7.1 Cập nhật danh mục quà tặng\n(frm204)
 *** F7.2 Theo dõi sổ điểm và đổi quà\n(frm205)
-** F8 Chăm sóc theo chiến dịch và báo cáo khách hàng
+** F8 Chiến dịch & báo cáo khách hàng
 *** F8.1 Lập và theo dõi chiến dịch chăm sóc\n(frm206)
 *** F8.2 Lập báo cáo khách hàng và dashboard 360\n(frm207)

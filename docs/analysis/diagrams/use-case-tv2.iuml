@@ -1,5 +1,5 @@
 ' [TV2] Use cases UC07-UC11 and their actor links.
-' Included by use-case.puml (TV1), which declares the actors with these aliases:
+' Included by use-case.puml (TV1) with "!include use-case-tv2.iuml"; use-case.puml declares the actors with these aliases:
 '   ADM = Admin, QL = Quản lý, LT = Lễ tân, CSKH = Nhân viên CSKH
 ' Admin reaches every use case through generalization in use-case.puml, so it has no links here.
 rectangle "Phân hệ Quan hệ khách hàng & khách hàng thân thiết (TV2)" {
