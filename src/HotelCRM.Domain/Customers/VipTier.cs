@@ -15,6 +15,9 @@ public sealed class VipTier : MembershipTier
     /// <summary>2.</summary>
     public override int PriorityBoost => 2;
 
+    /// <summary>2.0.</summary>
+    public override decimal EarnRate => 2.0m;
+
     /// <summary>15000.</summary>
     public override int MinPoints => 15000;
 

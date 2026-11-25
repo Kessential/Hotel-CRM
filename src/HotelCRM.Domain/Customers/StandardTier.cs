@@ -15,6 +15,9 @@ public sealed class StandardTier : MembershipTier
     /// <summary>0.</summary>
     public override int PriorityBoost => 0;
 
+    /// <summary>1.0.</summary>
+    public override decimal EarnRate => 1.0m;
+
     /// <summary>0.</summary>
     public override int MinPoints => 0;
 

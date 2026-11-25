@@ -15,6 +15,9 @@ public sealed class GoldTier : MembershipTier
     /// <summary>1.</summary>
     public override int PriorityBoost => 1;
 
+    /// <summary>1.5.</summary>
+    public override decimal EarnRate => 1.5m;
+
     /// <summary>5000.</summary>
     public override int MinPoints => 5000;
 

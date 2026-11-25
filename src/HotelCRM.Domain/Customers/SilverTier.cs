@@ -15,6 +15,9 @@ public sealed class SilverTier : MembershipTier
     /// <summary>0.</summary>
     public override int PriorityBoost => 0;
 
+    /// <summary>1.2.</summary>
+    public override decimal EarnRate => 1.2m;
+
     /// <summary>1000.</summary>
     public override int MinPoints => 1000;
 

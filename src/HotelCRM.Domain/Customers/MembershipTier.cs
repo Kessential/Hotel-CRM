@@ -1,3 +1,5 @@
+using HotelCRM.Domain.Common;
+
 namespace HotelCRM.Domain.Customers;
 
 /// <summary>
@@ -6,6 +8,9 @@ namespace HotelCRM.Domain.Customers;
 /// </summary>
 public abstract class MembershipTier
 {
+    /// <summary>Q9: room charges, in VND, that earn one point before the tier's earn rate is applied.</summary>
+    public const decimal VndPerPoint = 10_000m;
+
     /// <summary>Name of the tier: <c>Standard</c>, <c>Silver</c>, <c>Gold</c> or <c>VIP</c>. Stored in <c>customers.json</c>.</summary>
     public abstract string Name { get; }
 
@@ -17,6 +22,34 @@ public abstract class MembershipTier
 
     /// <summary>Rule 8: points needed to reach this tier. Standard 0, Silver 1000, Gold 5000, VIP 15000.</summary>
     public abstract int MinPoints { get; }
+
+    /// <summary>Q9: multiplier applied to the points of a stay. Standard 1.0, Silver 1.2, Gold 1.5, VIP 2.0.</summary>
+    public abstract decimal EarnRate { get; }
+
+    /// <summary>
+    /// Q9: points earned for <paramref name="amountVnd"/> of room charges:
+    /// amount / <see cref="VndPerPoint"/> x <see cref="EarnRate"/>, rounded down.
+    /// </summary>
+    /// <exception cref="ValidationException">The amount is negative.</exception>
+    public int PointsFor(decimal amountVnd)
+    {
+        if (amountVnd < 0)
+        {
+            throw new ValidationException("Số tiền tính điểm không được âm.");
+        }
+
+        return (int)decimal.Floor(amountVnd / VndPerPoint * EarnRate);
+    }
+
+    /// <summary>
+    /// Q10: whether this tier is the same as or higher than <paramref name="other"/>, for example the
+    /// minimum tier of a reward. Tiers are ordered by <see cref="MinPoints"/>, so a new tier needs no change here.
+    /// </summary>
+    public bool IsAtLeast(MembershipTier other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+        return MinPoints >= other.MinPoints;
+    }
 
     /// <summary>
     /// Returns the tier object for a stored name. Adding a new tier means adding one line here.
