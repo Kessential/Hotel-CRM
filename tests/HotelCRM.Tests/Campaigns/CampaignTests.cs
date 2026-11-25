@@ -97,6 +97,30 @@ public class CampaignTests
     }
 
     [Fact]
+    public void EnsureHasTargets_EmptyList_ThrowsBusinessRule()
+    {
+        // Arrange
+        Campaign campaign = NewCampaign();
+
+        // Act + Assert
+        Assert.Throws<BusinessRuleException>(() => campaign.EnsureHasTargets());
+    }
+
+    [Fact]
+    public void EnsureHasTargets_OneTarget_DoesNotThrow()
+    {
+        // Arrange: the smallest list that may be saved.
+        Campaign campaign = NewCampaign();
+        campaign.AddTarget(7, marketingConsent: true, hasOpenComplaint: false, ContactChannel.Email, DuringCampaign);
+
+        // Act
+        Exception? error = Record.Exception(() => campaign.EnsureHasTargets());
+
+        // Assert
+        Assert.Null(error);
+    }
+
+    [Fact]
     public void ResponseRate_OneAnswerOutOfFour_IsOneQuarter()
     {
         // Arrange

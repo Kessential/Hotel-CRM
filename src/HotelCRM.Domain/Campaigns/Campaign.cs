@@ -133,6 +133,17 @@ public sealed class Campaign : IEntity
         return target;
     }
 
+    /// <summary>Q11: a campaign needs at least one customer. The service calls this before saving.</summary>
+    /// <exception cref="BusinessRuleException">The target list is empty.</exception>
+    public void EnsureHasTargets()
+    {
+        if (_targets.Count == 0)
+        {
+            throw new BusinessRuleException(
+                $"Chiến dịch \"{Name}\" chưa có khách nào phù hợp; hãy đổi phân khúc hoặc khoảng ngày.");
+        }
+    }
+
     /// <summary>
     /// Q11: records or replaces the answer of a targeted customer while the campaign is not over
     /// (for example Interested first, Booked later).
