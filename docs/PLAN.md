@@ -1,439 +1,476 @@
-# Kế hoạch BTL OOP — Hotel CRM
+# Hotel CRM v2 — Kế hoạch (PLAN v2)
 
-> **Đặc tả chính của dự án.** File này (`docs/PLAN.md`) tự đủ, không phụ thuộc tài liệu nào khác. C# / .NET 10, WinForms, lưu JSON, test xUnit. Tên lớp/hàm trong tài liệu này phải xuất hiện đúng trong code vì báo cáo và UML đối chiếu 1-1. Mỗi phiên làm việc đọc `CLAUDE.md` → `docs/PROGRESS.md` → file task của giai đoạn, và chỉ mở những mục của file này mà file task nêu tên.
+> Kế hoạch làm lại theo checklist HTTTQL v2026 (nhóm 2 người), chốt 22/11/2026; đưa vào repo 25/11/2026 (M1). File này giữ nội dung bản kế hoạch gốc, trừ mục "Bước làm ngay" (đã làm ở M1). Kế hoạch v1 chỉ còn trong lịch sử git: `git show fd7b7e4:docs/PLAN.md`.
+>
+> Đề tài đã xác nhận: **CRM (quản lý dịch vụ chăm sóc khách hàng) áp dụng cho khách sạn**. So với bản 21/11, phần TV2 chuyển từ "lưu trú & thanh toán" sang "quan hệ khách hàng & khách hàng thân thiết".
+>
+> Trạng thái, việc đang dở, việc chờ người: `docs/PROGRESS.md`. Việc chi tiết của giai đoạn đang làm: `docs/tasks/`.
 
-## Context
-BTL môn LTHĐT, nhóm 2 người, đề "Quản lý dịch vụ chăm sóc khách hàng (CRM)" áp dụng cho khách sạn; gợi ý lớp: `Customer`, `SupportTicket`, `TicketState (Open, InProgress, Resolved)`, `Agent`, `InteractionHistory`. Chấm theo sheet **"Nhóm 02 người"** trong file checklist của giảng viên; toàn bộ nội dung sheet đã chép vào mục "Checklist chấm điểm" bên dưới.
+## 0. Đọc nhanh (cả hai người đọc mục này trước)
+- **Đề:** CRM cho khách sạn. Chấm theo sheet "Nhóm 02 người" của `docs/slide_checklist/Checklist_BTL_HTTTQL_v2026.xlsx`; quy ước tên theo `docs/slide_checklist/HuongdanXDHTTTQLv1_1.pdf`. Hai file này là tài liệu của giảng viên, **không đưa lên repo** (repo public): mỗi người tự giữ một bản ở `docs/slide_checklist/` trên máy mình; thư mục này nằm trong `.gitignore`.
+- **Hai phân hệ, chia dọc:**
+  - **TV1 (chủ repo) — Chăm sóc & hỗ trợ khách hàng:** ticket yêu cầu/khiếu nại, phân công, xử lý theo trạng thái, nhật ký xử lý, khảo sát hài lòng, báo cáo CSKH.
+  - **TV2 — Quan hệ khách hàng & khách hàng thân thiết:** hồ sơ khách 360, lưu trú (nguồn dữ liệu cho CRM), sổ điểm và đổi quà, chiến dịch chăm sóc theo phân khúc, báo cáo khách hàng và dashboard 360.
+- **Mỗi người tự làm trọn phần mình**: phân tích → Domain → mẫu thiết kế → test → giao diện → slide. Ai viết code người đó commit bằng tài khoản mình; merge qua PR có người kia review. Không làm hộ (Khóa 3 của checklist: hệ số cá nhân có thể về 0).
+- **Hai phân hệ chỉ nói chuyện qua interface** (mục 4.5). Không gọi service hay bảng của bên kia.
+- **Mốc:** slide 30/11 · code xong 12/12 · vấn đáp từ 13/12 · nộp cuối 30/12.
+- **Việc của từng người:** mục 6.4 (TV1), 6.5 (TV2), 6.6 (cả hai), dạng danh sách có hạn; trạng thái đánh dấu ở `docs/PROGRESS.md`.
+- **Khi vấn đáp:** mỗi người giải thích được cả phần của bạn và tự thêm một lớp mới khi tắt AI (Live OCP). Vì vậy thiết kế giữ tối giản: chỉ thêm thứ phục vụ một tiêu chí của checklist.
 
-## Checklist chấm điểm (sheet "Nhóm 02 người")
-20 tiêu chí, mỗi tiêu chí 1 điểm, chấm theo mức A = 1 / B = 0.75 / C = 0.5 / D = 0.25 / F = 0; tổng 20 điểm quy về thang 10. Báo cáo phải điền cột "Minh chứng" (trang X–Y) cho từng tiêu chí.
+## 1. Context
+Checklist mới (định mức N2) đòi những thứ project hiện tại chưa có: CSDL thật (JSON có nguy cơ FAIL_RUN, trần 3.5), ≥11 bảng 3NF có khóa ngoại, ≥3 vai trò chặn quyền ở tầng Service, ≥4 Form Master-Detail, ≥5 báo cáo xuất Excel có biểu đồ, seed ≥120 dòng, ≥8 integration test (rollback, RBAC, báo cáo khớp tính tay), quy ước tên theo HuongdanXDHTTTQL, giao diện tiếng Việt, Git rải ≥3 tuần có PR và mỗi người viết 40–60% code logic (hiện 84/16). Ngoài ra bản 21/11 đã để phần TV2 nghiêng về quản lý khách sạn (hóa đơn, công nợ, doanh thu), dễ bị coi là lệch đề CRM. Bản này làm lại từ phân tích thiết kế, dùng lại Domain/Business cũ, đưa cả hai phân hệ về đúng CRM.
 
-| # | Nhóm | Yêu cầu | Minh chứng trong dự án |
-|---|---|---|---|
-| 1 | Phân tích & Code | Xác định bài toán, tác nhân, đặc tả chức năng chính (≥ 8 Use Case chia đều 2 thành viên) khớp với các hàm điều khiển trong code | bảng "Use Case → hàm điều khiển", sơ đồ use case |
-| 2 | | Hệ thống lớp thực thể dùng chung (≥ 15 lớp), giải thích được ý nghĩa từng thuộc tính từ code | 26 lớp trong `HotelCRM.Domain`; bảng thuộc tính trong báo cáo |
-| 3 | | Đặc tả quy tắc nghiệp vụ (≥ 8) và cài đặt trực tiếp vào phương thức của các lớp ở cả hai phân hệ | bảng "Quy tắc nghiệp vụ → nơi cài đặt" + test tương ứng |
-| 4 | | Tách biệt lớp giao diện với lớp xử lý nghiệp vụ theo đúng phân quyền tác nhân và ranh giới hệ thống | `WinForms` chỉ gọi `Business/Services`; menu theo `UserSession` |
-| 5 | Thiết kế & Code | Sơ đồ lớp tổng thể (≥ 16 lớp) đồng bộ với khai báo lớp, thuộc tính, phương thức trong code của cả nhóm | `docs/uml/class-overview.puml` |
-| 6 | | Thiết kế và cài đặt đúng các quan hệ (kế thừa, thực thi, kết tập, hợp thành, phụ thuộc), đặc biệt giữa 2 phân hệ | bảng "Quan hệ UML" |
-| 7 | | Sơ đồ tuần tự hoặc hoạt động (≥ 4, mỗi thành viên 2) khớp thứ tự gọi hàm thực tế khi chạy | `docs/uml/seq-uc2`, `seq-uc4`, `seq-uc7`, `seq-uc8` |
-| 8 | | Kiến trúc phân tầng (≥ 3 tầng), phân chia module rõ ràng, khớp cấu trúc package và chiều gọi lệnh | 4 project trong `src/` + chiều tham chiếu project |
-| 9 | Design Pattern & Code | Lựa chọn và giải thích lý do áp dụng mẫu thiết kế (≥ 3, mỗi thành viên 1–2 mẫu) | bảng Design Pattern; chương pattern trong báo cáo |
-| 10 | | Xác định vai trò từng lớp trong các Design Pattern; cả 2 thành viên đối chiếu đúng với lớp, giao diện trong code | sơ đồ từng pattern |
-| 11 | | Cài đặt đúng cơ chế phối hợp giữa các lớp trong Design Pattern (đa hình, ủy quyền, khởi tạo) xuyên suốt chương trình | code State/Strategy/Factory/Observer/Repository + test |
-| 12 | | Đánh giá hiệu quả Design Pattern; cả 2 thành viên thực hành mở rộng thêm chức năng/lớp mới ngay trên code | 5 bài mở rộng trong `viva-notes.md` |
-| 13 | Nguyên lý LTHĐT & Code | Đóng gói và trừu tượng hóa toàn dự án: che giấu thuộc tính (private), kiểm tra dữ liệu hợp lệ khi giao tiếp giữa các lớp | `private set`, validate trong constructor/method, lớp abstract |
-| 14 | | Kế thừa và đa hình: lớp cơ sở/giao diện dùng chung, ghi đè phương thức, lớp con thay thế được lớp cha | 5 cây kế thừa, override, test dùng lớp con qua kiểu cha |
-| 15 | | Mỗi lớp một nhiệm vụ rõ ràng, interface tinh gọn, thống nhất Coding Convention giữa 2 thành viên | mỗi service một nhóm UC; interface 1–5 hàm; `.editorconfig` |
-| 16 | | Ghép nối công việc 2 thành viên qua interface, dễ mở rộng hoặc thay đổi cài đặt mà không làm lỗi code của nhau | `ICustomerDirectory`, `IStayLookup`, `ITicketQuery`, `ITicketObserver`, `IAssignmentStrategy` |
-| 17 | Đóng gói | Tích hợp mã nguồn 2 thành viên, đóng gói thành 1 tệp thực thi hoàn chỉnh, đường dẫn dữ liệu tương đối, chạy được trên máy khác | lệnh publish single-file, đường dẫn theo `AppContext.BaseDirectory` |
-| 18 | | Dữ liệu mẫu liên thông và ca kiểm thử (≥ 20 test case chia đều 2 thành viên) cho các phương thức xử lý chính | `Data/*.json`, 22 test xUnit |
-| 19 | | Xử lý ngoại lệ (try-catch) thống nhất, tách file cấu hình, làm việc nhóm trên Git có phân nhánh (≥ 20 commit chia đều 2 thành viên) | `ErrorHandler`, `appsettings.json`, nhánh + `git shortlog -sn` |
-| 20 | | Hoàn thiện báo cáo, README, kịch bản demo và thuyết trình (cả 2 thành viên hiểu rõ thiết kế và code của nhau) | báo cáo LaTeX, README, `demo-script.md`, `viva-notes.md` |
+Đã đọc khi lập kế hoạch (22/11): checklist (3 sheet), PROGRESS, PLAN và `docs/tasks/stage-3b-sqlite.md` bản v1 (lịch sử git, `fd7b7e4`), bản rà soát của TV2 (`RaSoat_Checklist_HotelCRM_2026-11-21.md`), slide L1 của TV2 (`docs/slides/*.tex`, đã merge vào `develop` qua PR #1). Bổ sung 25/11: `docs/slide_checklist/HuongdanXDHTTTQLv1_1.pdf`.
 
-**Bảng mô tả chi tiết thiết kế & code** (5 dòng phải điền trong báo cáo, mỗi dòng gồm mô tả thiết kế và cài đặt thực tế trong code):
+## 2. Checklist chấm thế nào (tóm tắt)
+- 20 tiêu chí × 0.5 = 10 điểm. Trục I sản phẩm 4 điểm; Trục II hiểu sâu (phân tích, thiết kế, kiểm thử ↔ code) 6 điểm.
+- Cổng sản phẩm: thiếu >20% khối lượng → trần 6.0; không chạy được trên máy chấm hoặc không có CSDL thật → trần 3.5.
+- Cổng hiểu sâu: Trục II < 3.0 → trần 6.5; < 1.8 → trần 3.5.
+- Điểm cá nhân = điểm nhóm × hệ số: 1.00 khi mỗi người viết 40–60% code logic (`git blame`, bỏ Designer và tài liệu) và qua vấn đáp chéo; 30–40% → 0.85; 20–30% → 0.70; < 20% → 0.50; làm hộ, rửa commit, không giải thích được code đứng tên mình → 0.00.
+- 5 khóa chống đối phó: lớp rỗng (Anemic); nhân bản Form CRUD một bảng; làm hộ hoặc chia "1 người code, 1 người làm slide"; test hình thức (thầy tiêm lỗi mà test vẫn xanh); code chết, pattern giả, không giải thích được code.
+- Buổi chấm 10–15 phút: chạy app theo README (≤3 phút) → đăng nhập các vai trò, làm 1 giao dịch Master-Detail, mở báo cáo, xuất Excel → chạy test, thầy tiêm lỗi, đặt breakpoint xem Call Stack → hỏi đánh đổi, mỗi người Live OCP, hỏi chéo phần của bạn.
 
-| Dòng trong checklist | Nội dung của dự án |
+## 3. Quyết định đã chốt
+| Mục | Chốt |
 |---|---|
-| Phân hệ / Module 1.0 (cấu trúc cơ sở) | xem "Module 1.0" ở mục Lớp thực thể |
-| Phân hệ / Module 1.1 (mở rộng từ 1.0 bằng kế thừa và đa hình) | xem "Module 1.1" ở mục Lớp thực thể |
-| Design Pattern 1 (tên mẫu, vai trò các lớp) | State |
-| Design Pattern 2 (tên mẫu, cơ chế phối hợp) | Observer |
-| Kiến trúc đóng gói (phân tầng, file cấu hình, Unit Test) | 3 tầng + Domain, `appsettings.json`, 22 test xUnit |
+| Đề tài | CRM áp dụng cho khách sạn (xác nhận 22/11) |
+| Lịch | Slide nộp **30/11**; vấn đáp **từ 13/12**; hạn cuối **30/12** |
+| Repo | Giữ `Kessential/Hotel-CRM`, nhánh tích hợp mới `v2` (giữ lịch sử từ 15/11) |
+| Chia phân hệ | TV1 = Chăm sóc & hỗ trợ khách hàng; TV2 = Quan hệ khách hàng & khách hàng thân thiết |
+| Cách làm của TV2 | TV2 tự code trên máy mình, tự commit/push/mở PR. Phiên Claude của TV1: đặc tả chung, file task cho cả hai, code phần TV1, review PR của TV2. |
+| CSDL | SQLite qua `Microsoft.Data.Sqlite` (ADO.NET, SQL có tham số) |
+| Gói NuGet | `Microsoft.Data.Sqlite`, `ClosedXML` (xuất .xlsx), `ScottPlot.WinForms` (biểu đồ); không làm PDF |
+| Ngôn ngữ | Giao diện, thông báo lỗi, dữ liệu mẫu tiếng Việt; tiền VND `#,##0` căn phải; ngày `dd/MM/yyyy`. Tên lớp/hàm/comment tiếng Anh. Tên Form/thư mục theo HuongdanXDHTTTQL |
+| Vai trò | 4 vai trò: Admin (làm được mọi thứ), Quản lý, Lễ tân, CSKH |
+| Slide 30/11 | Sửa bộ Beamer của TV2 theo thiết kế mới + tự đánh giá L2; mỗi người làm slide phân hệ mình |
+| Tài liệu | Markdown tiếng Việt + PlantUML trong `docs/analysis/`; DFD có thể vẽ draw.io; báo cáo cuối (Word hay LaTeX) chốt khi có mẫu |
+| Đã bỏ so với bản 21/11 | đặt nhiều phòng, dịch vụ phát sinh, hóa đơn, công nợ, báo cáo doanh thu/công suất phòng, Strategy giảm giá; 3 strategy phân công cũ |
 
-## Quyết định đã chốt
-- **Phân công (chốt 15/11):** bạn (chủ repo) nhận **suất A**, thành viên còn lại nhận **suất B**. Code của cả hai suất do bạn viết cùng Claude; cách commit của suất B (nhận patch hay tự code) chờ thành viên còn lại chọn trước 17/11, không trả lời thì mặc định nhận patch.
-- Commit không kèm dòng `Co-Authored-By`; việc dùng Claude được nêu trong README và trong báo cáo.
-- Thời hạn **2 tuần** (16/11 → 29/11/2026). Không có ràng buộc thêm từ giảng viên.
-- IDE **Visual Studio** → mỗi Form có `.Designer.cs` chuẩn, mở được bằng Designer.
-- Lưu **JSON**; giữ **10 Use Case**; tác nhân **Manager + Agent**.
-- **Toàn bộ tiếng Anh**: tên lớp/hàm, comment, giao diện, dữ liệu mẫu, thông báo lỗi. (Báo cáo và tài liệu ôn vấn đáp viết tiếng Việt.)
-- Mật khẩu **băm có salt** (PBKDF2-SHA256 qua `Rfc2898DeriveBytes.Pbkdf2`, có sẵn trong .NET).
-- Tài liệu Claude làm: UML PlantUML, báo cáo **LaTeX** (chờ mẫu), README + kịch bản demo, tài liệu ôn vấn đáp.
-- Cách làm: **xong mỗi module thì dừng**, tóm tắt thiết kế + điểm cần nhớ khi vấn đáp, bạn duyệt rồi đi tiếp.
+## 4. Hệ thống tổng thể
 
-## Phân công (chốt 15/11)
-Trong toàn bộ tài liệu, **A** = bạn (chủ repo), **B** = thành viên còn lại. Quyền sở hữu tính theo file, không theo thư mục.
-
-| | Suất A (bạn) — phân hệ Ticket | Suất B (thành viên còn lại) — phân hệ Khách hàng/Lưu trú |
+### 4.1 Vai trò và ma trận quyền
+| Vai trò | Trong khách sạn | Việc chính |
 |---|---|---|
-| Use Case | UC1–UC5 | UC6–UC10 |
-| Quy tắc nghiệp vụ | 1–5 | 6–10 |
-| Design Pattern | State, Factory Method | Observer, Strategy |
-| Sơ đồ tuần tự | UC2, UC4 | UC7, UC8 |
-| Test | 11 (`tests/HotelCRM.Tests/Tickets/`) | 11 (`tests/HotelCRM.Tests/Customers/`, `Assignment/`) |
-| Domain | `Domain/Tickets/**`; hàm `Agent.EnsureCanTake` | `Domain/Customers/**`, `Domain/Hotel/**` |
-| Business | `TicketService`, `Queries/TicketQuery`, `Factories/**` | `CustomerService`, `BookingService`, `SurveyService`, `ReportService`, `Queries/CustomerDirectory`, `Queries/StayLookup`, `Assignment/**`, `Observers/**` |
-| Giao diện | `Forms/Tickets/**` | `Forms/Customers/**`, `Forms/Bookings/**`, `Forms/Reports/**`, `UiNotificationObserver` |
-| Lớp giả cho test | `FakeCustomerDirectory`, `FakeStayLookup` | `FakeTicketQuery` |
-| Giai đoạn code | GĐ 2 | GĐ 3 và GĐ 4 |
-| Tài liệu riêng | sơ đồ use case; sơ đồ State/Factory Method; chương báo cáo về phân hệ Ticket; README; `demo-script.md` | class diagram tổng thể; sơ đồ Observer/Strategy; chương báo cáo về phân hệ Khách hàng/Lưu trú; `viva-notes.md` |
+| Admin | quản trị hệ thống | toàn quyền: tài khoản, danh mục, mọi nghiệp vụ, báo cáo |
+| Quản lý | trưởng bộ phận | phân công, đóng/mở lại ticket, xóa khách, tạo chiến dịch, xem báo cáo |
+| Lễ tân | nhân viên quầy | hồ sơ khách, đặt/nhận/trả phòng, đổi quà, tạo ticket, ghi khảo sát |
+| CSKH | nhân viên chăm sóc, kỹ thuật | xử lý ticket được giao, ghi khảo sát, gọi chăm sóc theo chiến dịch |
 
-**Phần chung, do bạn commit ở GĐ 1:** solution và cấu hình build; `Domain/Common`, `Domain/Staff`, `Domain/Interfaces`; toàn bộ `Data/` (Repository + Singleton, mọi record và mapper); `Business/Security`, `AuthService`; `Program.cs`, `ErrorHandler`, `LoginForm`, `MainForm`, vỏ rỗng của 9 Form; chữ ký của mọi lớp. Ngoài GĐ 1: quy tắc 11 (phân quyền), đóng gói, các chương mở đầu/kiến trúc/kết luận của báo cáo, cột "Minh chứng" của checklist.
-
-Nguyên tắc:
-- Hai suất cân bằng về số lượng (checklist yêu cầu "chia đều" ở tiêu chí 1, 7, 9, 18, 19).
-- Hai suất chỉ chạm nhau qua 5 interface ở mục "Ghép 2 phân hệ". Sau GĐ 1, không suất nào sửa `Program.cs`, `MainForm`, `Data/` hay chữ ký của khung.
-
-**Việc của thành viên B theo ngày:**
-
-| Hạn | Việc |
-|---|---|
-| 17/11 | Cài .NET 10 SDK, Visual Studio (workload ".NET desktop development"), Git; gửi tên tài khoản GitHub; clone, build thử; chọn cách commit (nhận patch hay tự code). Không trả lời thì mặc định nhận patch |
-| 25/11 | Áp từng patch code (hoặc tự code), đọc hiểu, commit ít nhất 12 lần, push; chạy thử UC6–UC10 |
-| 27/11 | Đọc `viva-notes.md`; tự làm lại bài mở rộng Observer và Strategy, và ít nhất 1 bài của suất A, trên nhánh `practice/*` (không merge) |
-| 29/11 | Áp patch tài liệu riêng của suất B, push; đọc báo cáo; chạy bản publish trên máy mình; tập vấn đáp chung |
-
-Bạn cũng tự làm lại bài mở rộng State và Factory Method, và ít nhất 1 bài của suất B, trước 27/11.
-
-## Đối chiếu ngưỡng tối thiểu
-| Tiêu chí | Tối thiểu | Kế hoạch |
-|---|---|---|
-| Use Case | 8, chia đều | 10 (A 5, B 5) |
-| Lớp thực thể | 15 | 26 |
-| Quy tắc nghiệp vụ | 8, cả 2 phân hệ | 11 (A 5, B 5, chung 1) |
-| Class Diagram | 16 lớp | toàn bộ Domain + Business |
-| Sơ đồ tuần tự | 4 (2/người) | 4 |
-| Design Pattern | 3 (1–2/người) | 5 (A: State, Factory Method; B: Observer, Strategy; chung: Repository + Singleton) |
-| Test | 20 (10/người) | 22 (11/người) |
-| Git | nhánh, 20 commit chia đều | `main`/`develop`/`feature/a-ticket`/`feature/b-customer`, ≥ 12 commit/người, tỷ lệ không lệch quá 60/40 |
-
-## Kiến trúc (3 tầng + Domain, 5 project)
-```
-HotelCRM.sln   Directory.Build.props   .editorconfig   .gitignore   README.md   CLAUDE.md
-├─ .claude/  settings.json, rules/*.md      # instruction cho các phiên Claude (mục "Tổ chức phiên làm việc")
-├─ src/HotelCRM.Domain/        # thực thể, State, quy tắc, interface — không tham chiếu project nào
-│   ├─ Common/      Person, Employee, EmployeeRole, DomainException (+ ValidationException, BusinessRuleException), BusinessSettings
-│   ├─ Customers/   Customer, MembershipTier + 4 tier, Interaction, InteractionHistory, ContactChannel, SatisfactionSurvey
-│   ├─ Hotel/       RoomType, Room, Booking, BookingStatus
-│   ├─ Staff/       Agent, Manager, Department
-│   ├─ Tickets/     SupportTicket + 3 lớp con, TicketPriority, States/ (TicketState + 4 state)
-│   └─ Interfaces/  IEntity, IRepository<T>, RepositoryExtensions, ITicketObserver, ICustomerDirectory, CustomerSlaProfile, CustomerSummary, IStayLookup, ITicketQuery
-├─ src/HotelCRM.Business/      # tầng nghiệp vụ
-│   ├─ Services/    AuthService, TicketService, CustomerService, BookingService, SurveyService, ReportService (+ AgentPerformanceRow, DepartmentReportRow)
-│   ├─ Queries/     CustomerDirectory, StayLookup, TicketQuery   # cài đặt 3 interface ranh giới, chỉ dựa trên repository
-│   ├─ Assignment/  IAssignmentStrategy, AgentWorkload + 3 strategy
-│   ├─ Factories/   TicketFactory + 3 factory
-│   ├─ Observers/   InteractionLogger, LoyaltyObserver
-│   └─ Security/    PasswordHasher, UserSession
-├─ src/HotelCRM.Data/          # tầng dữ liệu
-│   ├─ AppConfig.cs (Singleton)   JsonRepository.cs   InMemoryRepository.cs
-│   └─ Records/ + Mappers/     # DTO phẳng để ghi JSON + chuyển đổi sang thực thể
-├─ src/HotelCRM.WinForms/      # tầng giao diện (net10.0-windows)
-│   ├─ Program.cs (composition root)   ErrorHandler.cs   UiNotificationObserver.cs
-│   ├─ Forms/ LoginForm, MainForm
-│   │         Tickets/   TicketListForm, TicketEditForm, TicketDetailForm
-│   │         Customers/ CustomerListForm, CustomerEditForm, CustomerHistoryForm, SurveyForm
-│   │         Bookings/  BookingForm
-│   │         Reports/   ReportForm
-│   └─ appsettings.json   Data/*.json (copy ra thư mục output)
-└─ tests/HotelCRM.Tests/       # xUnit: Tickets/ (A), Customers/ và Assignment/ (B), Fakes/ (lớp giả viết tay)
-docs/  PLAN.md, PROGRESS.md, tasks/stage-N-*.md, uml/*.puml + ảnh, report/ (LaTeX), demo-script.md, viva-notes.md
-handoff/  (git-ignore) patch của suất B
-tools/  HashPassword.cs (file-based app sinh chuỗi băm mật khẩu, không nằm trong solution)
-```
-Chiều gọi: `WinForms → Business → Domain ← Data`. Form chỉ gọi Service; Service chỉ biết `IRepository<T>`; `Program.cs` tạo `AppConfig`, repository, observer, strategy, service rồi truyền qua constructor (inject thủ công, không dùng thư viện DI).
-
-**Lưu JSON:** thực thể giữ `private set` và validate nên không serialize trực tiếp. `JsonRepository<TEntity, TRecord> : IRepository<TEntity>` ghi/đọc `TRecord` (DTO phẳng) qua `IMapper<TEntity, TRecord>`; trạng thái ticket và hạng thành viên lưu bằng tên rồi dựng lại (`TicketState.FromName`, `MembershipTier.FromName`). Observer không lưu xuống file: `TicketService` gắn lại observer mỗi khi nạp/tạo ticket.
-
-## Lớp thực thể (26 lớp + 4 enum)
-Enum: `EmployeeRole` (Agent, Manager), `TicketPriority` (Low, Medium, High, Urgent), `BookingStatus`, `ContactChannel`. Loại ticket không phải enum mà là lớp con.
-
-- **Người (5):** `Person` (abstract: Id, FullName, Phone, Email) → `Customer`; `Employee` (abstract: Username, PasswordHash, Salt, `Role`, `Department`, abstract `CanAssign()`/`CanClose()`/`CanReopen()`, kèm `EnsureCanAssign()`/`EnsureCanClose()`/`EnsureCanReopen()` ném lỗi khi không có quyền) → `Agent`, `Manager`
-- **Tổ chức (1):** `Department` (Id, `Code`, Name, `Agents`)
-- **Hạng thành viên (5):** `MembershipTier` (abstract: `Name`, `SlaFactor`, `PriorityBoost`, `MinPoints`, `Next()`) → `StandardTier`, `SilverTier`, `GoldTier`, `VipTier`
-- **Khách sạn (3):** `RoomType`, `Room`, `Booking` (+ enum `BookingStatus`: Reserved, CheckedIn, CheckedOut, Cancelled)
-- **Ticket (4):** `SupportTicket` (abstract; các thành viên được override: `BaseSlaHours`, `HandlingDepartmentCode`, `GoodwillPoints`, `Validate()`) → `ComplaintTicket`, `ServiceRequestTicket`, `MaintenanceTicket`
-- **State (5):** `TicketState` (abstract) → `OpenState`, `InProgressState`, `ResolvedState`, `ClosedState`
-- **Tương tác (3):** `InteractionHistory`, `Interaction` (+ enum `ContactChannel`), `SatisfactionSurvey`
-
-**Module 1.0 (baseline):** `Person`/`Customer`/`Employee`/`Agent`, `SupportTicket` với một lớp cụ thể `ServiceRequestTicket`, `TicketState` 3 trạng thái của đề (Open, InProgress, Resolved), `InteractionHistory`, `IRepository<T>`.
-**Module 1.1 (mở rộng bằng kế thừa/đa hình):** `ComplaintTicket` và `MaintenanceTicket` (override `BaseSlaHours`, `HandlingDepartmentCode`, `GoodwillPoints`, `Validate()`), `ClosedState`, cây `MembershipTier`, `Manager` (override quyền). Báo cáo ghi đúng thực tế: 1.1 thêm lớp mới, và thêm đúng hai hàm `Close()`/`Reopen()` vào `SupportTicket`; các lớp khác của 1.0 không sửa.
-
-## Quan hệ UML phải có trong code (tiêu chí 6)
-| Quan hệ | Ví dụ |
-|---|---|
-| Kế thừa | `Customer`→`Person`; `Agent`,`Manager`→`Employee`; 3 ticket→`SupportTicket`; 4 state→`TicketState`; 4 tier→`MembershipTier` |
-| Thực thi | `JsonRepository`→`IRepository<T>`; strategy→`IAssignmentStrategy`; observer→`ITicketObserver`; `CustomerDirectory`→`ICustomerDirectory`; `StayLookup`→`IStayLookup`; `TicketQuery`→`ITicketQuery` |
-| Hợp thành | `Customer` ◆— `InteractionHistory` ◆— `Interaction`; `SupportTicket` ◆— `TicketState` |
-| Kết tập | `Department` ◇— `Agent`; `RoomType` ◇— `Room`; `SupportTicket` ◇— `Agent` (người được giao) |
-| Phụ thuộc | `TicketService` ⇢ `IAssignmentStrategy`, `TicketFactory`; Form ⇢ Service |
-
-**Ghép 2 phân hệ qua interface (tiêu chí 16):**
-- Phân hệ Ticket (A) cần dữ liệu của B qua `ICustomerDirectory` (tìm khách, lấy `CustomerSlaProfile` — quy tắc 4) và `IStayLookup` (phòng khách đang ở — quy tắc 5).
-- Phân hệ Khách hàng (B) cần dữ liệu của A qua `ITicketQuery` (khách còn ticket mở không — quy tắc 10; trạng thái ticket — quy tắc 9).
-- B phản ứng với sự kiện của A qua `ITicketObserver` (ghi lịch sử, cộng điểm).
-- `TicketService` (A) gọi thuật toán phân công của B qua `IAssignmentStrategy` (khai báo trong `Business/Assignment`).
-
-Bốn interface đầu nằm trong `Domain/Interfaces`. Không service nào tham chiếu trực tiếp lớp service của phân hệ kia, và `Domain/Tickets` không dùng lớp nào của `Domain/Customers` hay `Domain/Hotel`. Ba interface truy vấn do lớp riêng trong `Business/Queries` cài đặt (không phải service) để tránh phụ thuộc vòng khi khởi tạo.
-
-## Design Pattern
-| Pattern | Người | Vai trò lớp | Bài mở rộng khi vấn đáp |
-|---|---|---|---|
-| **State** | A | Context `SupportTicket`; State `TicketState`; Concrete 4 state. `Start(now)`, `Resolve(note, now)`, `Close(now)`, `Reopen(now, reopenDays)` ủy quyền cho `State`; lớp State đổi trạng thái qua `SupportTicket.MoveTo(next, now)` | thêm `OnHoldState` |
-| **Factory Method** | A | Creator `TicketFactory.Create(...)` → `ComplaintTicketFactory`, `ServiceRequestTicketFactory`, `MaintenanceTicketFactory`. `TicketService.CreateTicket()` chọn factory qua bảng tra `tên loại → TicketFactory` dựng trong `Program.cs` | thêm `LostItemTicket` + factory |
-| **Observer** | B | Subject `SupportTicket` (`Attach`/`Notify`, phần Subject do A cài ở GĐ 2); `ITicketObserver.OnStateChanged(ticket, from, to)` → `InteractionLogger`, `LoyaltyObserver`, `UiNotificationObserver` | thêm `EmailNotifier` |
-| **Strategy** | B | `IAssignmentStrategy.Pick(departmentCode, candidates)` (`candidates` là danh sách `AgentWorkload` của các Agent còn nhận được ticket; trả về `Agent?`) → `LeastLoadedStrategy`, `DepartmentMatchStrategy`, `RoundRobinStrategy`; Context `TicketService.AutoAssign()` (của A, chỉ biết interface); chọn theo `DefaultAssignmentStrategy` trong `appsettings.json` qua bảng tra dựng trong `Program.cs` | thêm `SkillBasedStrategy` |
-| **Repository + Singleton** | Chung | `IRepository<T>` → `JsonRepository`, `InMemoryRepository` (dùng cho test); `AppConfig.Instance` | thêm repository lưu CSV |
-
-- Bảng mô tả thiết kế trong báo cáo: Design Pattern 1 = State (A), Design Pattern 2 = Observer (B). Ba mẫu còn lại trình bày ở mục riêng; cả hai thành viên cùng trình bày Repository + Singleton.
-- Mở rộng nghĩa là "thêm lớp mới và đăng ký một dòng": lớp mới không sửa lớp cũ, nhưng phải thêm một dòng vào bảng tra (`TicketState.FromName`, bảng factory, bảng strategy, mapper). Báo cáo và vấn đáp nói đúng như vậy, không nói "không sửa dòng nào".
-- Bài mở rộng không commit vào `develop` hay nhánh `feature/*`; tập trên nhánh `practice/*`. `viva-notes.md` chứa lời giải dạng văn bản.
-
-## Quy tắc nghiệp vụ → nơi cài đặt
-Cách đặt quy tắc: **service tra cứu, lớp Domain quyết định.** Quy tắc cần dữ liệu của nhiều đối tượng thì service lấy dữ liệu rồi truyền kết quả vào một phương thức của lớp Domain; phương thức đó ném ngoại lệ. Service không tự ném ngoại lệ nghiệp vụ.
-
-| # | Người | Quy tắc | Cài đặt tại |
-|---|---|---|---|
-| 1 | A | Chuyển trạng thái hợp lệ: Open→InProgress (phải có Agent), InProgress→Resolved (phải có ghi chú), Resolved→Closed, Resolved→InProgress (Reopen); Closed bất biến. Phân công lần đầu chỉ ở Open; phân công lại ở Open hoặc InProgress | các lớp `*State`; `SupportTicket.AssignTo()` |
-| 2 | A | Reopen chỉ khi `now ≤ ResolvedAt + ReopenDays`; ticket quay về InProgress và giữ nguyên Agent | `SupportTicket.Reopen(now, reopenDays)` → `ResolvedState.Reopen()` |
-| 3 | A | Agent không giữ quá `MaxActiveTickets` ticket đang mở | `Agent.EnsureCanTake(activeCount, maxActive)` (và `Agent.CanTake` trả `bool`, dùng để lọc ứng viên), gọi từ `SupportTicket.AssignTo(agent, activeCount, maxActive)`; `TicketService` đếm `activeCount` |
-| 4 | A | Mức ưu tiên được nâng theo `PriorityBoost` của hạng khách lúc tạo ticket và lưu vào ticket. Hạn SLA = `BaseSlaHours` × hệ số Priority × `SlaFactor` | constructor của `SupportTicket` (nâng mức ưu tiên), `SupportTicket.CalculateDueAt(slaFactor)`; `TicketService` lấy `CustomerSlaProfile` từ `ICustomerDirectory` |
-| 5 | A | `MaintenanceTicket` phải gắn phòng khách đang ở (booking CheckedIn) | `MaintenanceTicket.Validate(roomInActiveStay)`; `TicketService` tra `IStayLookup` |
-| 6 | B | SĐT/Email đúng định dạng, không trùng | định dạng: `Person` (cài ở GĐ 1 vì đăng nhập cần); không trùng: `Customer.EnsureUnique(phoneTaken, emailTaken)`, `CustomerService.Register()`/`Update()` tra cứu |
-| 7 | B | CheckOut > CheckIn; phòng không bị đặt chồng (booking Reserved và CheckedIn chặn); chỉ hủy được booking Reserved; chỉ check-in khi `CheckInDate` ≤ ngày hiện tại < `CheckOutDate` | constructor của `Booking`; `Room.IsAvailable(checkInDate, checkOutDate, bookings)` và `Room.EnsureAvailable(...)` (ném lỗi); `Booking.CheckIn(now)`/`CheckOut()`/`Cancel()` |
-| 8 | B | Cộng điểm khi checkout và khi ticket Closed; tự nâng hạng theo ngưỡng, có thể nâng nhiều bậc một lần, không hạ | `Customer.AddPoints()`, `MembershipTier.Next()` |
-| 9 | B | Khảo sát chỉ cho ticket Resolved/Closed, điểm 1–5, mỗi ticket một lần | `SatisfactionSurvey.Create(score, ticketResolvedOrClosed, alreadySurveyed)`; `SurveyService.Submit()` tra `ITicketQuery` và repository |
-| 10 | B | Không xóa khách còn ticket chưa đóng | `Customer.EnsureCanBeDeleted(hasOpenTickets)`; `CustomerService.Delete()` tra `ITicketQuery` |
-| 11 | Chung | Tạo ticket: cả hai vai trò. Phân công và phân công lại: chỉ Manager. Start và Resolve: chỉ Agent đang được giao ticket đó. Close và Reopen: chỉ Manager. Agent không tự nhận ticket | `Employee.CanAssign()`/`CanClose()`/`CanReopen()` (`Agent`/`Manager` override) và `Employee.EnsureCanAssign()`/`EnsureCanClose()`/`EnsureCanReopen()` ném `BusinessRuleException` (cài ở GĐ 1); `SupportTicket.EnsureAssignedTo(actor)`; `TicketService` nhận `actor` và gọi các hàm `Ensure...` trước mỗi thao tác (A cài ở GĐ 2) |
-
-Vi phạm ném `ValidationException` hoặc `BusinessRuleException` (con của `DomainException`); quy tắc nào ném loại nào xem mục "Quyết định thiết kế bổ sung".
-
-## Use Case → hàm điều khiển (tiêu chí 1)
-| UC | Người | Tác nhân | Form | Hàm điều khiển |
+| Việc | Admin | Quản lý | Lễ tân | CSKH |
 |---|---|---|---|---|
-| UC1 Log in | A | Manager, Agent | `LoginForm` | `AuthService.Login()` / `Logout()` (cài ở GĐ 1) |
-| UC2 Create ticket | A | Manager, Agent | `TicketEditForm` | `TicketService.CreateTicket()` |
-| UC3 Assign ticket | A | Manager | `TicketListForm` | `TicketService.AutoAssign()` / `AssignManually()` |
-| UC4 Process ticket | A | Agent (Start, Resolve); Manager (Close, Reopen) | `TicketDetailForm` | `TicketService.Start()` / `Resolve()` / `Close()` / `Reopen()` |
-| UC5 Search tickets | A | Manager, Agent | `TicketListForm` | `TicketService.Search()` |
-| UC6 Manage customers | B | Manager, Agent | `CustomerListForm`, `CustomerEditForm` | `CustomerService.Register()` / `Update()` / `Delete()` |
-| UC7 Manage bookings | B | Manager, Agent | `BookingForm` | `BookingService.Book()` / `CheckIn()` / `CheckOut()` / `Cancel()` |
-| UC8 Record survey | B | Agent | `SurveyForm` | `SurveyService.Submit()` |
-| UC9 View interaction history | B | Manager, Agent | `CustomerHistoryForm` | `CustomerService.GetHistory()` |
-| UC10 Reports | B | Manager | `ReportForm` | `ReportService.AgentPerformance()` / `ByDepartment()` |
+| Tài khoản, phòng ban, nhân viên | ✓ | xem | – | – |
+| Danh mục phòng, quà tặng | ✓ | xem | xem | xem |
+| Thêm/sửa hồ sơ khách | ✓ | ✓ | ✓ | xem |
+| Xóa khách | ✓ | ✓ | – | – |
+| Đặt phòng, nhận phòng, trả phòng | ✓ | ✓ | ✓ | – |
+| Đổi quà | ✓ | ✓ | ✓ | – |
+| Tạo chiến dịch | ✓ | ✓ | – | – |
+| Ghi phản hồi chiến dịch | ✓ | ✓ | ✓ | ✓ |
+| Tạo ticket | ✓ | ✓ | ✓ | ✓ |
+| Phân công, đóng, mở lại ticket | ✓ | ✓ | – | – |
+| Bắt đầu, giải quyết ticket | ✓ | – | – | ✓ (ticket của mình) |
+| Ghi khảo sát | ✓ | ✓ | ✓ | ✓ |
+| Báo cáo, dashboard, xuất Excel | ✓ | ✓ | – | – |
 
-- `MainForm` ẩn/hiện menu theo `UserSession.Current.Role`.
-- Form truyền `UserSession.Current` vào tham số `actor` của service. Service không đọc `UserSession`.
-- Sơ đồ tuần tự: A vẽ UC2 và UC4, B vẽ UC7 và UC8.
+Cài đặt: `Employee` (abstract) có 4 lớp con `Administrator`, `Manager`, `Receptionist`, `Agent`, mỗi lớp override hàm quyền (đa hình, không `is/as`). Service nhận `actor` và gọi `actor.EnsureCan…()` trước khi làm; ẩn nút trên Form chỉ là lớp chặn thứ hai. Quy tắc nghiệp vụ (tải tối đa, trạng thái) vẫn áp cho Admin; mọi thao tác ghi người làm. Khi vấn đáp: cho Admin vượt "chỉ người được giao mới xử lý" là quyết định có chủ đích (giám sát can thiệp, có nhật ký).
 
-## Ngoại lệ, cấu hình, quy ước
-- `ErrorHandler.Run(Action)` bọc mọi event handler của Form: `DomainException` → hộp thoại cảnh báo; lỗi khác → ghi `logs/error.log` + thông báo chung. `Program.cs` đăng ký thêm `Application.ThreadException`.
-- `appsettings.json`: `DataFolder`, `DefaultAssignmentStrategy`, `MaxActiveTickets` (mặc định 5), `ReopenDays` (mặc định 7). Ngưỡng điểm, giờ SLA và hệ số hạng là hằng số trong các lớp Domain (thể hiện đa hình), không nằm trong cấu hình. Đường dẫn tính từ `AppContext.BaseDirectory`, không gán cứng.
-- `.editorconfig`: PascalCase cho public, `_camelCase` cho field private, file-scoped namespace, mỗi file một lớp.
-- `Directory.Build.props`: `Nullable=enable`, `TreatWarningsAsErrors=true`, `LangVersion=latest`, `ImplicitUsings=enable` cho mọi project.
-- Giao diện: `LoginForm` và `MainForm` (GĐ 1) là form mẫu, các form sau chép đúng cấu trúc. GĐ 1 cũng tạo vỏ rỗng của 9 Form còn lại và nối chúng vào menu, để GĐ 2–4 chỉ điền nội dung Form của mình. Mỗi form có `.Designer.cs`; `InitializeComponent()` chỉ tạo control và gán thuộc tính, không chứa logic, để Designer của Visual Studio mở được. Form chỉ gọi service; mọi event handler bọc trong `ErrorHandler.Run`.
+### 4.2 BFD (gốc → 8 nhánh cấp 2 → nút lá cấp 3; mỗi nút lá ↔ 1 Form)
+| Nhánh cấp 2 | TV | Nút lá cấp 3 | Form |
+|---|---|---|---|
+| F1 Hệ thống & nhân sự | 1 | F1.1 Đăng nhập, đổi mật khẩu | frm000 |
+| | | F1.2 Phòng ban, nhân viên, tài khoản | frm101 |
+| F2 Tiếp nhận yêu cầu | 1 | F2.1 Lập ticket (khiếu nại, yêu cầu dịch vụ, sửa chữa) | frm102 |
+| F3 Điều phối & xử lý | 1 | F3.1 Tra cứu & phân công ticket | frm103 |
+| | | F3.2 Xử lý ticket & nhật ký | frm104 |
+| F4 Đánh giá hài lòng | 1 | F4.1 Ghi phiếu khảo sát | frm105 |
+| | | F4.2 Báo cáo CSKH | frm106 |
+| F5 Hồ sơ khách hàng 360 | 2 | F5.1 Quản lý hồ sơ khách; F5.2 Xem lịch sử lưu trú, tương tác, điểm | frm201 |
+| F6 Lưu trú | 2 | F6.1 Danh mục loại phòng & phòng | frm202 |
+| | | F6.2 Đặt phòng, nhận phòng, trả phòng | frm203 |
+| F7 Khách hàng thân thiết | 2 | F7.1 Danh mục quà tặng | frm204 |
+| | | F7.2 Sổ điểm & đổi quà | frm205 |
+| F8 Chiến dịch & báo cáo khách hàng | 2 | F8.1 Chiến dịch chăm sóc | frm206 |
+| | | F8.2 Báo cáo khách hàng & dashboard 360 | frm207 |
 
-## Quyết định thiết kế bổ sung
+### 4.3 Use Case (11)
+| UC | Tên | TV | Tác nhân | Form | Phức hợp | Liên PH |
+|---|---|---|---|---|---|---|
+| UC01 | Đăng nhập, đổi mật khẩu, quản lý tài khoản | 1 | mọi vai trò; tài khoản: Admin | frm000, frm101 | | |
+| UC02 | Tạo ticket | 1 | mọi vai trò | frm102 | | ✓ L1 |
+| UC03 | Tra cứu & phân công ticket | 1 | xem: mọi vai trò; phân công: Quản lý, Admin | frm103 | | |
+| UC04 | Xử lý ticket (bắt đầu, giải quyết, đóng, mở lại) | 1 | CSKH; Quản lý; Admin | frm104 | ✓ | ✓ L2 |
+| UC05 | Ghi khảo sát hài lòng | 1 | mọi vai trò | frm105 | ✓ | ✓ (phiếu chờ do L3 tạo) |
+| UC06 | Báo cáo CSKH | 1 | Quản lý, Admin | frm106 | | ✓ (R2 lấy hạng khách) |
+| UC07 | Quản lý hồ sơ khách 360 | 2 | Lễ tân, Quản lý, Admin; CSKH xem | frm201 | | ✓ L5 |
+| UC08 | Đặt phòng & lưu trú (kèm danh mục phòng) | 2 | Lễ tân, Quản lý, Admin | frm202, frm203 | ✓ | ✓ L3 |
+| UC09 | Đổi quà (kèm danh mục quà) | 2 | Lễ tân, Quản lý, Admin | frm204, frm205 | ✓ | |
+| UC10 | Chiến dịch chăm sóc | 2 | tạo: Quản lý, Admin; phản hồi: mọi vai trò | frm206 | ✓ | ✓ L4 |
+| UC11 | Báo cáo khách hàng & dashboard 360 | 2 | Quản lý, Admin | frm207 | | ✓ L6 |
 
-**1. Khởi tạo.** Thứ tự trong `Program.cs`: `AppConfig` → repository → `CustomerDirectory`, `StayLookup`, `TicketQuery` → observer → bảng strategy và bảng factory → service → form. GĐ 1 viết toàn bộ phần nối dây này; các giai đoạn sau không sửa `Program.cs`. Mỗi kiểu thực thể có đúng một repository, nạp file một lần vào bộ nhớ và luôn trả về cùng một đối tượng. `TicketService` gắn observer cho mọi ticket trong repository lúc khởi tạo và cho ticket mới trong `CreateTicket()`. Tên strategy hợp lệ trong `appsettings.json`: `LeastLoaded`, `DepartmentMatch`, `RoundRobin`; tên lạ thì báo lỗi lúc khởi động.
+Giao dịch phức hợp: UC04 (ticket + nhật ký + điểm + tương tác), UC05 (phiếu + điểm từng tiêu chí), UC08 (booking + điểm + hạng + tương tác + phiếu khảo sát), UC09 (lượt đổi + sổ điểm + số quà), UC10 (chiến dịch + danh sách khách).
 
-**2. Cấu hình và thời gian đi xuống Domain.** `BusinessSettings` (`Domain/Common`: `MaxActiveTickets`, `ReopenDays`, tự kiểm tra > 0). `AppConfig.Instance.Rules` trả về `BusinessSettings`; `Program.cs` truyền nó vào constructor của service. Lớp Domain không đọc cấu hình và không gọi `DateTime.Now`: giới hạn và thời điểm `now` đi vào qua tham số. `AppConfig` chỉ được gọi trong `Program.cs`.
+### 4.4 Các luồng liên phân hệ
+| Luồng | Chiều | Diễn biến | Ai viết | Test |
+|---|---|---|---|---|
+| L1 Tạo ticket | TV1 hỏi TV2 | `TicketService` lấy hệ số hạng khách qua `ICustomerDirectory` để nâng mức ưu tiên và tính hạn SLA; ticket sửa chữa hỏi `IStayLookup` xem khách có đang ở đúng phòng đó không | TV1 gọi, TV2 cài 2 interface | unit TV1 (Fake) |
+| L2 Đóng ticket | TV1 → TV2, **1 transaction** | ticket → Đã đóng, ghi `ticket_logs` → phát sự kiện `ITicketObserver` → `GoodwillPointsObserver` (TV2) cộng điểm thiện chí vào sổ điểm, `InteractionLogger` (TV2) ghi tương tác → commit. Lỗi ở bước TV2 → rollback cả việc đóng ticket | TV1: đóng + phát sự kiện; TV2: 2 observer | integration TV1: luồng + rollback |
+| L3 Trả phòng | TV2 → TV1, **1 transaction** | booking → Đã trả phòng → cộng điểm lưu trú, nâng hạng → ghi tương tác → `ISurveyScheduler` (TV1) tạo phiếu khảo sát Chờ → commit. Lỗi ở bước TV1 → rollback cả việc trả phòng | TV2: trả phòng; TV1: `SurveyScheduler` | integration TV2: luồng + rollback |
+| L4 Chọn khách cho chiến dịch | TV2 hỏi TV1 | phân khúc (Strategy) → bỏ khách không đồng ý nhận ưu đãi → bỏ khách đang có khiếu nại chưa đóng (`ITicketQuery`) | TV2 gọi, TV1 cài | unit TV2 (Fake) |
+| L5 Xóa khách | TV2 hỏi TV1 | chặn nếu khách có ticket (`ITicketQuery`) hoặc có lưu trú | TV2 gọi, TV1 cài | unit TV2 (Fake) |
+| L6 Dashboard 360 | TV2 hỏi TV1 | số ticket, số khiếu nại, điểm hài lòng trung bình theo khách (`ICustomerCareStats`, lấy theo lô) | TV2 gọi, TV1 cài | integration TV2 (báo cáo) |
 
-**3. Ranh giới giữa hai phân hệ ở tầng Domain.** `Domain/Tickets` không dùng lớp nào của `Domain/Customers` hay `Domain/Hotel`, và `Domain/Customers`, `Domain/Hotel` không dùng lớp nào của `Domain/Tickets`; chỉ hai interface `ITicketObserver` và `ITicketQuery` (trong `Domain/Interfaces`) đưa `SupportTicket` sang cho tầng Business của suất B. Ticket lấy thông tin hạng khách qua `ICustomerDirectory.GetSlaProfile(customerId)`, trả về `CustomerSlaProfile(SlaFactor, PriorityBoost)` — hai con số, không phải `MembershipTier`. Form ticket chọn và hiển thị khách qua `CustomerSummary(Id, FullName, Phone, TierName)`, không dùng `Customer`. "Không tìm thấy theo Id" do `RepositoryExtensions.GetRequired` ném, để service không tự ném lỗi nghiệp vụ.
+### 4.5 Hợp đồng giữa hai phân hệ (interface trong `Domain/Interfaces`, tiêm qua constructor)
+Chữ ký chốt chung ở M6 (27/11). Bên **dùng** viết file khai báo (vì bên dùng biết mình cần gì), bên kia cài đặt. Đổi sau M6 phải được cả hai duyệt trong PR.
 
-**4. Con số và định nghĩa nghiệp vụ.**
-| Mục | Giá trị |
-|---|---|
-| `BaseSlaHours` (override theo loại ticket) | Complaint 24, ServiceRequest 8, Maintenance 12 |
-| Hệ số Priority | Low 2.0, Medium 1.0, High 0.5, Urgent 0.25 |
-| `SlaFactor` theo hạng | Standard 1.0, Silver 0.9, Gold 0.75, VIP 0.5 |
-| `PriorityBoost` (số bậc nâng, trần là Urgent) | Standard 0, Silver 0, Gold 1, VIP 2 |
-| Hạn xử lý | `DueAt = CreatedAt + BaseSlaHours × hệ số Priority (sau khi nâng) × SlaFactor` giờ. Ví dụ: Complaint, Medium, `PriorityBoost` 1, `SlaFactor` 0.75 → High → 24 × 0.5 × 0.75 = 9 giờ |
-| Phòng ban xử lý (`HandlingDepartmentCode`, override theo loại ticket) | Complaint → `GUEST` (Guest Relations), ServiceRequest → `HOUSE` (Housekeeping), Maintenance → `ENG` (Engineering). Phòng ban thứ tư: `FRONT` (Front Office) |
-| `DepartmentMatchStrategy` | chọn Agent ít ticket đang mở nhất trong phòng ban xử lý; phòng ban đó không còn ai nhận được thì chọn trong toàn bộ Agent |
-| Điểm khi checkout | 1 điểm cho 1 USD; `Booking.TotalAmount` = số đêm × `RoomType.PricePerNight` |
-| Điểm khi ticket Closed | `SupportTicket.GoodwillPoints`: mặc định 10, `ComplaintTicket` override thành 50 |
-| `MinPoints` của hạng | Standard 0, Silver 1000, Gold 5000, VIP 15000 |
-| Ticket "đang mở" | Quy tắc 3: đã giao cho Agent và ở Open/InProgress. Quy tắc 10: mọi ticket chưa Closed |
-| Định dạng SĐT | đúng 10 chữ số, bắt đầu bằng `0` |
-| Định dạng Email | có đúng một `@`, có dấu chấm sau `@`, không có khoảng trắng |
-| Ticket trễ hạn | `(ResolvedAt ?? now) > DueAt` |
-| Số giờ giải quyết | `ResolvedAt − CreatedAt`, lấy lần Resolved gần nhất; chỉ tính ticket đã từng Resolved |
-| Phòng ban của ticket trong báo cáo | phòng ban của Agent đang được giao; ticket chưa giao không tính |
-| `ReportService.AgentPerformance()` | mỗi Agent: số ticket được giao, số đã giải quyết, số giờ giải quyết trung bình, số ticket trễ hạn, điểm khảo sát trung bình |
-| `ReportService.ByDepartment()` | mỗi phòng ban: số ticket theo trạng thái, số giờ giải quyết trung bình, điểm khảo sát trung bình |
-| Tiêu chí tìm ticket (UC5) | trạng thái, mức ưu tiên, loại, Agent được giao, từ khóa trong tiêu đề; để trống nghĩa là không lọc |
-| Băm mật khẩu | PBKDF2-SHA256, 100.000 vòng, salt 16 byte ngẫu nhiên cho mỗi tài khoản, hash 32 byte, lưu Base64 |
+| Interface | Khai báo | Cài đặt | Dùng cho |
+|---|---|---|---|
+| `ICustomerDirectory` | TV1 | TV2 (`CustomerDirectory`) | tìm khách, hệ số SLA/ưu tiên theo hạng, hạng theo lô (L1, R2) |
+| `IStayLookup` | TV1 | TV2 (`StayLookup`) | khách có đang ở phòng này không (L1, Q4) |
+| `ITicketObserver` | TV1 | TV2 (`GoodwillPointsObserver`, `InteractionLogger`) | sự kiện đổi trạng thái ticket (L2, Q12) |
+| `ITicketQuery` | TV2 | TV1 (`TicketQuery`) | khách có ticket không, có khiếu nại chưa đóng không (L4, L5) |
+| `ISurveyScheduler` | TV2 | TV1 (`SurveyScheduler`) | tạo phiếu khảo sát chờ khi trả phòng (L3) |
+| `ICustomerCareStats` | TV2 | TV1 (`CustomerCareStats`) | thống kê CSKH theo khách cho dashboard (L6) |
+| Dùng chung | | | `IUnitOfWork`, `IClock` (TV1); `IReportExporter` (TV2) |
 
-**5. Loại ngoại lệ theo quy tắc.**
-- `ValidationException` (dữ liệu của một đối tượng không hợp lệ): sai định dạng SĐT/Email (6), CheckOut ≤ CheckIn (7), điểm khảo sát ngoài 1–5 (9), ghi chú giải quyết rỗng (1), trường bắt buộc bỏ trống.
-- `BusinessRuleException` (vi phạm quy tắc giữa các đối tượng hoặc sai trạng thái): chuyển trạng thái sai, chưa có Agent, phân công sai trạng thái (1); Reopen quá hạn (2); vượt `MaxActiveTickets` (3); phòng không thuộc booking đang ở (5); trùng SĐT/Email (6); đặt chồng phòng, hủy booking không ở Reserved, check-in ngoài khoảng ngày của booking (7); khảo sát sai trạng thái hoặc lần hai (9); xóa khách còn ticket (10); thao tác sai quyền (11).
-- Quy tắc 4 và 8 là phép tính, không ném lỗi.
+## 5. Thiết kế chi tiết
 
-**6. Lưu trữ.**
-- 8 kiểu có file JSON cài `IEntity { int Id }`: `Department`, `Employee`, `RoomType`, `Room`, `Customer`, `Booking`, `SupportTicket`, `SatisfactionSurvey`. Repository cấp Id kế tiếp; service lấy Id rồi mới tạo thực thể. `TicketState`, `MembershipTier`, `InteractionHistory`, `Interaction` không có Id riêng.
-- File trong `Data/`: `departments.json`, `employees.json`, `roomtypes.json`, `rooms.json`, `customers.json`, `bookings.json`, `tickets.json`, `surveys.json`; nạp theo đúng thứ tự này.
-- Tên trường trong record trùng tên thuộc tính của thực thể (PascalCase); enum ghi dạng chuỗi; thời gian ISO 8601.
-- Trường phân biệt lớp con: `tickets.json` có `Type` (Complaint/ServiceRequest/Maintenance) và `State`; `employees.json` có `Role` (Agent/Manager), dùng chung `IRepository<Employee>`; `customers.json` có `Tier`, `Points` và mảng `Interactions` lồng bên trong; `departments.json` có `Code`.
-- Khôi phục từ file: mỗi thực thể có hàm `internal static Restore(...)` dựng lại đối tượng với trạng thái đã lưu mà không chạy lại quy tắc nghiệp vụ. `Domain` mở `internal` cho project `Data` bằng `InternalsVisibleTo`. Phía ngoài vẫn chỉ thấy constructor có kiểm tra.
-- Tham chiếu: trong cùng phân hệ giữ đối tượng (`SupportTicket.AssignedAgent`, `Room.RoomType`, `Booking.Room`, `Booking.Customer`, `Employee.Department`); khác phân hệ giữ Id (`SupportTicket.CustomerId`, `MaintenanceTicket.RoomId`, `SatisfactionSurvey.TicketId`). Mapper cần tham chiếu thì nhận repository tương ứng qua constructor.
-- Chuỗi băm mật khẩu trong `employees.json` phải sinh bằng `PasswordHasher`, không gõ tay.
+### 5.1 Form (13 Form nghiệp vụ, 7 Master-Detail, 3 danh mục đơn = 23%)
+Tên Form tạm theo mẫu trong checklist. HuongdanXDHTTTQL (có từ 25/11) dùng mẫu `frm000_dang_nhap`, `frm001_dm_sinh_vien`, `frm002_nv_sinh_vien` (tiền tố `dm_` danh mục, `nv_` nghiệp vụ, số đánh liên tiếp); bảng dưới đánh số theo người (0xx hệ thống, 1xx TV1, 2xx TV2). Rà ở M8 và chốt trước P3.
 
-**7. Observer và lịch sử tương tác.**
-- Observer chạy sau khi trạng thái ticket đã đổi. Lỗi trong observer không bị nuốt: nó lan lên và `ErrorHandler` hiển thị.
-- `InteractionLogger` và `LoyaltyObserver` nhận `IRepository<Customer>` qua constructor, sửa `Customer` rồi tự gọi repository để lưu.
-- `InteractionLogger` ghi một `Interaction` mỗi lần ticket đổi trạng thái. `LoyaltyObserver` cộng `GoodwillPoints` khi ticket chuyển sang Closed.
-- `Interaction` lúc check-in và check-out do `BookingService` ghi trực tiếp vào `Customer`, không đi qua `ITicketObserver`.
-- Thời điểm đổi trạng thái nằm ở `SupportTicket.UpdatedAt`; observer đọc từ đó vì `OnStateChanged(ticket, from, to)` không mang thời gian.
-- Từ GĐ 1 đến hết GĐ 3, thân `OnStateChanged` của ba observer để rỗng (không ném `NotImplementedException`) để các thao tác trên ticket chạy được ở điểm duyệt chung đầu GĐ 4; GĐ 4 điền thân hàm.
+| Form (tạm) | Nội dung | Loại | Master → Detail (tổng tính động) | Nút BFD | Biểu mẫu | TV |
+|---|---|---|---|---|---|---|
+| frm000_dang_nhap | Đăng nhập | hệ thống | – | F1.1 | – | 1 |
+| frm001_man_hinh_chinh | Màn hình chính, menu theo vai trò | hệ thống | – | – | – | 1 |
+| frm101_dm_nhan_vien | Phòng ban & nhân viên/tài khoản | danh mục | phòng ban → nhân viên (số ticket đang giữ) | F1.2 | – | 1 |
+| frm102_nv_tao_ticket | Lập ticket | nghiệp vụ | – | F2.1 | BM1 | 1 |
+| frm103_nv_tra_cuu_ticket | Tra cứu & phân công (lọc: trạng thái, ưu tiên, loại, nhân viên, khoảng ngày, từ khóa; nút xóa lọc) | nghiệp vụ | – | F3.1 | – | 1 |
+| frm104_nv_xu_ly_ticket | Xử lý ticket | nghiệp vụ | ticket → nhật ký xử lý (số bước, thời gian xử lý) | F3.2 | BM2 | 1 |
+| frm105_nv_khao_sat | Phiếu khảo sát | nghiệp vụ | phiếu chờ → điểm từng tiêu chí (điểm TB tính ngay) | F4.1 | BM3 | 1 |
+| frm106_bc_cskh | Báo cáo CSKH (R1, R2) | báo cáo | – | F4.2 | – | 1 |
+| frm201_dm_khach_hang | Hồ sơ khách 360 (lọc: từ khóa, hạng, quốc tịch, đồng ý ưu đãi) | danh mục | khách → lưu trú, tương tác, giao dịch điểm (tổng chi tiêu, số lần ở, số dư) | F5 | BM4 | 2 |
+| frm202_dm_phong | Loại phòng & phòng | danh mục | loại phòng → phòng (số phòng) | F6.1 | – | 2 |
+| frm203_nv_luu_tru | Đặt phòng, nhận/trả phòng (lọc: ngày, trạng thái, khách) | nghiệp vụ | – | F6.2 | BM5 | 2 |
+| frm204_dm_qua_tang | Danh mục quà | danh mục | – | F7.1 | – | 2 |
+| frm205_nv_doi_qua | Sổ điểm & đổi quà | nghiệp vụ | khách → giao dịch điểm (số dư tính ngay) | F7.2 | BM6 | 2 |
+| frm206_nv_chien_dich | Chiến dịch chăm sóc | nghiệp vụ | chiến dịch → khách nhận (đã gửi, phản hồi, tỷ lệ) | F8.1 | BM7 | 2 |
+| frm207_bc_khach_hang | Báo cáo khách hàng & dashboard (R3, R4, R5) | báo cáo | – | F8.2 | – | 2 |
 
-## Kiểm thử (22 test xUnit, dùng `InMemoryRepository`)
-Cả 22 test được viết ở GĐ 1 trên khung. Ở cuối GĐ 1: 2 test định dạng của `CustomerTests` xanh (vì `Person` đã cài), 20 test còn lại đỏ và lý do duy nhất là `NotImplementedException`. Các giai đoạn sau làm cho test xanh và **không sửa test**; thấy test sai thì dừng, ghi vào `PROGRESS.md`. Thời điểm `now` luôn là giá trị cố định.
+Biểu mẫu thật cần thu thập ở M2: BM1 Phiếu yêu cầu/khiếu nại, BM2 Phiếu theo dõi xử lý, BM3 Phiếu khảo sát hài lòng (TV1); BM4 Phiếu đăng ký thành viên/hồ sơ khách, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chiến dịch (TV2).
 
-**A — `tests/HotelCRM.Tests/Tickets/` (11), xanh ở cuối GĐ 2**
+### 5.2 CSDL SQLite (17 bảng; 4 n–n có thuộc tính; 5 khóa ngoại nối hai phân hệ; 4 danh mục = 24%)
+| Bảng | TV | Loại | Cột chính | Ghi chú |
+|---|---|---|---|---|
+| `departments` | 1 | danh mục | Id, Code, Name | |
+| `employees` | 1 | | Id, Username, PasswordHash, Salt, FullName, Phone, Email, Role, DepartmentId, IsActive | Role CHECK 4 giá trị; mật khẩu PBKDF2 |
+| `tickets` | 1 | giao dịch | Id, Type, **CustomerId**, **RoomId**, Title, Description, Priority, State, AssignedAgentId, CreatedById, CreatedAt, DueAt, ResolvedAt, ResolutionNote, ClosedAt | 2 khóa nối sang TV2 |
+| `ticket_logs` | 1 | **n–n** ticket–nhân viên | Id, TicketId, EmployeeId, Action, FromState, ToState, Note, At | nhật ký xử lý |
+| `survey_criteria` | 1 | danh mục | Id, Name, IsActive | sạch sẽ, thái độ, tiện nghi, ăn uống, giá trị |
+| `surveys` | 1 | giao dịch | Id, **BookingId** (UNIQUE), Status (Chờ/Đã khảo sát), CreatedAt, CompletedAt, RecordedById, Comment | khóa nối sang TV2; không lưu CustomerId (suy từ booking, giữ 3NF) |
+| `survey_answers` | 1 | **n–n** phiếu–tiêu chí | SurveyId, CriterionId, Score (CHECK 1–5) | PK (SurveyId, CriterionId) |
+| `customers` | 2 | | Id, FullName, Phone, Email, IdentityNumber, Nationality, DateOfBirth, MarketingConsent, Tier, Notes, CreatedAt | Phone/Email/IdentityNumber UNIQUE |
+| `interactions` | 2 | giao dịch | Id, CustomerId, OccurredAt, Channel, Summary, EmployeeId, **TicketId** | khóa nối sang TV1 |
+| `room_types` | 2 | danh mục | Id, Name, PricePerNight, Capacity | |
+| `rooms` | 2 | | Id, Number, Floor, RoomTypeId | |
+| `bookings` | 2 | giao dịch | Id, CustomerId, RoomId, CheckInDate, CheckOutDate, RatePerNight, Status, CreatedById, CreatedAt, CheckedInAt, CheckedOutAt | **RatePerNight chốt lúc đặt** (thuộc tính lịch sử) |
+| `point_transactions` | 2 | giao dịch | Id, CustomerId, Points (+/−), Reason (Lưu trú/Thiện chí/Đổi quà/Điều chỉnh), BookingId, **TicketId**, RedemptionId, CreatedAt | sổ điểm; khóa nối sang TV1 |
+| `rewards` | 2 | danh mục | Id, Name, PointsCost, MinTier, Quantity, IsActive | |
+| `reward_redemptions` | 2 | **n–n** khách–quà | Id, CustomerId, RewardId, PointsSpent, RedeemedAt, Status, ProcessedById | **PointsSpent chốt lúc đổi** |
+| `campaigns` | 2 | giao dịch | Id, Name, SegmentCode, Offer, StartDate, EndDate, CreatedById, CreatedAt | |
+| `campaign_targets` | 2 | **n–n** chiến dịch–khách | CampaignId, CustomerId, Channel, SentAt, Response, RespondedAt, RecordedById | PK (CampaignId, CustomerId) = mỗi khách một lần |
 
-| Lớp test | Hàm test |
-|---|---|
-| `TicketStateTests` | `Start_OpenTicketWithAgent_MovesToInProgress`; `Resolve_InProgressWithNote_MovesToResolved`; `Close_ResolvedTicket_MovesToClosed`; `Start_WithoutAgent_ThrowsBusinessRule`; `Resolve_ClosedTicket_ThrowsBusinessRule`; `Reopen_AfterReopenDays_ThrowsBusinessRule` |
-| `TicketRuleTests` | `AssignTo_AgentAtMaxActive_ThrowsBusinessRule`; `CalculateDueAt_ComplaintBoostedToHighFactor075_Returns9Hours` |
-| `TicketServiceTests` | `CreateTicket_MaintenanceRoomNotInActiveStay_ThrowsBusinessRule`; `Close_ByAgent_ThrowsBusinessRule` |
-| `TicketFactoryTests` | `Create_EachFactory_ReturnsMatchingSubclass` |
+- Khóa ngoại nối hai phân hệ: `tickets.CustomerId → customers`, `tickets.RoomId → rooms`, `surveys.BookingId → bookings`, `interactions.TicketId → tickets`, `point_transactions.TicketId → tickets`. Các cột `…ById` của TV2 trỏ sang `employees` của TV1.
+- Bật `PRAGMA foreign_keys=ON` mỗi kết nối; CHECK cho trạng thái, điểm, số tiền, ngày; ON DELETE khớp quan hệ UML (hợp thành ↔ CASCADE, còn lại RESTRICT); index cho cột khóa ngoại.
+- `Database/schema.sql` + `Database/seed.sql` (một file chung, mỗi người viết phần bảng của mình). App tự tạo `hotel.db` khi chưa có; Admin có lệnh tạo lại CSDL mẫu.
 
-**B — `tests/HotelCRM.Tests/Customers/` và `Assignment/` (11): 9 test xanh ở cuối GĐ 3, 2 test của `SurveyServiceTests` xanh ở GĐ 4**
+### 5.3 Quy tắc nghiệp vụ (13; liên phân hệ: Q3, Q4, Q5, Q11, Q12, Q13)
+Nguyên tắc: service tra cứu dữ liệu, lớp Domain quyết định và ném ngoại lệ. Tên lớp/hàm ở cột cuối là dự kiến, chốt ở M6.
 
-| Lớp test | Hàm test |
-|---|---|
-| `CustomerTests` | `Constructor_InvalidEmail_ThrowsValidation`; `Constructor_InvalidPhone_ThrowsValidation`; `AddPoints_PositiveAmount_IncreasesPoints`; `AddPoints_CrossingThresholds_UpgradesTier` |
-| `CustomerServiceTests` | `Register_DuplicatePhone_ThrowsBusinessRule`; `Delete_CustomerWithOpenTicket_ThrowsBusinessRule` |
-| `BookingTests` | `Constructor_CheckOutNotAfterCheckIn_ThrowsValidation` |
-| `BookingServiceTests` | `Book_OverlappingDates_ThrowsBusinessRule` |
-| `SurveyServiceTests` | `Submit_TicketNotResolved_ThrowsBusinessRule`; `Submit_SecondSurveyForTicket_ThrowsBusinessRule` |
-| `AssignmentStrategyTests` (trong `Assignment/`) | `LeastLoaded_Pick_ReturnsAgentWithFewestActive` |
+| Mã | TV | Quy tắc | Cài ở đâu (dự kiến) |
+|---|---|---|---|
+| Q1 | 1 | Vòng đời ticket: Mới → Đang xử lý (phải có người được giao) → Đã giải quyết (phải có ghi chú) → Đã đóng; mở lại từ Đã giải quyết trong `ReopenDays` ngày; Đã đóng không đổi được; mỗi lần đổi ghi nhật ký | các lớp `*State`, `SupportTicket` |
+| Q2 | 1 | Nhân viên CSKH không giữ quá `MaxActiveTickets` ticket đang mở; phân công tự động chọn người ít việc nhất trong bộ phận xử lý loại ticket đó | `Agent.EnsureCanTake`, `TicketService.AutoAssign` |
+| Q3 | 1 | Hạn SLA = giờ chuẩn theo loại × hệ số ưu tiên × hệ số hạng khách; hạng cao được nâng mức ưu tiên | `SupportTicket.CalculateDueAt`, qua `ICustomerDirectory` |
+| Q4 | 1 | Ticket sửa chữa phải gắn đúng phòng khách đang ở | `MaintenanceTicket.Validate`, qua `IStayLookup` |
+| Q5 | 1 | Chỉ ghi khảo sát cho phiếu đang Chờ (tạo lúc trả phòng); mỗi lưu trú một phiếu; chấm đủ mọi tiêu chí đang dùng; điểm 1–5 | `SatisfactionSurvey.Complete` |
+| Q6 | chung | Phân quyền theo ma trận ở tầng Service; Admin vượt mọi quyền; bắt đầu/giải quyết chỉ người được giao (hoặc Admin) | `Employee` + 4 lớp con; TV1 cài nền + quyền ticket, TV2 cài kiểm quyền trong service của mình |
+| Q7 | 2 | SĐT 10 số bắt đầu bằng 0, email hợp lệ, CCCD 12 số; không trùng SĐT/email/CCCD | `Person`, `Customer`, `Customer.EnsureUnique` |
+| Q8 | 2 | Ngày trả > ngày nhận; phòng không trùng lịch với booking chưa hủy; giá/đêm chốt lúc đặt; chỉ nhận phòng trong [ngày nhận, ngày trả); chỉ hủy booking chưa nhận phòng | `Booking`, `Room.EnsureAvailable` |
+| Q9 | 2 | Trả phòng: điểm = tiền phòng / 10.000đ × hệ số tích điểm của hạng (làm tròn xuống); hạng tính theo tổng điểm đã tích (không trừ điểm đã đổi), có thể lên nhiều bậc, không bao giờ hạ | `MembershipTier` (+ hệ số tích điểm), `Customer.EarnPoints` |
+| Q10 | 2 | Đổi quà: số dư ≥ điểm quy đổi; hạng ≥ hạng tối thiểu của quà; quà còn số lượng; số dư không bao giờ âm; điểm quy đổi chốt lúc đổi | `Reward`, `Customer.SpendPoints` |
+| Q11 | 2 | Danh sách chiến dịch = phân khúc đã chọn ∩ khách đồng ý nhận ưu đãi − khách có khiếu nại chưa đóng; mỗi khách một lần trong một chiến dịch; chỉ ghi phản hồi khi chiến dịch chưa kết thúc | `Campaign.AddTarget`, `CampaignService`, qua `ITicketQuery` |
+| Q12 | 2 | Ticket chuyển sang Đã đóng → khách được cộng điểm thiện chí theo loại ticket (khiếu nại 50, loại khác 10) và ghi một tương tác, cùng transaction với việc đóng | `GoodwillPointsObserver`, `SupportTicket.GoodwillPoints` |
+| Q13 | 2 | Không xóa khách đã có lưu trú hoặc ticket | `Customer.EnsureCanBeDeleted`, qua `ITicketQuery` |
 
-- Tên hàm có thể chỉnh ở GĐ 1 cho khớp chữ ký thật, nhưng số lượng và nội dung kiểm tra giữ nguyên.
-- Lớp giả viết tay trong `tests/HotelCRM.Tests/Fakes/`: `FakeCustomerDirectory`, `FakeStayLookup` thuộc suất A; `FakeTicketQuery` thuộc suất B.
-- Test của suất A không dùng lớp nào của `Domain/Customers` hay `Domain/Hotel`, nên xanh được mà không cần code của suất B.
-- 11 test của suất B và `FakeTicketQuery` chỉ có trên `local/b-work` (mục Git); trên `develop` chỉ có 11 test của suất A cho tới khi thành viên B push.
-- Test chỉ phủ Domain và Business; giao diện kiểm tra bằng tay (mục Kiểm tra).
+Loại ngoại lệ: sai dữ liệu một đối tượng → `ValidationException`; sai quy tắc giữa các đối tượng hoặc sai trạng thái → `BusinessRuleException`; sai quyền → `AuthorizationException`.
 
-## Dữ liệu mẫu liên thông (`Data/*.json`)
-- GĐ 1 (tối thiểu, phần chung): 4 phòng ban (`GUEST`, `HOUSE`, `ENG`, `FRONT`), 1 manager, 2 agent; sáu file còn lại là mảng rỗng.
-- GĐ 4 (đầy đủ, thành viên B commit, chia theo file): 2 manager, 6 agent, 5 loại phòng, 20 phòng, 15 khách (đủ 4 hạng), khoảng 20 booking (đủ 4 trạng thái), khoảng 25 ticket (đủ 3 loại × 4 trạng thái), lịch sử tương tác và khảo sát khớp Id với nhau.
-- `employees.json` đầy đủ do phiên Sonnet của GĐ 4 sinh bằng tiện ích băm của GĐ 1. Bảy file còn lại giao cho phiên Haiku.
-- Tài khoản mẫu ghi trong README.
-
-## Git
-- Nhánh: `main` (bản ổn định) ← `develop` ← `feature/a-ticket` (bạn) và `feature/b-customer` (thành viên B). `local/b-work` chỉ có trên máy bạn và **không bao giờ push**. `practice/*` để tập bài mở rộng, không merge.
-- Commit message không kèm dòng `Co-Authored-By` (đã tắt trong `.claude/settings.json`). Việc dùng Claude được nêu trong README và trong báo cáo.
-- Mục tiêu: mỗi người ít nhất 12 commit và tỷ lệ không lệch quá 60/40 (`git shortlog -sn`). Commit nhỏ theo từng lớp/quy tắc/test.
-- **Khung chung và suất A:** Claude commit bằng tài khoản của bạn khi bạn đồng ý; khung trên `develop`, suất A trên `feature/a-ticket` rồi merge vào `develop`.
-- **Suất B, cách 1 — nhận patch (mặc định):**
-  1. `local/b-work` được tạo ở GĐ 1 từ `develop`; commit đầu tiên là 11 test của suất B và `FakeTicketQuery`. Nhánh này tồn tại tới khi thành viên B đã push toàn bộ, chỉ xóa ở cuối GĐ 6.
-  2. Claude làm việc của suất B trên `local/b-work`, chia thành commit nhỏ (commit khi bạn đồng ý). Khi `develop` có thay đổi mới, merge `develop` vào `local/b-work`.
-  3. Mỗi commit của suất B xuất thành `handoff/NN-ten-ngan.patch` (bằng `git diff <commit trước> <commit này>`) kèm `handoff/NN-ten-ngan.msg.txt` chứa commit message gợi ý. Số `NN` chạy liên tục từ 01 qua GĐ 3, 4, 5, 6. Merge commit không xuất patch; `handoff/README.txt` ghi patch nào cần merge `origin/develop` trước khi áp.
-  4. Thành viên B, trên `feature/b-customer` tạo từ `develop`: `git apply` từng patch theo thứ tự, đọc hiểu, build, tự commit bằng message đó, rồi push.
-  5. Bạn fetch và kiểm tra `git diff local/b-work origin/feature/b-customer -- src tests` rỗng (so trước khi thành viên B thêm commit không qua patch), rồi merge `feature/b-customer` vào `develop`.
-  6. Vòng đầu tiên của GĐ 3 chạy đúng thì chép các bước thành skill `.claude/skills/export-patch/SKILL.md`.
-- **Suất B, cách 2 — tự code:** thành viên B tự viết theo file task của GĐ 3 và GĐ 4 trên `feature/b-customer`; Claude chỉ làm khung và suất A. `docs/PROGRESS.md` ghi rõ cách nào đang được dùng.
-- **Test:** 11 test của suất A do bạn commit trên `develop` ở GĐ 1. 11 test của suất B là patch số 01, áp trước mọi patch khác.
-- **Bù commit:** khung chung làm bạn nhiều commit hơn. Thành viên B bù bằng Strategy, dữ liệu mẫu đầy đủ (mỗi file một commit) và tài liệu riêng của suất B; tài liệu ở GĐ 5–6 cũng đi qua quy trình patch.
-- Thành viên B push xong code trước khi GĐ 5 bắt đầu (hạn 25/11).
-- Tiêu chí 12 và 20 yêu cầu cả hai hiểu code của nhau: cả hai đọc `docs/viva-notes.md` và tự làm lại các bài mở rộng pattern trước buổi vấn đáp.
-
-## Lộ trình
-14 ngày (16–29/11/2026). Cột "Hạn" là hạn chót; xong sớm thì dồn thời gian dư cho GĐ 5–6 và ôn vấn đáp. Mỗi giai đoạn kết thúc bằng một điểm dừng để bạn duyệt. Trạng thái thực tế của từng giai đoạn ghi ở `docs/PROGRESS.md`.
-
-| GĐ | Hạn | Nhánh | Nội dung | Sản phẩm bắt buộc | Điểm dừng để duyệt |
+### 5.4 Mẫu GoF (4 mẫu, 2 nhóm; Repository/Singleton không tính)
+| Mẫu | Nhóm | TV | Các lớp | Giải quyết vấn đề gì | Bài Live OCP |
 |---|---|---|---|---|---|
-| **0 Chuẩn bị** | 16/11 | — | Viết instruction cho các phiên sau | `CLAUDE.md`, `.claude/settings.json`, 5 file `.claude/rules/`, `docs/PROGRESS.md`, `docs/tasks/stage-1-skeleton.md`, `.gitignore` | Bạn đọc `CLAUDE.md` và rules |
-| **1 Khung** | 17/11 | `develop`; `local/b-work` cho test của B | Solution + 5 project, `Directory.Build.props`, `.editorconfig`; `Domain/Common`, `Staff`, `Interfaces`; toàn bộ `Data/`; `PasswordHasher`, `UserSession`, `AuthService`; `Program.cs` nối dây đầy đủ; `ErrorHandler`; `LoginForm`, `MainForm`, vỏ rỗng của 9 Form; dữ liệu mẫu tối thiểu; **khung toàn bộ Domain + Business của GĐ 2–4** (chữ ký đầy đủ, chú thích XML, thân hàm `throw new NotImplementedException()`); **22 test** | `docs/tasks/stage-2-ticket.md`, `stage-3-customer.md`, `stage-4-integration.md`; 5 file rules đã rà lại theo code thật; `handoff/01-…` | Chạy app, đăng nhập 2 vai trò, mở được 9 Form rỗng từ menu; `dotnet build` sạch; 22 test: 2 xanh, 20 đỏ vì `NotImplementedException` |
-| **2 Suất A** | 20/11 | `feature/a-ticket` | Thân hàm của ticket, 4 State, 3 Factory, `TicketService` (gồm quy tắc 11), `TicketQuery`, `Agent.EnsureCanTake`; nội dung của `TicketListForm`, `TicketEditForm`, `TicketDetailForm` | 11 test A xanh | Test xanh; 3 Form ticket mở được trong Designer |
-| **3 Suất B** | 23/11 | `local/b-work` | Thân hàm của `Customer`, cây `MembershipTier`, `Room`/`Booking`, `CustomerService`, `BookingService`, `CustomerDirectory`, `StayLookup`, 3 strategy; nội dung của Form khách hàng và đặt phòng | 9 test B xanh; patch trong `handoff/` | Test xanh; Form khách hàng và đặt phòng mở được trong Designer |
-| **4 Ghép nối** | 25/11 | `local/b-work`, sau khi đã merge `develop` có suất A | Mở đầu: điểm duyệt chung, UC1–UC7 chạy trên giao diện. Sau đó suất B: `InteractionLogger`, `LoyaltyObserver`, `UiNotificationObserver`, `SurveyService` (UC8), lịch sử (UC9), `ReportService` (UC10), dữ liệu mẫu đầy đủ; publish thử | 22 test xanh; bản publish chạy được; `docs/tasks/stage-5-docs.md`; thành viên B đã push toàn bộ code | Chạy trọn kịch bản demo trên bản publish |
-| **5 Tài liệu kỹ thuật** | 27/11 | `develop` (phần của A), `local/b-work` (phần của B) | UML PlantUML (use case, class tổng thể, 4 sequence, 5 sơ đồ pattern); README có mục nêu việc dùng Claude; `demo-script.md`; `viva-notes.md` kèm lời giải 5 bài mở rộng | file `.puml` + ảnh trong `docs/uml/`; `docs/tasks/stage-6-report.md` | Sơ đồ khớp tên lớp/hàm trong code |
-| **6 Báo cáo & nộp** | 29/11 | như GĐ 5 | Báo cáo LaTeX theo mẫu, có mục nêu việc dùng Claude; điền cột "Minh chứng" của checklist; chạy bản publish trên máy khác; tập vấn đáp | `docs/report/` biên dịch được; gói nộp | Bản nộp |
+| State | Hành vi | 1 | Context `SupportTicket`; `TicketState` + `OpenState`, `InProgressState`, `ResolvedState`, `ClosedState` | bỏ chuỗi if/switch theo trạng thái; mỗi trạng thái tự quyết thao tác hợp lệ (Q1) | không dùng (thêm trạng thái phải sửa trạng thái cũ) |
+| Factory Method | Khởi tạo | 1 | `TicketFactory` → `ComplaintTicketFactory`, `ServiceRequestTicketFactory`, `MaintenanceTicketFactory`; bảng đăng ký ở `Program.cs` | service không `new` lớp ticket cụ thể | thêm `LostItemTicket` + factory, đăng ký 1 dòng |
+| Strategy | Hành vi | 2 | `ISegmentStrategy` → `VipSegment`, `LapsedGuestSegment` (lâu chưa quay lại), `BirthdayMonthSegment`; Context `CampaignService`; chọn trên Form lúc chạy | đổi cách chọn khách mà không sửa service | thêm `FrequentGuestSegment` (ở ≥3 lần trong năm) |
+| Observer (cầu nối) | Hành vi | 1 phát, 2 nhận | Subject: phía ticket của TV1; `ITicketObserver` → `GoodwillPointsObserver`, `InteractionLogger` (TV2) | TV1 không cần biết TV2 làm gì khi ticket đổi trạng thái | thêm observer mới |
 
-- **Chạy song song:** GĐ 2 và GĐ 3 chỉ phụ thuộc khung của GĐ 1, nên có thể mở hai phiên cùng lúc từ 18/11, mỗi phiên một worktree. Không phiên nào sửa `Program.cs`, `MainForm`, `Data/` hay chữ ký của khung. Trong GĐ 5, ba việc UML, README + kịch bản demo, `viva-notes.md` cũng chạy song song được.
-- **Review:** cuối GĐ 2, 3 và 4, một phiên Opus chạy `/code-review`; lỗi tìm ra do phiên Sonnet của giai đoạn đó sửa trước điểm duyệt.
-- **Mốc phụ thuộc vào người:** thành viên B gửi tên GitHub và chọn cách commit trước **17/11**; push xong code trước **25/11**; mẫu báo cáo LaTeX có trước **26/11**.
-- **Thứ tự cắt giảm nếu trễ tiến độ** (vẫn giữ đủ mọi ngưỡng tối thiểu của checklist): (1) `RoundRobinStrategy` — còn 2 strategy; (2) `ReportService.ByDepartment()` — còn báo cáo hiệu suất Agent; (3) `UiNotificationObserver` — còn 2 observer; (4) giảm dữ liệu mẫu còn một nửa; (5) sơ đồ riêng từng pattern gộp vào class diagram tổng thể. Không cắt: 10 UC, 11 quy tắc, 22 test, 5 pattern, 4 sơ đồ tuần tự.
+- Đổi `switch` cứng ở `TicketState.FromName` và `TicketMapper` thành bảng đăng ký dựng ở Composition Root, để thêm lớp mới không phải sửa lớp cũ.
+- Mỗi người chuẩn bị ≥2 nhược điểm của mẫu mình dùng (câu hỏi W).
 
-## Tổ chức phiên làm việc, model và instruction
+### 5.5 Lớp chính theo người (dự kiến, chốt ở M6; * = abstract)
+- **Chung (TV1 viết):** `Person`*, `Employee`*, `Administrator`, `Manager`, `Agent`, `Department`; cây ngoại lệ; `IClock`, `IUnitOfWork`.
+- **TV1:** `SupportTicket`*, `ComplaintTicket`, `ServiceRequestTicket`, `MaintenanceTicket`, `TicketState`* + 4 state, `TicketLog`, `SatisfactionSurvey`, `SurveyAnswer`, `SurveyCriterion`, `TicketFactory`* + 3 factory; enum `TicketPriority`, `TicketAction`, `SurveyStatus`.
+- **TV2:** `Customer`, `MembershipTier`* + `StandardTier`, `SilverTier`, `GoldTier`, `VipTier`, `Interaction`, `RoomType`, `Room`, `Booking`, `PointTransaction`, `Reward`, `RewardRedemption`, `Campaign`, `CampaignTarget`, `Receptionist`, `ISegmentStrategy` + 3 phân khúc; enum `BookingStatus`, `ContactChannel`, `PointReason`, `CampaignResponse`.
+- Cây kế thừa cho LSP: `Employee` (4), `SupportTicket` (3), `TicketState` (4), `MembershipTier` (4). LSP xuyên phân hệ: `Receptionist` (TV2) đi qua `TicketService` (TV1) dưới kiểu `Employee`, không ép kiểu.
+- Dùng lại: `Person`, `Customer`, 4 hạng, `Employee`/`Agent`/`Manager`, `Department`, `SupportTicket` + 3 lớp con + 4 state, `Room`, `RoomType`, `Booking`, `Interaction`, `SatisfactionSurvey`, `PasswordHasher`, `ErrorHandler`, phần lớn service, 22 test cũ (sửa theo thiết kế mới).
 
-**Nguyên tắc.** Mỗi giai đoạn một phiên mới, chọn model cho cả phiên. Không dùng agent tùy biến: agent con khởi động lại từ đầu và phải đọc lại ngữ cảnh, nên với code lõi nó tốn hơn một phiên model nhỏ làm trực tiếp. Tiết kiệm token đến từ: file task ngắn thay cho việc đọc cả plan, rules chỉ nạp theo thư mục, test có sẵn làm điều kiện xong, và không kéo dài phiên cũ.
+### 5.6 Kiến trúc
+```
+Database/            schema.sql, seed.sql
+Resource/            icon, logo
+src/HotelCRM.GUI     WinForms; Program.cs = Composition Root (DI thủ công)
+src/HotelCRM.BLL     Services, Queries (cài interface ranh giới), Observers, Segments, Factories, Reporting
+src/HotelCRM.Domain  Common, Staff | Tickets, Surveys (TV1) | Customers, Hotel, Loyalty, Campaigns (TV2) | Interfaces
+src/HotelCRM.DAL     Sqlite (kết nối, UnitOfWork, tạo CSDL), Repositories, ReadModels (JOIN cho lưới/báo cáo)
+tests/HotelCRM.Tests Unit/, Integration/, Fakes/
+```
+- Chiều phụ thuộc: GUI → BLL → Domain ← DAL; Domain không tham chiếu project nào; Form không chứa SQL hay quy tắc.
+- Đổi tên project: `WinForms → GUI`, `Business → BLL`, `Data → DAL`.
+- HuongdanXDHTTTQL ("Solution Convention") còn nêu Solution Folder `Dlllib` và tên solution kèm phiên bản (ví dụ `QuanLyDiemv2012.05.02`). Có làm theo hay không quyết ở P2 khi đổi tên project (xem "Việc chờ người" trong `docs/PROGRESS.md`).
+- Repository đọc CSDL khi cần (bỏ nạp hết vào bộ nhớ) để rollback không làm lệch bộ nhớ. Tham chiếu giữa các aggregate bằng Id. Lưới và báo cáo dùng truy vấn JOIN, không N+1.
+- `IUnitOfWork.Execute(...)`: một connection + một transaction dùng chung; lời gọi lồng nhau tham gia transaction ngoài. L2 và L3 chạy trọn trong một transaction.
+- Cây ngoại lệ: `DomainException` → `ValidationException`, `BusinessRuleException`, `AuthorizationException`; DAL bọc lỗi SQLite thành `DataAccessException`. Không `catch {}` rỗng. `ErrorHandler` hiện thông báo tiếng Việt, ghi `logs/error.log`, không lộ stack trace.
+- Cấu hình: một `appsettings.json` (+ `appsettings.example.json`): đường dẫn CSDL, `MaxActiveTickets`, `ReopenDays`, số ngày "lâu chưa quay lại". Bỏ Singleton `AppConfig`: đọc một lần ở `Program.cs` rồi truyền qua constructor. Thời gian qua `IClock`.
 
-**Model theo phiên**
+### 5.7 Báo cáo (5; đều xuất Excel có tiêu đề, ngày xuất, dòng tổng; không tính booking đã hủy)
+| Mã | Báo cáo | TV | Biểu đồ | Liên PH |
+|---|---|---|---|---|
+| R1 | Hiệu suất nhân viên CSKH: số ticket được giao, đã giải quyết, giờ xử lý TB, số trễ SLA | 1 | | |
+| R2 | Ticket & SLA theo loại, tháng và hạng khách | 1 | ✓ | ✓ (hạng lấy theo lô qua `ICustomerDirectory`) |
+| R3 | Phân khúc khách theo hạng: số khách, tổng chi tiêu, điểm đã tích/đổi | 2 | ✓ | |
+| R4 | Hiệu quả chiến dịch: số khách nhận, số phản hồi, tỷ lệ quan tâm/đặt phòng | 2 | | |
+| R5 | Dashboard 360: theo khách — số lần ở, chi tiêu, số khiếu nại, điểm hài lòng TB | 2 | | ✓ (qua `ICustomerCareStats`) |
 
-| Phiên | Model | Lý do |
+### 5.8 Test (28 = mỗi người 10 unit + 4 integration)
+Unit test chạy không cần CSDL, dùng Fake; integration test chạy trên CSDL SQLite tạm có seed; `IClock` cố định thời gian; giá trị kỳ vọng lấy từ bảng tính tay, không chép công thức của code.
+
+| | TV1 | TV2 |
 |---|---|---|
-| GĐ 1 Khung | Fable 5.2, hoặc Opus 5.5 | Quyết định chữ ký, viết test và file task; sai ở đây thì mọi phiên sau sai theo |
-| GĐ 2 Suất A | Sonnet 5.5 | Điền thân hàm theo khung và test có sẵn |
-| GĐ 3 Suất B (song song với GĐ 2) | Sonnet 5.5 | Như trên |
-| GĐ 4 Ghép nối, gồm `employees.json` đầy đủ | Sonnet 5.5 | Observer, khảo sát, báo cáo; chạy tiện ích băm mật khẩu |
-| GĐ 4 Bảy file dữ liệu mẫu còn lại (phiên riêng) | Haiku 5.5 | Sinh JSON theo cấu trúc Record có sẵn |
-| Review cuối GĐ 2, 3, 4 | Opus 5.5, chạy `/code-review` | Bắt lỗi thiết kế mà model nhỏ bỏ sót; phiên Sonnet của giai đoạn đó sửa |
-| GĐ 5: UML, `viva-notes.md` | Sonnet 5.5 | Phải đọc code và đối chiếu tên |
-| GĐ 5: README, `demo-script.md` (phiên riêng) | Haiku 5.5 | Văn bản theo khuôn |
-| GĐ 6 Báo cáo | Sonnet 5.5; rà đối chiếu cuối bằng Opus 5.5 | Viết dài theo mẫu; rà cuối cần chính xác |
+| Unit (10) | chuyển trạng thái hợp lệ; giải quyết thiếu ghi chú; Đã đóng bất biến; mở lại đúng mốc/quá mốc (BVA); tải tối đa đúng ngưỡng (BVA); hạn SLA khớp tính tay; ticket sửa chữa sai phòng (Fake `IStayLookup`); nâng ưu tiên theo hạng (Fake `ICustomerDirectory`); khảo sát thiếu tiêu chí, điểm 0/1/5/6 (BVA); factory trả đúng lớp con | SĐT/email/CCCD sai (BVA độ dài); trùng SĐT; đặt trùng lịch và nối tiếp ngày (BVA); nhận phòng trước ngày; tích điểm theo hạng + lên 2 bậc; đổi quà giảm số dư không hạ hạng; đổi quà thiếu điểm/thiếu hạng/hết quà; 3 phân khúc chọn đúng khách (BVA ngày); chiến dịch loại khách có khiếu nại (Fake `ITicketQuery`); xóa khách có ticket (Fake `ITicketQuery`) |
+| Integration (4) | L2 luồng đầy đủ; L2 rollback khi observer TV2 lỗi giữa chừng; R2 khớp tính tay; RBAC (Lễ tân phân công bị chặn, CSKH xử lý ticket người khác bị chặn, Admin được) | L3 luồng đầy đủ; L3 rollback khi `SurveyScheduler` lỗi; R5 khớp tính tay; RBAC (CSKH đổi quà bị chặn, Lễ tân tạo chiến dịch bị chặn, Admin được) |
+| Fake tự viết | `FakeCustomerDirectory`, `FakeStayLookup` | `FakeTicketQuery`, `FakeSurveyScheduler`, `FakeCustomerCareStats` |
 
-Không giao cho Haiku: code State/Observer, file `.Designer.cs`, chuỗi băm mật khẩu, và bất cứ việc gì đổi chữ ký.
+Mỗi người tự thử tiêm lỗi vào phần mình (đổi `>=` thành `>`, bỏ rollback, bỏ kiểm quyền) và chắc chắn có test chuyển đỏ.
 
-**Cấu trúc instruction**
+### 5.9 Dữ liệu mẫu (≥150 dòng, 17 bảng, tháng 9–11/2026)
+- Tài khoản: 1 Admin, 2 Quản lý, 3 Lễ tân, 4 CSKH (mật khẩu ghi trong README).
+- Ước lượng: 4 phòng ban, 10 nhân viên, 5 tiêu chí, 4 loại phòng, 20 phòng, 30 khách (đủ 4 hạng), 40 booking, 30 ticket, ~80 dòng nhật ký, 25 phiếu khảo sát, ~100 điểm tiêu chí, ~60 giao dịch điểm, 6 quà, 10 lượt đổi, 3 chiến dịch, 40 khách nhận, ~60 tương tác.
+- Đủ trạng thái: ticket đã đóng/quá hạn SLA/mở lại; booking đã hủy/đang ở/đã trả; phiếu khảo sát chờ/đã làm; lượt đổi đã hủy; chiến dịch đã kết thúc. CRM không có "công nợ"; khi vấn đáp giải thích các trạng thái tương đương.
+- Bảng đáp án tính tay cho R2 và R5 nằm trong `docs/analysis/10-kiem-thu.md`.
 
-```
-CLAUDE.md                     # luôn được nạp, tối đa ~80 dòng
-.claude/
-  settings.json               # cho phép sẵn dotnet build/test/run/publish/restore, git status/diff/log/show; tắt dòng Co-Authored-By
-  rules/                      # mỗi file có frontmatter `paths:`, chỉ nạp khi làm việc với thư mục đó
-    domain.md                 # src/HotelCRM.Domain/**
-    business.md               # src/HotelCRM.Business/**
-    data.md                   # src/HotelCRM.Data/**
-    winforms.md               # src/HotelCRM.WinForms/**
-    tests.md                  # tests/**
-  skills/export-patch/SKILL.md   # chỉ tạo trong GĐ 3 nếu suất B dùng cách 1
-docs/
-  PLAN.md                     # đặc tả (file này)
-  PROGRESS.md                 # trạng thái
-  tasks/stage-N-*.md          # bản giao việc từng giai đoạn
-```
+### 5.10 Đối chiếu định mức N2
+| Hạng mục | Định mức N2 | TV1 | TV2 | Tổng |
+|---|---|---|---|---|
+| Nhánh BFD cấp 2 | ≥6, ≥3/TV | 4 | 4 | 8 |
+| Use Case | ≥8, ≥4/TV, ≥4 phức hợp, ≥2 liên PH | 6 | 5 | 11; 5 phức hợp; 7 liên PH |
+| Form nghiệp vụ | ≥9, ≥4/TV, ≤40% danh mục | 6 | 7 | 13; danh mục 23% |
+| Form Master-Detail | ≥4, ≥2/TV | 3 | 4 | 7 |
+| Báo cáo | ≥5, ≥2/TV, ≥1 tổng hợp, ≥1 biểu đồ, xuất file | 2 | 3 | 5; 2 liên PH; 2 biểu đồ |
+| Vai trò | ≥3 | | | 4 |
+| Bảng 3NF | ≥11, ≥3 n–n, ≥2 khóa nối | 7 (2 n–n) | 10 (2 n–n) | 17; 4 n–n; 5 khóa nối |
+| Lớp Domain thực chất / UML | ≥13 / ≥20 | ~20 | ~20 | ~40 |
+| Quy tắc | ≥8, ≥4/TV, ≥2 liên PH | 5 | 7 | 13 (+Q6 chung); 6 liên PH |
+| GoF | ≥3, ≥2 nhóm, mỗi TV ≥1, ≥1 cầu nối | State, Factory Method | Strategy | 4 với Observer cầu nối |
+| Sơ đồ Sequence/State | ≥4, ≥2/TV, ≥1 xuyên PH | tuần tự L2 + trạng thái ticket | tuần tự L3 + trạng thái booking | 4; 2 xuyên PH |
+| Unit / Integration / Tổng test | ≥18 (≥9/TV) / ≥8 / ≥26 | 10 / 4 | 10 / 4 | 20 / 8 / 28 |
+| Seed | ≥120 dòng, ≥11 bảng, 2–3 tháng | | | ≥150, 17 bảng, 3 tháng |
+| Git | ≥24 commit, ≥3 tuần, ≥2 PR, 40–60%/TV | | | đo mỗi Chủ nhật |
 
-| File | Nội dung |
+## 6. Phân công
+
+### 6.1 Nguyên tắc
+1. Chia dọc theo phân hệ: mỗi người có đủ Domain, mẫu thiết kế, test, giao diện, tài liệu, slide của phần mình.
+2. Ai viết code thì người đó commit bằng tài khoản mình. Được hỏi nhau, review nhau; không viết hộ.
+3. Mỗi người đọc hiểu phần của bạn đủ để trả lời câu hỏi chéo và đặt breakpoint trong code của bạn.
+4. Hai bên chỉ nói chuyện qua interface ở mục 4.5. Phần bạn chưa xong thì dùng Fake.
+5. Tỷ lệ code 40–60%: TV1 đã có sẵn nhiều code cũ, nên phần việc mới và phần chung còn lại nghiêng về TV2.
+
+### 6.2 Ai sở hữu gì
+| Tầng | TV1 | TV2 |
+|---|---|---|
+| Domain | `Common/**`, `Staff/**` (trừ `Receptionist`), `Tickets/**`, `Surveys/**` | `Customers/**`, `Hotel/**`, `Loyalty/**`, `Campaigns/**`, `Staff/Receptionist` |
+| Interface (khai báo) | `ICustomerDirectory`, `IStayLookup`, `ITicketObserver`, `IUnitOfWork`, `IClock` | `ITicketQuery`, `ISurveyScheduler`, `ICustomerCareStats`, `IReportExporter`, `ISegmentStrategy` |
+| BLL | `AuthService`, `EmployeeService`, `TicketService`, `SurveyService`, `CustomerCareReportService`, `Factories/**`, `TicketQuery`, `SurveyScheduler`, `CustomerCareStats` | `CustomerService`, `StayService`, `LoyaltyService`, `CampaignService`, `CustomerReportService`, `DashboardService`, `CustomerDirectory`, `StayLookup`, `Observers/**`, `Segments/**`, `ExcelReportExporter` |
+| DAL | `Sqlite/**` (kết nối, UnitOfWork, tạo CSDL, nạp seed); repository + truy vấn báo cáo 7 bảng TV1 | repository + truy vấn báo cáo 10 bảng TV2 |
+| Database | `schema.sql`/`seed.sql`: khung file + 7 bảng TV1 | 10 bảng TV2 |
+| GUI | `Program.cs` (khung; mỗi người thêm dòng đăng ký của mình), `ErrorHandler`, frm000, frm001, frm101–frm106 | frm201–frm207; hàm định dạng tiền/ngày, căn phải, `ErrorProvider` dùng chung; hàm vẽ biểu đồ dùng chung |
+| Tests | 10 unit + 4 integration TV1; Fake cho interface của TV2 | 10 unit + 4 integration TV2; Fake cho interface của TV1 |
+| Tài liệu | phần chung (4W+1H tổng, cây BFD, sơ đồ UC tổng, DFD ngữ cảnh + mức 0, ma trận quyền, kiến trúc/package) + phân hệ TV1 | phân hệ TV2 |
+| Slide | phần chung + TV1 | phần TV2; biên dịch (máy có TeX) |
+
+### 6.3 Lịch chung
+**P1 — Phân tích thiết kế (22–29/11), nộp slide 30/11.** Tài liệu trong `docs/analysis/`, sơ đồ trong `docs/analysis/diagrams/`. Danh sách việc chi tiết của từng người ở mục 6.4–6.6.
+
+| Module | Hạn | TV1 | TV2 |
+|---|---|---|---|
+| M1 Chuẩn bị | 22/11 | `CLAUDE.md`, `docs/PLAN.md` v2, `docs/PROGRESS.md` v2, file task P1, nhánh `v2` | đọc plan, xác nhận phân công; cùng merge PR #1 |
+| M2 Khảo sát (`01-khao-sat.md`) | 23/11 | 4W+1H toàn hệ thống; yêu cầu phi chức năng; BM1–BM3 | hiện trạng phần khách hàng/lưu trú/điểm; BM4–BM7; yêu cầu chức năng F5–F8 |
+| M3 BFD + UC (`02-bfd.md`, `03-use-case.md`) | 24/11 | cây BFD 8 nhánh, lá F1–F4; sơ đồ UC tổng; đặc tả UC04, UC05 | lá F5–F8; đặc tả UC08, UC09, UC10 |
+| M4 Quy tắc, quyền, DFD (`04-quy-tac.md`, `05-dfd.md`) | 25/11 | Q1–Q6 (tiền/hậu điều kiện, ngoại lệ); ma trận quyền; DFD ngữ cảnh + mức 0; DFD mức 1 của F3 | Q7–Q13; DFD mức 1 của F7 |
+| M5 ERD + CSDL (`06-erd.md`) | 26/11 | khung `erd.puml` + phần 7 bảng TV1; giải thích 3NF | phần 10 bảng TV2; giải thích thuộc tính lịch sử (giá chốt, điểm chốt) |
+| M6 Lớp + package + hợp đồng (`07-thiet-ke-lop.md`) | 27/11 | sơ đồ lớp phần chung + TV1; package diagram; khai báo 3 interface phía TV1 | sơ đồ lớp TV2; khai báo 3 interface phía TV2; **cả hai chốt bảng hợp đồng** |
+| M7 Hành vi (`08-hanh-vi.md`) | 28/11 | tuần tự L2 đóng ticket (xuyên PH, có alt rollback); máy trạng thái ticket | tuần tự L3 trả phòng (xuyên PH); máy trạng thái booking |
+| M8 Giao diện + test (`09-giao-dien.md`, `10-kiem-thu.md`) | 28/11 | bảng Form F1–F4; ma trận test TV1; bảng tính tay R2 | bảng Form F5–F8; ma trận test TV2; bảng tính tay R5 |
+| M9 Slide + tự đánh giá L2 | 29/11 | slide phần chung + TV1 | slide TV2, biên dịch PDF; cả hai điền tự đánh giá L2 |
+
+**P2–P5**
+| Giai đoạn | Thời gian | Mục tiêu | Mốc kiểm cuối giai đoạn |
+|---|---|---|---|
+| P2 Hạ tầng | 1–4/12 | TV1 dựng nền SQLite và phân quyền; TV2 làm Domain mới song song | đăng nhập được 4 vai trò trên SQLite; TV2 có 10 unit test xanh |
+| P3 Phân hệ | 5–10/12 | mỗi người làm repository, service, Form, báo cáo, seed của mình | đủ 13 Form, R1–R4, seed ≥150 dòng |
+| P4 Ghép & đóng gói | 11–12/12 | luồng L2/L3, dashboard R5, publish | 28 test xanh; chạy trên máy sạch ≤3 phút theo README |
+| P5 Vấn đáp | 13/12 → 30/12 | ôn, Live OCP, video, báo cáo | buổi vấn đáp; nộp cuối 30/12 |
+
+Nếu lịch vấn đáp của nhóm muộn hơn 13/12, vẫn giữ code xong trước buổi vấn đáp ít nhất 3 ngày.
+
+### 6.4 Việc của TV1 — Chăm sóc & hỗ trợ khách hàng (+ phần nền chung)
+Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/PROGRESS.md`, không đánh dấu ở file này.
+
+**Tài liệu & sơ đồ (P1)**
+- M1: `CLAUDE.md`, `docs/PLAN.md` v2, `docs/PROGRESS.md` v2, file task P1, nhánh `v2` (22/11)
+- 4W+1H toàn hệ thống; yêu cầu phi chức năng; biểu mẫu BM1 Phiếu yêu cầu/khiếu nại, BM2 Phiếu theo dõi xử lý, BM3 Phiếu khảo sát (23/11)
+- Cây BFD 8 nhánh, lá F1–F4; sơ đồ Use Case tổng; đặc tả UC04, UC05 (24/11)
+- Q1–Q6 với tiền/hậu điều kiện và ngoại lệ; ma trận quyền; DFD ngữ cảnh, mức 0, mức 1 của F3 (25/11)
+- Khung `erd.puml` + 7 bảng TV1; giải thích 3NF (26/11)
+- Sơ đồ lớp phần chung + TV1; package diagram; khai báo `ICustomerDirectory`, `IStayLookup`, `ITicketObserver`; chốt hợp đồng với TV2 (27/11)
+- Sơ đồ tuần tự L2 (đóng ticket, có khung alt rollback); máy trạng thái ticket (28/11)
+- Bảng Form F1–F4; ma trận test TC1-xx; bảng tính tay R2 (28/11)
+- Slide phần chung + TV1 (29/11)
+
+**Nền chung (P2, 1–4/12)**
+- Đổi tên project thành `HotelCRM.GUI`, `HotelCRM.BLL`, `HotelCRM.DAL`; thêm `Database/`, `Resource/`; bỏ JSON
+- SQLite: kết nối, `UnitOfWork`, tạo CSDL từ `schema.sql` + nạp `seed.sql`; một repository mẫu để TV2 làm theo
+- Cây ngoại lệ, `ErrorHandler` tiếng Việt, `appsettings.json` + file mẫu, bỏ Singleton, `IClock`
+- `Employee` + `Administrator`, `Manager`, `Agent`; đăng nhập (frm000); màn hình chính theo vai trò (frm001)
+- `schema.sql` 7 bảng TV1; seed tài khoản 4 vai trò; sửa `.claude/rules/*` theo v2
+
+**Phân hệ CSKH (P3, 5–10/12)**
+- Domain: `SupportTicket` + 3 loại ticket, 4 state (bảng đăng ký thay `switch`), `TicketLog`, `SatisfactionSurvey`, `SurveyAnswer`, `SurveyCriterion`
+- Repository + truy vấn báo cáo cho 7 bảng TV1
+- `TicketService` (tạo, phân công, xử lý, nhật ký, phát sự kiện), 3 factory, `SurveyService`
+- Cài cho TV2 dùng: `TicketQuery`, `SurveyScheduler`, `CustomerCareStats` (8/12)
+- Form frm101–frm106 (Master-Detail: frm101, frm104, frm105); `ErrorProvider`; tiền/ngày đúng định dạng
+- R1, R2 (có biểu đồ), xuất Excel
+- Seed 7 bảng: đủ 3 loại ticket, đủ trạng thái, có ticket quá hạn SLA, nhật ký, phiếu khảo sát chờ/đã làm
+
+**Test (P2–P4)**
+- `FakeCustomerDirectory`, `FakeStayLookup`
+- 10 unit test (mục 5.8)
+- 4 integration: R2 khớp tính tay; RBAC; L2 luồng đầy đủ; L2 rollback
+
+**Đóng gói (P4, 11–12/12)**
+- Publish single-file, chạy thử trên máy sạch
+- README: cài đặt, tài khoản demo, lệnh chạy test
+
+**Vấn đáp (P5)**
+- Live OCP khi tắt AI: thêm `LostItemTicket` + factory, đăng ký 1 dòng (tập ≥2 lần)
+- Đặt breakpoint theo sơ đồ L2 (của mình) và L3 (của TV2), đọc Call Stack
+- Trả lời câu hỏi chéo phần TV2: Strategy phân khúc, sổ điểm, vì sao hạng không hạ, rollback L3
+- Nêu ≥2 nhược điểm của State và Factory Method
+- Demo phần mình trong video; chương báo cáo phân hệ TV1 + chương kiến trúc
+
+**Định mức riêng của TV1 (checklist đòi / kế hoạch):** nhánh BFD ≥3 / 4 · UC ≥4 / 6 · Form ≥4 / 6 · Master-Detail ≥2 / 3 · báo cáo ≥2 / 2 · quy tắc ≥4 / 5 · mẫu GoF ≥1 / 2 · unit test ≥9 / 10 · sơ đồ hành vi ≥2 / 2 · test dùng Fake của bạn ≥2 / 2.
+
+### 6.5 Việc của TV2 — Quan hệ khách hàng & khách hàng thân thiết (+ phần dùng chung được giao)
+Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/PROGRESS.md`, không đánh dấu ở file này.
+
+**Tài liệu & sơ đồ (P1)**
+- Đọc plan, xác nhận phân công; cùng merge PR #1 (22/11)
+- Hiện trạng phần khách hàng, lưu trú, điểm, chiến dịch; biểu mẫu BM4 Phiếu đăng ký thành viên, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chiến dịch; yêu cầu chức năng F5–F8 (23/11)
+- Lá BFD F5–F8; đặc tả UC08, UC09, UC10 (24/11)
+- Q7–Q13 với tiền/hậu điều kiện và ngoại lệ; DFD mức 1 của F7 (25/11)
+- Phần ERD 10 bảng TV2; giải thích thuộc tính lịch sử (giá/đêm chốt, điểm quy đổi chốt) (26/11)
+- Sơ đồ lớp TV2; khai báo `ITicketQuery`, `ISurveyScheduler`, `ICustomerCareStats`; chốt hợp đồng với TV1 (27/11)
+- Sơ đồ tuần tự L3 (trả phòng, có khung alt rollback); máy trạng thái booking (28/11)
+- Bảng Form F5–F8; ma trận test TC2-xx; bảng tính tay R5 (28/11)
+- Slide phần TV2; biên dịch PDF cả bộ (29/11)
+
+**Domain (P2, 1–4/12, chưa cần CSDL)**
+- Sửa `Customer` (CCCD, ngày sinh, đồng ý nhận ưu đãi), `MembershipTier` (hệ số tích điểm), `Booking` (giá/đêm chốt)
+- Thêm `PointTransaction`, `Reward`, `RewardRedemption`, `Campaign`, `CampaignTarget`, `Receptionist`
+- `ISegmentStrategy` + `VipSegment`, `LapsedGuestSegment`, `BirthdayMonthSegment`
+- `schema.sql` 10 bảng TV2
+
+**Phân hệ quan hệ khách hàng (P3, 5–10/12)**
+- Repository + truy vấn báo cáo cho 10 bảng TV2 (theo repository mẫu của TV1)
+- `CustomerService`, `StayService`, `LoyaltyService`, `CampaignService`, có kiểm quyền trong từng service
+- Cài cho TV1 dùng: `CustomerDirectory`, `StayLookup` (8/12); `GoodwillPointsObserver`, `InteractionLogger` (9/12)
+- Phần dùng chung: `ExcelReportExporter`, hàm định dạng tiền/ngày + căn phải + `ErrorProvider`, hàm vẽ biểu đồ (7/12, để TV1 dùng)
+- Form frm201–frm207 (Master-Detail: frm201, frm202, frm205, frm206)
+- R3 (có biểu đồ), R4, xuất Excel
+- Seed 10 bảng: khách đủ 4 hạng, booking đủ trạng thái, giao dịch điểm, lượt đổi (có lượt hủy), chiến dịch đã kết thúc
+
+**Test (P2–P4)**
+- `FakeTicketQuery`, `FakeSurveyScheduler`, `FakeCustomerCareStats`
+- 10 unit test (mục 5.8)
+- 4 integration: R5 khớp tính tay; RBAC; L3 luồng đầy đủ; L3 rollback
+
+**Ghép (P4, 11–12/12)**
+- Dashboard R5 (frm207)
+- README: dữ liệu mẫu, báo cáo
+
+**Vấn đáp (P5)**
+- Live OCP khi tắt AI: thêm `FrequentGuestSegment`, đăng ký 1 dòng (tập ≥2 lần)
+- Đặt breakpoint theo sơ đồ L3 (của mình) và L2 (của TV1), đọc Call Stack
+- Trả lời câu hỏi chéo phần TV1: State, Factory Method, cách tính hạn SLA, rollback L2
+- Nêu ≥2 nhược điểm của Strategy và Observer
+- Demo phần mình trong video; chương báo cáo phân hệ TV2
+
+**Định mức riêng của TV2 (checklist đòi / kế hoạch):** nhánh BFD ≥3 / 4 · UC ≥4 / 5 · Form ≥4 / 7 · Master-Detail ≥2 / 4 · báo cáo ≥2 / 3 · quy tắc ≥4 / 7 · mẫu GoF ≥1 / Strategy + observer cầu nối · unit test ≥9 / 10 · sơ đồ hành vi ≥2 / 2 · test dùng Fake của bạn ≥2 / 2.
+
+### 6.6 Việc cả hai cùng làm
+- Merge PR #1 vào `develop` (22/11)
+- Chốt chữ ký interface ở mục 4.5 (27/11)
+- Điền tự đánh giá L2 (29/11)
+- Review PR của nhau trong 24 giờ; mỗi người ≥2 PR được merge trên GitHub
+- Cập nhật `docs/PROGRESS.md` trong PR của mình sau mỗi module
+- Chủ nhật 29/11, 6/12, 13/12: đo tỷ lệ `git blame`, rà tiến độ
+- Rà bảng 5.10, đồng bộ giao diện hai phân hệ (12/12)
+- Quay video 3–5 phút; tập vấn đáp chéo (P5)
+- Ghép báo cáo cuối, nộp (30/12)
+
+### 6.7 Phụ thuộc giữa hai người
+| Cần gì | Ai làm | Cho ai | Hạn | Nếu chưa có |
+|---|---|---|---|---|
+| Chữ ký interface (mục 4.5) | cả hai | cả hai | 27/11 | — |
+| `UnitOfWork` + repository mẫu + `schema.sql` chạy được | TV1 | TV2 | 4/12 | TV2 làm Domain + unit test trước |
+| Tài khoản 4 vai trò trong seed | TV1 | cả hai | 4/12 | — |
+| `IReportExporter` + hàm định dạng/biểu đồ dùng chung | TV2 | TV1 (frm106) | 7/12 | TV1 làm lưới trước, gắn xuất file sau |
+| `CustomerDirectory`, `StayLookup` thật | TV2 | TV1 | 8/12 | TV1 dùng Fake |
+| `TicketQuery`, `SurveyScheduler`, `CustomerCareStats` thật | TV1 | TV2 | 8/12 | TV2 dùng Fake |
+| 2 observer thật | TV2 | TV1 (integration L2) | 9/12 | — |
+
+## 7. Cách làm việc chung
+- **Git:** nhánh tích hợp `v2`; nhánh việc `tv1/<việc>`, `tv2/<việc>`; mở PR vào `v2`, người kia đọc, chạy thử, comment rồi mới merge (trong 24 giờ). Mỗi module một commit, message tiếng Anh, không `Co-Authored-By`. Không force-push `v2`. Cuối cùng merge `v2` → `main`.
+- **Tài liệu:** tiếng Việt; mỗi mục đánh dấu [TV1]/[TV2]; mã F, UC, BM, Q, R, TC dùng thống nhất. Sơ đồ chung (ERD, lớp) tách thành `-tv1.iuml`, `-tv2.iuml` rồi `!include` vào một file `.puml` để ra một sơ đồ tổng mà mỗi người sửa phần mình. Xuất ảnh: `java -jar tools/plantuml.jar -tpng docs/analysis/diagrams/*.puml`.
+- **Code:** tên lớp/hàm/comment tiếng Anh; chữ trên Form, thông báo, dữ liệu mẫu tiếng Việt; tiền `#,##0` căn phải; ngày `dd/MM/yyyy`; tên Form theo mục 5.1; mọi handler bọc `ErrorHandler.Run`; kiểm tra ở Form (`ErrorProvider`) và ở Domain/Service.
+- **Xong một module khi:** build 0 lỗi 0 warning; test xanh; `docs/PROGRESS.md` cập nhật; PR đã review và merge; Form đã bấm thử.
+- **Mỗi Chủ nhật (29/11, 6/12, 13/12):** đo tỷ lệ `git blame`, rà tiến độ, chỉnh phân công nếu lệch quá 60/40.
+- **Dùng AI:** được dùng để hỏi, nháp, review; code ai commit thì người đó phải giải thích được và tự viết lại được khi tắt AI. README và báo cáo ghi rõ việc dùng Claude.
+
+## 8. Kiểm tra
+- **P1:** mọi `.puml` xuất ảnh không lỗi; bảng 5.10 đạt hết; mỗi nút lá BFD có Form, Service, UC tương ứng; TV2 review PR tài liệu; slide biên dịch được.
+- **P2–P4 (mỗi module):** `dotnet build HotelCRM.sln` 0 lỗi 0 warning; `dotnet test` xanh 100%; unit test chạy không cần CSDL; integration test chạy trên CSDL tạm; người làm tự bấm thử các Form của mình.
+- **P4:** publish single-file, chép sang thư mục khác không có `src/`, xóa `hotel.db`, chạy theo README trong ≤3 phút; đăng nhập đủ 4 vai trò, làm 1 giao dịch Master-Detail, mở báo cáo, xuất Excel mở được tiếng Việt; tiêm lỗi (đổi `>=`, bỏ rollback, bỏ kiểm quyền) thì có test chuyển đỏ.
+
+## 9. Rủi ro
+| Rủi ro | Cách xử lý |
 |---|---|
-| `CLAUDE.md` | Thứ tự đọc; lệnh build/test/run/publish; chiều tham chiếu project và 5 interface ranh giới; ngôn ngữ; phân công theo file; luật làm việc; điều kiện xong. Không chép nội dung plan |
-| `rules/domain.md` | `private set`; validate trong constructor/method; `Restore` mức `internal`; không gọi `DateTime.Now`, không đọc cấu hình, không gắn attribute JSON; hai phân hệ không dùng lớp của nhau; loại ngoại lệ |
-| `rules/business.md` | Service chỉ nhận interface qua constructor; "service tra cứu, Domain quyết định"; nhận `actor` và kiểm tra quyền; không gọi service của phân hệ kia |
-| `rules/data.md` | Quy ước Record/Mapper; tên file JSON và thứ tự nạp; cấp Id; `AppConfig` chỉ được gọi trong `Program.cs`; `Data/` là phần chung, viết xong ở GĐ 1 |
-| `rules/winforms.md` | Form chỉ gọi service và truyền `actor`; handler bọc trong `ErrorHandler.Run`; `InitializeComponent()` chỉ gán thuộc tính; chép cấu trúc `LoginForm`; không sửa `Program.cs` và `MainForm` sau GĐ 1 |
-| `rules/tests.md` | Tên `Method_Condition_Expected`; dùng `InMemoryRepository`; `now` cố định; không sửa test có sẵn; thư mục và lớp giả của từng suất |
-| `docs/PROGRESS.md` | Giai đoạn đã xong; việc đang dở; cách commit của suất B; quyết định lệch khỏi plan; câu hỏi chờ bạn. Mỗi phiên đọc đầu tiên và cập nhật trước khi kết thúc |
-| `docs/tasks/stage-N-*.md` | Tự đủ cho một phiên: mục tiêu; danh sách module đánh số; file được tạo/sửa; file cấm đụng; quy tắc nghiệp vụ kèm con số; test phải xanh; các mục PLAN cần đọc; cách kiểm tra bằng tay; điều kiện xong |
+| CRM không có trạng thái "công nợ" mà checklist nêu làm ví dụ | seed phủ đủ trạng thái tương đương (mục 5.9); chuẩn bị câu trả lời |
+| Admin làm được mọi thứ | giải thích là quyết định có chủ đích, có nhật ký; test RBAC dựa vào 3 vai trò còn lại |
+| Tên Form và cây solution chưa đối chiếu HuongdanXDHTTTQL (file có từ 25/11; tiêu chí 2.4 "Cây Solution chuẩn Thầy Thăng") | rà tên Form ở M8, cây solution ở P2; chốt trước P3 |
+| TeX chỉ có ở máy TV2 | TV2 biên dịch slide |
+| Tỷ lệ code lệch (TV1 có sẵn ~5.800 dòng) | phần mới nghiêng về TV2; đo mỗi Chủ nhật |
+| P1 trễ: M1 xong 25/11 (hạn 22/11); M2–M4 đã quá hạn khi bắt đầu | nộp slide 30/11 không đổi; dời lịch M2–M9 hay giữ thì chờ người quyết (`docs/PROGRESS.md`) |
+| TV2 đã code Domain P2 (PR #2 `tv2/domain`) trước khi xong M5–M6 | sơ đồ lớp/ERD ở M5–M6 đối chiếu với code PR #2; chỗ lệch xử lý trong PR, theo thiết kế được cả hai duyệt |
+| Lịch code chỉ 12 ngày | nếu trễ, cắt theo thứ tự mà vẫn giữ định mức: bớt tiện ích phụ trên Form → bỏ Master-Detail của frm202 → bỏ biểu đồ R3 (còn R2) → gộp frm204 vào frm205. Không cắt: CSDL, rollback, kiểm quyền ở Service, 5 báo cáo, 28 test |
 
-**Luật làm việc cho mọi phiên** (ghi trong `CLAUDE.md`):
-- Không tự commit; commit khi bạn đồng ý. Commit message không kèm dòng `Co-Authored-By`.
-- Code suất B làm trên `local/b-work` và xuất patch (mục Git), trừ khi `docs/PROGRESS.md` ghi thành viên B tự code.
-- Không đổi tên lớp, chữ ký public, cấu trúc thư mục của khung, và không sửa test có sẵn. Cần đổi thì dừng, ghi lý do vào `PROGRESS.md` và hỏi bạn.
-- Dừng sau mỗi module. Một module là một dòng trong danh sách đánh số của file task. Khi dừng: tóm tắt thiết kế và điểm cần nhớ khi vấn đáp.
-- Điều kiện xong: `dotnet build` không warning, test của giai đoạn xanh, `PROGRESS.md` đã cập nhật.
-
-Câu mở đầu mỗi phiên: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-N-….md` rồi làm theo."
-
-## Đóng gói
-`dotnet publish src/HotelCRM.WinForms -c Release -r win-x64 --self-contained -p:PublishSingleFile=true` → một file `.exe` kèm `appsettings.json` và thư mục `Data/`.
-
-## Kiểm tra (Verification)
-- `dotnet build` không lỗi, không warning; `dotnet test` đủ 22 test pass.
-- Sau mỗi giai đoạn có giao diện (1–4), bạn tự mở app, bấm thử các Form của giai đoạn đó và mở từng Form bằng Designer của Visual Studio; model không tự kiểm tra được hai việc này.
-- Kịch bản đầu-cuối: Manager đăng nhập → tạo ticket bảo trì cho khách VIP đang ở → tự phân công → Agent đăng nhập → Start → Resolve → khảo sát → Manager Close → xem lịch sử tương tác và điểm thưởng tự cập nhật → xem báo cáo.
-- Thử vi phạm từng quy tắc 1–11 trên giao diện, mỗi lần phải hiện đúng thông báo, không crash. Riêng quy tắc 4 và 8 là phép tính: kiểm tra hạn xử lý và điểm/hạng hiển thị đúng.
-- Copy thư mục publish sang ổ/máy khác, chạy được với dữ liệu mẫu.
-- Đổi `DefaultAssignmentStrategy` trong `appsettings.json`, hành vi phân công đổi mà không build lại.
-- `git shortlog -sn`: mỗi tác giả ít nhất 12 commit, tỷ lệ không lệch quá 60/40.
-- Đối chiếu tên lớp/hàm trong UML và báo cáo với code.
-
-## Phần cố ý chưa chi tiết trong plan
-Sẽ được chốt ở giai đoạn ghi bên cạnh, không cần hỏi lại trước khi bắt đầu:
-- Thuộc tính và chữ ký hàm của từng lớp: chốt bằng code khung + chú thích XML ở GĐ 1, rồi chép vào UML và báo cáo.
-- Bố cục từng Form: theo form mẫu của GĐ 1; chi tiết ghi trong file task của GĐ 2–4.
-- Dàn ý báo cáo: theo mẫu LaTeX, ghi trong `docs/tasks/stage-6-report.md`.
-- Slide thuyết trình: chưa nằm trong phạm vi; nếu cần thì thêm vào GĐ 6.
-
-## Việc còn chờ người
-- Bạn: báo cho thành viên B hai thay đổi so với bản tóm tắt đã gửi — Strategy chuyển sang suất B (Repository + Singleton thành phần chung), và hạn chọn cách commit là 17/11.
-- Thành viên B: tên tài khoản GitHub và cách commit (nhận patch hay tự code) — trước 17/11.
-- Mẫu báo cáo LaTeX — trước 26/11.
-- Bạn: kiểm tra máy có Java (xuất ảnh PlantUML cục bộ) và bản TeX (biên dịch báo cáo); thiếu thì dùng Overleaf — trước 26/11.
-
-## Bước tiếp theo
-Xem `docs/PROGRESS.md`. Giai đoạn kế tiếp là GĐ 1: mở phiên mới bằng model mạnh, làm theo `docs/tasks/stage-1-skeleton.md`, dừng ở điểm duyệt của GĐ 1.
-
+## 10. Việc chờ người
+Danh sách việc chờ người (ai, hạn, trạng thái) theo dõi ở mục "Việc chờ người" của `docs/PROGRESS.md`.

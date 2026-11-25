@@ -13,11 +13,8 @@ TestResults/
 # Runtime output
 logs/
 
-# Patches handed to the other team member (never committed)
-handoff/
-
-# One-off brief already sent to the other team member
-docs/TEAM-BRIEF.md
+# Lecturer's checklist and guide: each member keeps a local copy, not published
+docs/slide_checklist/
 
 # Claude Code personal files
 .claude/settings.local.json
