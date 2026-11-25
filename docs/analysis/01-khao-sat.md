@@ -80,7 +80,7 @@ Lập khi khách đến lần đầu; sửa khi khách đổi thông tin. Form: 
 | Họ và tên | Nhập | `customers.FullName` | `txtFullName` | bắt buộc |
 | Số điện thoại | Nhập | `customers.Phone` | `txtPhone` | Q7: 10 số, bắt đầu bằng 0, không trùng |
 | Email | Nhập | `customers.Email` | `txtEmail` | Q7: đúng định dạng, không trùng |
-| Số CCCD / hộ chiếu | Nhập | `customers.IdentityNumber` | `txtIdentityNumber` | Q7: không trùng; xem câu hỏi mở 1 ở mục 7 |
+| Số CCCD / hộ chiếu | Nhập | `customers.IdentityNumber` | `txtIdentityNumber` | Q7: quốc tịch Việt Nam → CCCD 12 chữ số; quốc tịch khác → hộ chiếu 6–9 ký tự chữ và số; không trùng |
 | Quốc tịch | Nhập | `customers.Nationality` | `cboNationality` | lọc được trên lưới |
 | Ngày sinh | Nhập | `customers.DateOfBirth` | `dtpDateOfBirth` | không bắt buộc; dùng cho phân khúc sinh nhật |
 | Đồng ý nhận ưu đãi | Nhập | `customers.MarketingConsent` | `chkMarketingConsent` | Q11: không đồng ý thì không vào chiến dịch |
@@ -178,7 +178,7 @@ Quản lý lập phần đầu; CSKH điền phản hồi từng dòng. Form: `f
 
 Ví dụ tính tay (Q9): khách Silver ở 2 đêm, giá chốt 1.250.000đ/đêm → thành tiền 2.500.000đ → 2.500.000 / 10.000 × 1,2 = 300 điểm.
 
-## 8. Câu hỏi còn mở [TV2]
-1. **CCCD với khách nước ngoài.** Q7 ghi "CCCD 12 số", nhưng khách nước ngoài dùng hộ chiếu (thường 6–9 ký tự chữ và số). Đề xuất: Việt Nam → CCCD 12 số; quốc tịch khác → hộ chiếu 6–9 ký tự. Cần chốt trước M4 (`04-quy-tac.md`).
+## 8. Quyết định và câu hỏi còn mở [TV2]
+1. **CCCD với khách nước ngoài — đã chốt 25/11 (TV1 đồng ý).** Quốc tịch Việt Nam → CCCD đúng 12 chữ số; quốc tịch khác → hộ chiếu 6–9 ký tự chữ và số. Ghi vào Q7 (`04-quy-tac.md`).
 2. **Ảnh biểu mẫu thật BM4–BM7** chưa có (mục 4).
 3. **Số liệu hệ số tích điểm** (mục 7) do TV2 đề xuất, plan chưa nêu; TV1 xem lại khi review.

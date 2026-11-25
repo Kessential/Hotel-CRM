@@ -49,7 +49,7 @@ Admin làm được mọi Use Case (tổng quát hóa trong sơ đồ tổng), n
 1. Lễ tân chọn booking "Đang ở", bấm Trả phòng.
 2. Hệ thống mở một giao dịch và lần lượt:
    1. chuyển booking sang "Đã trả phòng", ghi giờ trả phòng thực tế;
-   2. tính điểm = thành tiền / 10.000đ × hệ số tích điểm của hạng **hiện tại** của khách, làm tròn xuống (Q9; `MembershipTier.PointsFor`);
+   2. tính điểm = thành tiền / 10.000đ × hệ số tích điểm của hạng khách đang có **trước khi** trả phòng, làm tròn xuống (Q9; `MembershipTier.PointsFor`); hạng mới (nếu lên hạng ở bước 4) áp dụng từ lần ở sau;
    3. ghi một dòng sổ điểm lý do Lưu trú gắn với booking (`PointTransaction.ForStay`);
    4. xét lại hạng theo tổng điểm đã tích; có thể lên nhiều bậc, không bao giờ hạ (Q9);
    5. ghi một tương tác "Trả phòng, cộng N điểm";
@@ -131,16 +131,16 @@ Số dư điểm = tổng mọi dòng sổ điểm của khách. Điểm đã t�
 3. Hệ thống cập nhật ngay số phản hồi và tỷ lệ phản hồi ở cuối danh sách.
 
 **Luồng thay thế**
-- A3a. Danh sách rỗng: hệ thống báo không có khách phù hợp và không cho lưu; quản lý đổi phân khúc hoặc ngày. (Chốt ở M4: thêm quy tắc "chiến dịch phải có ít nhất một khách" vào Q11.)
+- A3a. Danh sách rỗng: hệ thống báo không có khách phù hợp và không cho lưu (Q11: chiến dịch phải có ít nhất một khách); quản lý đổi phân khúc hoặc ngày.
 - A3b. Quản lý đổi phân khúc rồi Xem trước lại: danh sách được tính lại từ đầu.
 
 **Luồng ngoại lệ**
 - E1. Lễ tân hoặc CSKH tạo chiến dịch: bị từ chối ở tầng Service (Q6).
 - E2. Ghi phản hồi sau ngày kết thúc, hoặc cho khách không có trong danh sách: báo lỗi, không ghi.
-- E3. Giữa lúc xem trước và lúc lưu, khách mở khiếu nại mới: bước A4 kiểm tra lại và báo khách đó bị loại; các khách còn lại vẫn được lưu hay hủy cả chiến dịch sẽ chốt ở M4.
+- E3. Giữa lúc xem trước và lúc lưu, có khách vừa mở khiếu nại hoặc vừa rút đồng ý nhận ưu đãi: bước A4 kiểm tra lại, loại khách đó, vẫn lưu các khách còn lại và báo rõ khách nào bị loại, vì sao. Nếu loại xong danh sách rỗng thì áp dụng A3a.
 - E4. Ngày kết thúc trước ngày bắt đầu, thiếu tên/ưu đãi/phân khúc: báo lỗi dữ liệu.
 
-## 6. Câu hỏi còn mở [TV2]
+## 6. Quyết định và câu hỏi còn mở [TV2]
 1. `ITicketQuery` cần một hàm theo lô cho L4, ví dụ trả tập Id khách đang có khiếu nại chưa đóng, để không hỏi từng khách (N+1). Chốt chữ ký ở M6 với TV1.
-2. UC10 A3a và E3: thêm quy tắc "chiến dịch có ít nhất một khách" và cách xử lý khách bị loại lúc lưu. Chốt ở M4.
-3. UC08 C2.2: điểm tính theo hạng **trước** khi trả phòng (hạng mới chỉ áp dụng từ lần ở sau). Cần TV1 đồng ý để bảng tính tay R5 và test khớp nhau.
+2. **Đã chốt 25/11 (TV1 đồng ý):** chiến dịch phải có ít nhất một khách (UC10 A3a); khách trở nên không đủ điều kiện giữa lúc xem trước và lúc lưu thì bị loại, các khách còn lại vẫn được lưu (UC10 E3).
+3. **Đã chốt 25/11 (TV1 đồng ý):** điểm khi trả phòng tính theo hạng trước khi trả phòng; hạng mới áp dụng từ lần ở sau (UC08 C2.2). Bảng tính tay R5 và test dùng cách này.
