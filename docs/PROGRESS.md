@@ -1,149 +1,177 @@
-# Tiến độ dự án Hotel CRM
+# PROGRESS — Hotel CRM v2
 
-Mỗi phiên đọc file này đầu tiên và cập nhật trước khi kết thúc. Ghi ngắn, đúng sự thật: việc chưa kiểm tra thì ghi là chưa kiểm tra. File này chỉ ghi trạng thái; thiết kế và lộ trình nằm ở `docs/PLAN.md`, cách làm từng giai đoạn nằm ở `docs/tasks/`.
+Kế hoạch: `docs/PLAN.md` (v2). Việc chi tiết giai đoạn đang làm: `docs/tasks/v2-p1-analysis.md`. Tiến độ v1 (15–21/11) chỉ còn trong lịch sử git: `git show fd7b7e4:docs/PROGRESS.md`.
 
-## Trạng thái các giai đoạn
+Cách cập nhật: mỗi người sửa dòng/ô của mình trong PR của mình, sau mỗi module (đánh dấu `[x]`, đổi cột trạng thái, thêm một dòng nhật ký). Không sửa dòng của người kia.
 
-| GĐ | Hạn | Trạng thái | File task |
+Cập nhật lần cuối: 25/11/2026 (M1, TV1).
+
+## 1. Trạng thái giai đoạn
+| Giai đoạn | Thời gian (plan) | Trạng thái | Mốc kiểm cuối giai đoạn |
 |---|---|---|---|
-| 0 Chuẩn bị | 16/11 | Xong, đã commit và push trên `develop` | — |
-| 1 Khung | 17/11 | Xong. Đã push `develop` ngày 16/11; chủ repo xác nhận GĐ 1 đạt ngày 16/11 | `docs/tasks/stage-1-skeleton.md` |
-| 2 Suất A | 20/11 | Code xong cả 7 module (16/11), 11/11 test xanh. `/code-review high` chạy 17/11, sửa 4 lỗi. Đã merge `feature/a-ticket` vào `develop` ngày 17/11. Chủ repo xác nhận 3 bước kiểm tra bằng tay đạt ngày 17/11. **Xong**, đã push `develop` ngày 17/11 | `docs/tasks/stage-2-ticket.md` |
-| 3 Suất B | 23/11 | Code xong 7 module + 1 lần sửa sau tự rà soát (17/11, trên `local/b-work`, patch 02–09 trong `handoff/`), 9 test suất B xanh. Từ 18/11 thành viên B nhận chốt GĐ 3 (áp patch 02–09 rồi tự kiểm tra bằng tay, mở 3 Form bằng Designer, chạy `/code-review`, sửa lỗi trên `feature/b-customer`). B push 18/11 (`9819537`); chủ repo merge vào `develop` 19/11 (`da676e6`) và sửa `Booking.CheckIn` (bảng lệch plan dòng 22). B bấm lại phần xóa khách có booking: đạt 19/11. Chờ: chủ repo bấm thử bản sửa, commit, push `develop` | `docs/tasks/stage-3-customer.md` |
-| 3b Chuyển SQLite | 22/11 | Kế hoạch chốt 18/11, chưa có code. Làm sau khi chốt GĐ 3, xong trước GĐ 4 | `docs/tasks/stage-3b-sqlite.md` |
-| 4 Ghép nối | 25/11 | Chưa bắt đầu | `docs/tasks/stage-4-integration.md` |
-| 5 Tài liệu kỹ thuật | 27/11 | Chưa bắt đầu | viết ở cuối GĐ 4 |
-| 6 Báo cáo & nộp | 29/11 | Chưa bắt đầu | viết ở cuối GĐ 5 |
+| P1 Phân tích thiết kế | 22–29/11, nộp slide 30/11 | **Đang làm**, trễ 3 ngày (M1 xong 25/11) | mọi `.puml` xuất ảnh; bảng 5.10 đạt; slide biên dịch được |
+| P2 Hạ tầng | 1–4/12 | Chưa làm (TV2 đã bắt đầu Domain sớm, PR #2) | đăng nhập 4 vai trò trên SQLite; TV2 có 10 unit test xanh |
+| P3 Phân hệ | 5–10/12 | Chưa làm | đủ 13 Form, R1–R4, seed ≥150 dòng |
+| P4 Ghép & đóng gói | 11–12/12 | Chưa làm | 28 test xanh; chạy máy sạch ≤3 phút |
+| P5 Vấn đáp | 13/12 → 30/12 | Chưa làm | buổi vấn đáp; nộp cuối 30/12 |
 
-## Việc tiếp theo
-1. Chủ repo bấm thử trên app (`develop`), mở `BookingForm`: (a) đặt phòng từ hôm nay, check-in được; (b) đặt phòng từ ngày mai, check-in hiện cảnh báo "starts on …"; (c) check-out: điểm tăng đúng số đêm × giá; (d) xóa khách đã có booking: hiện cảnh báo (bản sửa của B; B đã bấm lại, đạt 19/11); (e) thoát, mở lại: dữ liệu còn nguyên. Đạt thì commit bản sửa, đánh dấu GĐ 3 xong, push `develop`.
-2. Báo thành viên B kéo `develop` mới về `feature/b-customer`. Trước Module B1, merge `develop` vào `local/b-work`: đã thử trong bộ nhớ (19/11, trước bản sửa `CheckIn`), xung đột ở `Customer.cs` và `BookingService.cs`; lấy bản của `develop`.
-3. Publish thử bản JSON hiện tại trên `develop` (lệnh trong `CLAUDE.md`), chép sang thư mục khác và chạy, để có mốc so sánh cho Mốc 1 của GĐ 3b.
-4. **Tạm dừng từ 19/11, chưa mở phiên A1:** checklist mới (`Checklist_BTL_HTTTQL_v2026.xlsx`) mâu thuẫn với các quyết định 7, 9, 12 của `stage-3b-sqlite.md` (không khóa ngoại, mỗi `Save` một transaction, quay về JSON) và đòi ≥ 11 bảng. Chờ chủ repo quyết định sửa kế hoạch GĐ 3b rồi mới làm. Câu lệnh cũ: mở phiên Sonnet 5.5 cho GĐ 3b: "Đọc `CLAUDE.md`, `docs/PROGRESS.md` và `docs/tasks/stage-3b-sqlite.md` rồi làm Module A1." Thư mục chính, nhánh `feature/sql-storage` tạo từ `develop`.
+## 2. Trạng thái module P1
+| Module | Hạn | TV1 | TV2 | Trạng thái (25/11) |
+|---|---|---|---|---|
+| M1 Chuẩn bị | 22/11 | **Xong 25/11** (trễ 3 ngày): `CLAUDE.md`, `docs/PLAN.md` v2, file này, `docs/tasks/v2-p1-analysis.md`, xóa tài liệu v1 khỏi cây thư mục, dọn đồ v1 | PR #1 đã merge (25/11); xác nhận phân công khi approve PR #4 (25/11) | **Xong 25/11**: PR #4 (`tv1/m1-setup` → `v2`) đã được TV2 approve và merge |
+| M2 Khảo sát | 23/11 | Chưa làm | Chưa làm | **Quá hạn 2 ngày** |
+| M3 BFD + UC | 24/11 | Chưa làm | Chưa làm | **Quá hạn 1 ngày** |
+| M4 Quy tắc, quyền, DFD | 25/11 | Chưa làm | Chưa làm | **Đến hạn hôm nay, chưa làm** |
+| M5 ERD + CSDL | 26/11 | Chưa làm | Chưa làm | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M6 Lớp + package + hợp đồng | 27/11 | Chưa làm | Chưa làm (đã có code Domain trong PR #2) | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M7 Hành vi | 28/11 | Chưa làm | Chưa làm | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M8 Giao diện + test | 28/11 | Chưa làm | Chưa làm | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M9 Slide + tự đánh giá L2 | 29/11 | Chưa làm | Chưa làm | Chưa tới hạn; slide nộp **30/11 (không dời)** |
 
-## Cách commit của suất B
-**GĐ 3: Tự code** (từ 18/11). Code GĐ 3 do chủ repo viết trên `local/b-work` (patch 02–09); B áp các patch này lên `feature/b-customer`, rồi tự làm phần chốt còn lại và tự sửa lỗi trên nhánh đó, không qua patch. Chủ repo không sửa GĐ 3 trên `local/b-work` nữa. Ngoại lệ: ngày 19/11 chủ repo sửa `Booking.CheckIn` thẳng trên `develop` sau khi merge nhánh của B (chủ repo chọn, không qua patch), nên commit này mang tên chủ repo dù nằm trong file của suất B.
+Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 
-**GĐ 3b: Nhận patch** (chủ repo chốt 18/11, chưa đổi): Module B1, B2 làm trên `local/b-work` và xuất patch. Vì lỗi sửa ở GĐ 3 nằm trên nhánh của B, trước B1 phải merge `develop` (đã có GĐ 3 của B) vào `local/b-work`.
+## 3. Việc của TV1 (sao từ PLAN mục 6.4)
+**Tài liệu & sơ đồ (P1)**
+- [x] M1: `CLAUDE.md`, `docs/PLAN.md` v2, `docs/PROGRESS.md` v2, file task P1, nhánh `v2` (22/11) — xong 25/11
+- [ ] 4W+1H toàn hệ thống; yêu cầu phi chức năng; biểu mẫu BM1 Phiếu yêu cầu/khiếu nại, BM2 Phiếu theo dõi xử lý, BM3 Phiếu khảo sát (23/11)
+- [ ] Cây BFD 8 nhánh, lá F1–F4; sơ đồ Use Case tổng; đặc tả UC04, UC05 (24/11)
+- [ ] Q1–Q6 với tiền/hậu điều kiện và ngoại lệ; ma trận quyền; DFD ngữ cảnh, mức 0, mức 1 của F3 (25/11)
+- [ ] Khung `erd.puml` + 7 bảng TV1; giải thích 3NF (26/11)
+- [ ] Sơ đồ lớp phần chung + TV1; package diagram; khai báo `ICustomerDirectory`, `IStayLookup`, `ITicketObserver`; chốt hợp đồng với TV2 (27/11)
+- [ ] Sơ đồ tuần tự L2 (đóng ticket, có khung alt rollback); máy trạng thái ticket (28/11)
+- [ ] Bảng Form F1–F4; ma trận test TC1-xx; bảng tính tay R2 (28/11)
+- [ ] Slide phần chung + TV1 (29/11)
 
-## Tiện ích băm mật khẩu
-`tools/HashPassword.cs` là file-based app của .NET 10, không nằm trong solution, gọi thẳng `PasswordHasher` của project `Business`. Chạy từ thư mục gốc repo:
+**Nền chung (P2, 1–4/12)**
+- [ ] Đổi tên project thành `HotelCRM.GUI`, `HotelCRM.BLL`, `HotelCRM.DAL`; thêm `Database/`, `Resource/`; bỏ JSON
+- [ ] SQLite: kết nối, `UnitOfWork`, tạo CSDL từ `schema.sql` + nạp `seed.sql`; một repository mẫu để TV2 làm theo
+- [ ] Cây ngoại lệ, `ErrorHandler` tiếng Việt, `appsettings.json` + file mẫu, bỏ Singleton, `IClock`
+- [ ] `Employee` + `Administrator`, `Manager`, `Agent`; đăng nhập (frm000); màn hình chính theo vai trò (frm001)
+- [ ] `schema.sql` 7 bảng TV1; seed tài khoản 4 vai trò; sửa `.claude/rules/*` theo v2
 
-```
-dotnet run tools/HashPassword.cs -- <mật khẩu 1> [<mật khẩu 2> ...]
-```
+**Phân hệ CSKH (P3, 5–10/12)**
+- [ ] Domain: `SupportTicket` + 3 loại ticket, 4 state (bảng đăng ký thay `switch`), `TicketLog`, `SatisfactionSurvey`, `SurveyAnswer`, `SurveyCriterion`
+- [ ] Repository + truy vấn báo cáo cho 7 bảng TV1
+- [ ] `TicketService` (tạo, phân công, xử lý, nhật ký, phát sự kiện), 3 factory, `SurveyService`
+- [ ] Cài cho TV2 dùng: `TicketQuery`, `SurveyScheduler`, `CustomerCareStats` (8/12)
+- [ ] Form frm101–frm106 (Master-Detail: frm101, frm104, frm105); `ErrorProvider`; tiền/ngày đúng định dạng
+- [ ] R1, R2 (có biểu đồ), xuất Excel
+- [ ] Seed 7 bảng: đủ 3 loại ticket, đủ trạng thái, có ticket quá hạn SLA, nhật ký, phiếu khảo sát chờ/đã làm
 
-Mỗi mật khẩu in ra một cặp `"PasswordHash"` và `"Salt"` để dán vào `src/HotelCRM.WinForms/Data/employees.json`. Mỗi lần chạy sinh salt mới nên chuỗi băm khác nhau dù cùng mật khẩu. GĐ 4 dùng lại lệnh này cho `employees.json` đầy đủ. Mật khẩu của tài khoản mẫu ghi trong mục "Sample accounts" của `README.md` (viết ở Module 4).
+**Test (P2–P4)**
+- [ ] `FakeCustomerDirectory`, `FakeStayLookup`
+- [ ] 10 unit test (PLAN mục 5.8)
+- [ ] 4 integration: R2 khớp tính tay; RBAC; L2 luồng đầy đủ; L2 rollback
 
-## Trạng thái Git
-- `main`: commit "first commit" (`README.md`), và commit `f533f3a` ("add file", thành viên B, 16/11) thêm `PLAN.md` và `TEAM-BRIEF.md` ở thư mục gốc. Phát hiện khi fetch ngày 17/11; `develop` không chứa commit này.
-- `develop`: đã tạo từ `main` ở GĐ 0, có thêm 1 commit chứa `CLAUDE.md`, `.gitignore`, `.claude/`, `docs/`. Đã push lên `origin/develop` ngày 16/11.
-- `develop`: toàn bộ 11 commit của GĐ 1 đã push lên `origin/develop` ngày 16/11, kèm commit `7a88011` (`LoginForm.resx`).
-- `local/b-work`: tạo ngày 16/11 từ `develop`, chỉ có trên máy chủ repo, không bao giờ push. Gồm 1 commit test của suất B và 1 merge commit đưa Module 6 của `develop` vào.
-- `feature/a-ticket`: tạo ngày 16/11 từ `develop` tại `1707f97` (commit ghi nhận GĐ 1 đạt; đã lên `origin/develop` ngày 17/11 cùng GĐ 2). Có 8 commit của GĐ 2 (7 module + 1 commit sửa lỗi sau review), chưa push. Đã merge vào `develop` ngày 17/11 bằng `--no-ff`.
-- `develop` sau merge GĐ 2 và nhánh của B: đã push lên `origin/develop` ngày 17/11 (`7a88011..870424b`), kèm commit cập nhật file này ngay sau đó.
-- `origin/feature/b-customer`: thành viên B push 1 commit `f3992b8` (17/11, "Add the eleven customer subsystem tests and FakeTicketQuery"), dựa trên `origin/develop`. So với commit patch 01 trên `local/b-work` (`9450105`), `src` và `tests` chỉ khác `LoginForm.resx`, `MainForm.resx` (đến từ `origin/develop`), tức 11 test khớp patch 01. Đã merge vào `develop` ngày 17/11 bằng `--no-ff`. Từ đây `dotnet test` trên `develop` chạy 22 test: 13 xanh, 9 đỏ (test suất B, `NotImplementedException`, xanh dần ở GĐ 3–4).
-- `docs/TEAM-BRIEF.md` đã gửi cho thành viên B và nằm trong `.gitignore`; không commit, không cập nhật.
-- `develop`: 19/11 merge `origin/feature/b-customer` (`9819537`, GĐ 3 của B) bằng `--no-ff`, merge commit `da676e6`, không xung đột. Chưa push.
-- `local/b-work`: thêm 8 commit GĐ 3 (`f349f5c` … `584ab86`), làm trong worktree `.claude/worktrees/b-work` (thư mục nằm trong `.gitignore`). Ngày 18/11 merge `develop` (`93c3b3a`, có GĐ 2 và kế hoạch GĐ 3b) vào, merge commit `d837bb1`, không xung đột. Không push.
+**Đóng gói (P4, 11–12/12)**
+- [ ] Publish single-file, chạy thử trên máy sạch
+- [ ] README: cài đặt, tài khoản demo, lệnh chạy test
 
-## Việc đang dở
-- Patch số 01 (`handoff/01-customer-tests.patch`) đã tới thành viên B: nội dung đã có trên `origin/feature/b-customer` (17/11). Patch 02–09 (GĐ 3) chưa gửi. Đã kiểm tra: áp lần lượt 01→09 lên `origin/develop` (`7a88011`) đều sạch; sau khi áp build 0 lỗi 0 warning, `dotnet test` 22 test: 9 xanh, 13 đỏ (11 `Tickets/` + 2 `SurveyServiceTests`, đều `NotImplementedException`). Ngày 18/11 áp lại 02→09 lên `origin/develop` mới (`93c3b3a`, đã có patch 01 và GĐ 2): cả 8 patch sạch, kết quả `src`/`tests` trùng với `local/b-work` (24 file, +1467/−62). GĐ 3 không còn patch 10 (B tự sửa); patch kế tiếp của GĐ 3b mang số 10.
-- Bản nháp skill xuất patch nằm ở `handoff/export-patch-SKILL.draft.md`; chưa chép thành `.claude/skills/export-patch/SKILL.md`. `handoff/stage3-notes.md` đã chép vào file này ngày 18/11, chưa xóa.
-- GĐ 3 chưa kiểm tra bằng tay (6 bước trong file task), chưa mở Form bằng Designer, chưa `/code-review`. Ba việc này giao cho thành viên B từ 18/11.
-- `CustomerListForm.btnHistory` mở `CustomerHistoryForm` trống. GĐ 4 thêm hàm public nhận Id khách cho Form đó (ví dụ `ShowCustomer(int customerId)`) thì phải sửa thêm một dòng trong `btnHistory_Click` để gọi hàm này trước `ShowDialog`.
-- GĐ 3b chưa bắt đầu. `CLAUDE.md` và `.claude/rules/data.md` vẫn cấm thêm gói NuGet và sửa phần chung; chỉ gỡ ở bước đầu của Module A1, theo mục "Phê duyệt đã có" của `docs/tasks/stage-3b-sqlite.md`.
-- GĐ 1: chủ repo báo "GĐ 1 ok" ngày 16/11 sau khi tự kiểm tra bằng tay; không báo chi tiết từng bước trong 6 bước. `MainForm.resx` và `LoginForm.resx` do Visual Studio tạo cho thấy hai Form này đã mở được bằng Designer.
-- GĐ 2: `/code-review high` đã chạy 17/11; 4 lỗi đã sửa, 6 điểm để lại chưa sửa:
-  - `AssignTo` kiểm tra agent `null` trước trạng thái, nên ticket Closed hoặc phân công cho Manager đều báo "No agent is available" (`SupportTicket.cs:183`; đúng thứ tự của file task, đổi thì cần duyệt).
-  - Ticket đã Reopen không bao giờ hiện trễ hạn vì `IsOverdue` dùng `ResolvedAt` cũ (`SupportTicket.cs:154`; hệ quả của quy tắc 2).
-  - `ResolvedState.Reopen` lấy `UpdatedAt` khi `ResolvedAt` là `null`, che dữ liệu hỏng (`ResolvedState.cs:37`).
-  - Thông báo Reopen in ngày theo culture của máy (`{deadline:g}`, `ResolvedState.cs:42`).
-  - `AutoAssign` đếm lại ticket cho từng Agent (`TicketService.cs:129`).
-  - Chuỗi `"yyyy-MM-dd HH:mm"` lặp ở `TicketListForm.cs` và `TicketEditForm.cs`.
-- Chưa thử `dotnet publish` single-file. Kế hoạch mới: publish thử bản JSON trước Module A1 của GĐ 3b (việc tiếp theo số 3), rồi thử lại với SQLite ở Mốc 1.
-- Lỗi check-in trước ngày đặt (từ `/code-review high` của B ngày 18/11) đã sửa ngày 19/11, chưa bấm thử: xem bảng lệch plan dòng 22. Trả phòng sớm vẫn được và vẫn cộng đủ điểm (cố ý: khách đã trả tiền cả kỳ ở). Khách ở quá ngày chưa check-out thì khách sau vẫn check-in được đúng ngày của mình, nên phòng có thể có hai booking CheckedIn trong ngày đó; chưa chặn.
+**Vấn đáp (P5)**
+- [ ] Live OCP khi tắt AI: thêm `LostItemTicket` + factory, đăng ký 1 dòng (tập ≥2 lần)
+- [ ] Đặt breakpoint theo sơ đồ L2 (của mình) và L3 (của TV2), đọc Call Stack
+- [ ] Trả lời câu hỏi chéo phần TV2: Strategy phân khúc, sổ điểm, vì sao hạng không hạ, rollback L3
+- [ ] Nêu ≥2 nhược điểm của State và Factory Method
+- [ ] Demo phần mình trong video; chương báo cáo phân hệ TV1 + chương kiến trúc
 
-## Quyết định lệch khỏi plan
-Chốt ở GĐ 1 Module 2 khi viết chữ ký. `docs/PLAN.md` và 5 file `.claude/rules/` đã được sửa cho khớp ở Module 6 (16/11).
+## 4. Việc của TV2 (sao từ PLAN mục 6.5)
+**Tài liệu & sơ đồ (P1)**
+- [ ] Đọc plan, xác nhận phân công; cùng merge PR #1 (22/11) — PR #1 đã merge 25/11; còn xác nhận phân công
+- [ ] Hiện trạng phần khách hàng, lưu trú, điểm, chiến dịch; biểu mẫu BM4 Phiếu đăng ký thành viên, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chiến dịch; yêu cầu chức năng F5–F8 (23/11)
+- [ ] Lá BFD F5–F8; đặc tả UC08, UC09, UC10 (24/11)
+- [ ] Q7–Q13 với tiền/hậu điều kiện và ngoại lệ; DFD mức 1 của F7 (25/11)
+- [ ] Phần ERD 10 bảng TV2; giải thích thuộc tính lịch sử (giá/đêm chốt, điểm quy đổi chốt) (26/11)
+- [ ] Sơ đồ lớp TV2; khai báo `ITicketQuery`, `ISurveyScheduler`, `ICustomerCareStats`; chốt hợp đồng với TV1 (27/11)
+- [ ] Sơ đồ tuần tự L3 (trả phòng, có khung alt rollback); máy trạng thái booking (28/11)
+- [ ] Bảng Form F5–F8; ma trận test TC2-xx; bảng tính tay R5 (28/11)
+- [ ] Slide phần TV2; biên dịch PDF cả bộ (29/11)
 
-| # | Plan ghi | Code thật | Lý do |
-|---|---|---|---|
-| 1 | `IAssignmentStrategy.Pick(ticket, agents)` | `Pick(string departmentCode, IReadOnlyList<AgentWorkload> candidates)` trả về `Agent?` | Test strategy của suất B phải xanh ở GĐ 3 khi chưa có code ticket của suất A; strategy cũng cần số ticket đang mở của từng Agent. `candidates` chỉ gồm Agent còn nhận được (`Agent.CanTake`) |
-| 2 | Interface 1–4 hàm | `IRepository<T>` có 5 hàm: `GetAll`, `GetById`, `NextId`, `Save`, `Delete` | Cần đủ cả cấp Id và xóa khách (UC6) |
-| 3 | `Domain/Interfaces` gồm 7 kiểu | Thêm `CustomerSummary` (record) và `RepositoryExtensions.GetRequired` | Form ticket phải chọn khách và hiện tên khách mà không dùng `Customer`; "không tìm thấy" do Domain ném, service không tự ném |
-| 4 | Observer ném `NotImplementedException` tới GĐ 4 | `InteractionLogger.OnStateChanged` và `LoyaltyObserver.OnStateChanged` để thân rỗng | Điểm duyệt chung UC1–UC7 ở đầu GĐ 4 chạy trước khi observer được cài; nếu ném lỗi thì UC4 không chạy được |
-| 5 | `Employee.CanAssign()/CanClose()/CanReopen()` | Thêm `EnsureCanAssign()/EnsureCanClose()/EnsureCanReopen()` (ném `BusinessRuleException`) và `Employee.EnsureLoginValid(account, passwordMatches)` | Giữ nguyên tắc "service tra cứu, Domain quyết định": service không tự ném lỗi quyền hay lỗi đăng nhập |
-| 6 | `Start()`, `Close()` không tham số thời gian | `Start(now)`, `Resolve(note, now)`, `Close(now)`, `Reopen(now, reopenDays)`; ticket có `UpdatedAt` | Observer cần thời điểm đổi trạng thái mà `OnStateChanged(ticket, from, to)` không mang theo |
-| 7 | `Booking.CheckIn`/`CheckOut` vừa là ngày vừa là hàm | Thuộc tính `CheckInDate`, `CheckOutDate`; hàm `CheckIn()`, `CheckOut()`, `Cancel()` | C# không cho thuộc tính và hàm trùng tên |
-| 8 | `Department (Id, Code, Name)`, `RoomType` | Thêm `Department.Agents` và `RoomType.Rooms` (Agent/Room tự đăng ký khi được tạo) | Để quan hệ kết tập `Department ◇— Agent`, `RoomType ◇— Room` có thật trong code |
-| 9 | (chưa nêu) | Kiểu phụ: `TicketSnapshot` (internal, dùng cho `Restore`), `AgentWorkload`, `AgentPerformanceRow`, `DepartmentReportRow` | Gói tham số của `Restore`; kiểu trả về của `ReportService` |
-| 10 | Reopen (quy tắc 2) không nhắc quy tắc 3 | `TicketService.Reopen` gọi `AssignedAgent.EnsureCanTake(...)` trước `ticket.Reopen` | Reopen đưa ticket về InProgress với Agent cũ nên có thể vượt `MaxActiveTickets`. Đặt ở service để không đổi chữ ký `SupportTicket.Reopen` (test dùng bản 2 tham số). Hệ quả: (a) ticket Resolved của Agent đã đủ tải không Reopen được và cũng không phân công lại được (`AssignTo` từ chối Resolved), phải đợi Agent bớt tải; (b) ticket Closed hoặc quá hạn mở lại mà Agent đủ tải sẽ nhận thông báo giới hạn tải thay vì thông báo trạng thái. Sửa (b) cho gọn cần đổi chữ ký và sửa test, chưa làm |
-| 11 | (chưa nêu) | Start/Resolve/Close/Reopen của `TicketService` lưu ticket trong `finally` (hàm `ChangeStateAndSave`) | Observer chạy sau khi trạng thái đổi; nếu observer ném lỗi thì trạng thái mới vẫn nằm trong bộ nhớ và sẽ bị ghi xuống file ở lần lưu kế tiếp. Lưu ngay để file khớp bộ nhớ, lỗi của observer vẫn tới người dùng. Lưu ý cho GĐ 4: Close mà `LoyaltyObserver` ném lỗi thì ticket vẫn Closed và không đóng lại được để thử lại, nên thứ tự observer và việc observer làm lại được an toàn là quan trọng |
-| 12 | File task GĐ 3: mỗi lớp một commit, 13 patch (02–14) | Mỗi module một commit, 7 patch (02–08), cộng 1 patch sửa lỗi rà soát (09) | Chủ repo yêu cầu ngày 17/11 |
-| 13 | File task GĐ 3 Module 8: "11 test xanh (2 có sẵn + 9 mới)" | 9 test xanh | 2 test định dạng có sẵn nằm trong 4 test `CustomerTests`, đã tính trong 9; 9 + 13 đỏ = 22 |
-| 14 | (chưa nêu) | `Room.IsAvailable` coi khoảng ngày có ngày trả ≤ ngày nhận là không chồng lên gì | Service chạy `EnsureAvailable` trước khi tạo `Booking`; nếu không thì ngày đảo ngược nằm trong một booking có sẵn bị báo "đã đặt" thay vì lỗi ngày |
-| 15 | (chưa nêu) | Cột lưới đặt tên `colXxx` | Danh sách tiền tố trong `.claude/rules/winforms.md` không có tiền tố cho cột `DataGridView` |
-| 16 | Lưu JSON (`JsonRepository`, 8 file `Data/*.json`) | **Đã chốt 18/11, chưa cài.** Lưu SQLite qua `Microsoft.Data.Sqlite`, `SqliteRepository`; 8 file seed `Data/*.sql`; `hotel.db` tự tạo; bỏ JSON ở Module A3 | Chủ repo quyết định 17–18/11 (yêu cầu/điểm của môn học, để học). Chi tiết ở `docs/tasks/stage-3b-sqlite.md` |
-| 17 | Phần chung không sửa sau GĐ 1; không thêm gói NuGet ngoài bộ xUnit | **Đã chốt, chưa cài.** GĐ 3b sửa `Data/`, `Program.cs`, `AppConfig`, file `.csproj`, `tools/HashPassword.cs`; thêm gói `Microsoft.Data.Sqlite` | Chủ repo đồng ý 18/11; phạm vi ghi ở mục "Phê duyệt đã có" của file task |
-| 18 | `Program.cs` là phần chung | **Đã chốt, chưa cài.** Mỗi suất sửa dòng repository của mình (A: `departments`, `employees`, `tickets`; B: `roomTypes`, `rooms`, `customers`, `bookings`, `surveys`) | Chia việc chuyển SQLite theo phân hệ |
-| 19 | 22 test | **Đã chốt, chưa cài.** 26 test: thêm 4 test ghi rồi nạp lại bảng (A 2, B 2) | Kiểm tra kho lưu mới |
-| 20 | GĐ 4 sinh 7 file JSON; `HashPassword` in cặp cho `employees.json` | **Đã chốt, chưa cài.** GĐ 4 sinh file `.sql`; `HashPassword` in thêm dạng SQL cho `02-employees.sql` | Hệ quả của dòng 16 |
-| 21 | Quy tắc 10 chỉ chặn xóa khách còn ticket chưa Closed | `Customer.EnsureCanBeDeleted` chặn thêm khách đã có booking (mọi trạng thái); `Customer.Bookings` (`IReadOnlyList<Booking>`), `Booking` tự đăng ký vào khách trong constructor và `Restore` | `/code-review` 18/11: xóa khách có booking thì `bookings.json` trỏ tới khách không tồn tại, lần mở sau `BookingMapper` ném lỗi và app không khởi động. Không đổi chữ ký, constructor hay `Program.cs`. GĐ 3b: bảng booking phải nạp qua `Booking.Restore` để khách có lại danh sách booking |
-| 22 | Quy tắc 7 không xét ngày khi check-in; `Booking.CheckIn()` | `Booking.CheckIn(DateTime now)`: chỉ check-in khi `CheckInDate` ≤ `now.Date` < `CheckOutDate`, ngoài khoảng đó `BusinessRuleException`. `BookingService.CheckIn(bookingId, now)` giữ chữ ký, truyền `now` xuống | `/code-review` của B 18/11: check-in trước ngày đặt cho phép hai khách cùng CheckedIn một phòng, `IsRoomInActiveStay` đúng cho khách chưa tới ngày, cộng điểm khống (ảnh hưởng hạng và SLA ticket). Chủ repo duyệt đổi chữ ký public ngày 19/11. Không đổi test, Form, interface; `Restore` không kiểm tra ngày |
+**Domain (P2, 1–4/12, chưa cần CSDL)**
+- [ ] Sửa `Customer` (CCCD, ngày sinh, đồng ý nhận ưu đãi), `MembershipTier` (hệ số tích điểm), `Booking` (giá/đêm chốt)
+- [ ] Thêm `PointTransaction`, `Reward`, `RewardRedemption`, `Campaign`, `CampaignTarget`, `Receptionist`
+- [ ] `ISegmentStrategy` + `VipSegment`, `LapsedGuestSegment`, `BirthdayMonthSegment`
+- [ ] `schema.sql` 10 bảng TV2
 
-Chỗ plan để ngỏ đã chốt: khách hàng (UC6) nhập `FullName`, `Phone`, `Email`, `IdentityNumber`, `Nationality` (bắt buộc) và `Notes` (tùy chọn); `ContactChannel` gồm `FrontDesk`, `Phone`, `Email`, `System`; `TicketFactory.Create(id, customerId, title, description, priority, slaProfile, createdAt, roomId)`.
+**Phân hệ quan hệ khách hàng (P3, 5–10/12)**
+- [ ] Repository + truy vấn báo cáo cho 10 bảng TV2 (theo repository mẫu của TV1)
+- [ ] `CustomerService`, `StayService`, `LoyaltyService`, `CampaignService`, có kiểm quyền trong từng service
+- [ ] Cài cho TV1 dùng: `CustomerDirectory`, `StayLookup` (8/12); `GoodwillPointsObserver`, `InteractionLogger` (9/12)
+- [ ] Phần dùng chung: `ExcelReportExporter`, hàm định dạng tiền/ngày + căn phải + `ErrorProvider`, hàm vẽ biểu đồ (7/12, để TV1 dùng)
+- [ ] Form frm201–frm207 (Master-Detail: frm201, frm202, frm205, frm206)
+- [ ] R3 (có biểu đồ), R4, xuất Excel
+- [ ] Seed 10 bảng: khách đủ 4 hạng, booking đủ trạng thái, giao dịch điểm, lượt đổi (có lượt hủy), chiến dịch đã kết thúc
 
-## Câu hỏi và việc đang chờ người
-| Việc | Cần trước | Kết quả |
+**Test (P2–P4)**
+- [ ] `FakeTicketQuery`, `FakeSurveyScheduler`, `FakeCustomerCareStats`
+- [ ] 10 unit test (PLAN mục 5.8)
+- [ ] 4 integration: R5 khớp tính tay; RBAC; L3 luồng đầy đủ; L3 rollback
+
+**Ghép (P4, 11–12/12)**
+- [ ] Dashboard R5 (frm207)
+- [ ] README: dữ liệu mẫu, báo cáo
+
+**Vấn đáp (P5)**
+- [ ] Live OCP khi tắt AI: thêm `FrequentGuestSegment`, đăng ký 1 dòng (tập ≥2 lần)
+- [ ] Đặt breakpoint theo sơ đồ L3 (của mình) và L2 (của TV1), đọc Call Stack
+- [ ] Trả lời câu hỏi chéo phần TV1: State, Factory Method, cách tính hạn SLA, rollback L2
+- [ ] Nêu ≥2 nhược điểm của Strategy và Observer
+- [ ] Demo phần mình trong video; chương báo cáo phân hệ TV2
+
+## 5. Việc cả hai cùng làm (sao từ PLAN mục 6.6)
+- [x] Merge PR #1 vào `develop` (22/11) — merge 25/11 (`fd7b7e4`)
+- [ ] Chốt chữ ký interface ở PLAN mục 4.5 (27/11)
+- [ ] Điền tự đánh giá L2 (29/11)
+- [ ] Review PR của nhau trong 24 giờ; mỗi người ≥2 PR được merge trên GitHub
+- [ ] Cập nhật `docs/PROGRESS.md` trong PR của mình sau mỗi module
+- [ ] Chủ nhật 29/11, 6/12, 13/12: đo tỷ lệ `git blame`, rà tiến độ
+- [ ] Rà bảng 5.10, đồng bộ giao diện hai phân hệ (12/12)
+- [ ] Quay video 3–5 phút; tập vấn đáp chéo (P5)
+- [ ] Ghép báo cáo cuối, nộp (30/12)
+
+## 6. Việc đang dở
+| Việc | Ai | Trạng thái |
 |---|---|---|
-| Chủ repo báo cho thành viên B: Strategy chuyển sang suất B, hạn chọn cách commit là 17/11 (khác bản tóm tắt đã gửi) | 17/11 | |
-| Tên tài khoản GitHub của thành viên B | 17/11 | |
-| Thành viên B chọn cách commit: nhận patch hay tự code | 17/11 | |
-| Mẫu báo cáo LaTeX | 26/11 | |
-| Máy có Java (xuất ảnh PlantUML) và bản TeX không | 26/11 | |
-| Thành viên B kiểm tra bằng tay GĐ 3 (6 bước), mở 3 Form bằng Designer, chạy `/code-review`, sửa lỗi | 18/11 (trước Module A1) | Xong 18/11; bấm lại phần sửa (xóa khách có booking) đạt 19/11 |
-| Publish thử bản JSON làm mốc cho GĐ 3b | 18/11 (trước Module A1) | |
-| Thành viên B áp patch 02–09, chốt GĐ 3 và push `feature/b-customer` | 18/11 | Đã push; chủ repo merge vào `develop` 19/11 (`da676e6`) |
-| Chủ repo đồng ý push `develop` sau Module A2 (B cần A1, A2 trước patch của B1) | 20/11 | |
-| Thành viên B merge `origin/develop`, áp patch B1, B2 của GĐ 3b, push | 22/11 (chậm nhất hết 23/11) | |
+| PR #2 `tv2/domain` → `v2` (Domain P2 đợt 1: hệ số tích điểm, sổ điểm, đổi quà, chiến dịch, 3 phân khúc + test) | TV2 mở 25/11, TV1 review | chờ TV1 review trong 24 giờ (tới 26/11) |
+| PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | TV2 rebase lên `v2` sau khi PR #4 merge, sửa theo khung của `docs/tasks/v2-p1-analysis.md`; sau đó TV1 review |
+| M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | bắt đầu sau khi M1 merge; xem `docs/tasks/v2-p1-analysis.md` |
+| Sửa đường dẫn trong slide: `sec1`, `sec3`, `sec5`, `sec6` còn trỏ `docs/PLAN.md` (v1), `docs/PROGRESS.md` (v1), `docs/tasks/stage-*.md` — các file này đã xóa (bản v1 chỉ còn trong lịch sử git, `fd7b7e4`) | TV2 | làm ở M9 |
 
-## Nhật ký
-- 15/11/2026 — GĐ 0: tạo `CLAUDE.md`, `.gitignore`, `.claude/settings.json`, 5 file `.claude/rules/`, file này và `docs/tasks/stage-1-skeleton.md`. Các file rules viết khi chưa có code, phải rà lại ở cuối GĐ 1.
-- 15/11/2026 — Rà soát và sửa plan + instruction theo 34 điểm. Các thay đổi chính: Strategy sang suất B, Repository + Singleton và toàn bộ `Data/` thành phần chung; quy tắc đặt theo "service tra cứu, Domain quyết định"; ticket không dùng `MembershipTier` mà nhận `CustomerSlaProfile`; GĐ 1 viết luôn `Program.cs` và vỏ 9 Form; ma trận phân quyền của quy tắc 11; commit không kèm `Co-Authored-By`. Chưa có dòng code nào; quy tắc `PowerShell(...)` trong `settings.json` chưa được chạy thử.
-- 16/11/2026 — Tạo nhánh `develop` từ `main` và commit toàn bộ file GĐ 0 trên `develop` (commit số 1 trong danh sách đề xuất của `stage-1-skeleton.md`). GĐ 1 không cần tạo lại nhánh, chỉ cần chuyển sang `develop`.
-- 16/11/2026 — GĐ 1 Module 1 (SDK 10.0.403): tạo `HotelCRM.sln` (định dạng `sln`), 5 project với tham chiếu đúng bảng trong file task, `Directory.Build.props`, `.editorconfig`; xóa `Class1.cs`, `UnitTest1.cs`, `Form1`. `InternalsVisibleTo("HotelCRM.Data")` khai báo bằng item `<InternalsVisibleTo>` trong `HotelCRM.Domain.csproj`. Gói test là bộ mặc định của mẫu `xunit` (xunit 2.9.3, xunit.runner.visualstudio 3.1.4, Microsoft.NET.Test.Sdk 17.14.1, coverlet.collector 6.0.4). Đã kiểm tra: `dotnet build HotelCRM.sln` 0 lỗi 0 warning; `dotnet test` chạy được, chưa có test nào. Chưa kiểm tra: mở solution bằng Visual Studio. Quy tắc đặt tên trong `.editorconfig` chỉ hiện trong IDE, không chặn `dotnet build` (không bật `EnforceCodeStyleInBuild` vì file task chỉ nêu 4 thuộc tính cho `Directory.Build.props`).
-- 16/11/2026 — GĐ 1 Module 2: khung `Domain` (Common, Staff, Interfaces, Tickets + States, Customers, Hotel) và `Business` (Services, Queries, Assignment, Factories, Observers, Security), mọi thành viên public có chú thích XML. Cài thật: `Person`, `Employee`, `Agent`/`Manager` (trừ `CanTake`/`EnsureCanTake`), `Department`, `BusinessSettings`, 3 ngoại lệ, mọi `Restore`, `TicketState.FromName`, `MembershipTier.FromName`, `SupportTicket.Attach`, `PasswordHasher`, `UserSession`, `AuthService`, constructor của mọi service. Phần còn lại ném `NotImplementedException` (riêng 2 observer để thân rỗng, xem bảng lệch plan). Đã kiểm tra: build 0 lỗi 0 warning. Chưa kiểm tra bằng test (22 test thuộc Module 5). Ba commit: lõi chung + ticket, khách hàng + khách sạn, Business.
-- 16/11/2026 — GĐ 1 Module 3: `AppConfig` (Singleton), `IMapper`, `JsonRepository`, `InMemoryRepository`, 9 record (8 file + `InteractionRecord`), 8 mapper, `appsettings.json`, dữ liệu mẫu tối thiểu (4 phòng ban, 1 manager, 2 agent, 6 file `[]`), `tools/HashPassword.cs`. `appsettings.json` và `Data/*.json` được chép ra thư mục output và đặt ngoài file `.exe` khi publish single-file. Đã kiểm tra bằng một script tạm ngoài repo (31 phép thử, đều đạt): nạp cả 8 file, tham chiếu trỏ đúng cùng đối tượng, ghi rồi nạp lại cho JSON giống hệt, xóa có ghi file, đăng nhập đúng/sai bằng tài khoản mẫu, JSON hỏng / thiếu file / tên trạng thái lạ đều báo lỗi có tên file. Chưa kiểm tra: publish single-file.
-- 16/11/2026 — GĐ 1 Module 4: `Program.cs` (composition root, bảng strategy và factory, `Application.ThreadException`, vòng đăng nhập lại sau Logout), `ErrorHandler` (`Run` trả về `bool`, `Handle`, `ReportStartupFailure`), `UiNotificationObserver` (sự kiện `NotificationRaised`, `MainForm` hiện lên thanh trạng thái), `LoginForm`, `MainForm`, vỏ 9 Form, mục "Sample accounts" trong `README.md`. Các Form con mở dạng hộp thoại (`ShowDialog`). Menu: Reports chỉ Manager thấy, Record Survey chỉ Agent thấy. `.editorconfig` bỏ quy tắc PascalCase cho hàm trong `Forms/` vì tên handler theo kiểu Visual Studio (`btnLogin_Click`). Đã kiểm tra bằng script tạm ngoài repo (29 phép thử, đều đạt): nối dây như `Program`, đăng nhập sai bị từ chối, đăng nhập 2 vai trò, menu ẩn/hiện đúng, cả 9 Form tạo được cửa sổ, Logout kết thúc phiên. Chạy file `.exe` thật: hiện cửa sổ "Hotel CRM - Log In"; đổi `MaxActiveTickets` vẫn khởi động; đổi `DefaultAssignmentStrategy` thành tên lạ thì hiện hộp thoại lỗi và ghi `logs/error.log` có nêu 3 tên hợp lệ. Chưa kiểm tra: bấm thật trên giao diện, mở Form bằng Designer của Visual Studio (chỉ người làm được).
-- 16/11/2026 — GĐ 1 Module 5: 11 test suất A + `FakeCustomerDirectory`, `FakeStayLookup`, `TicketTestData` trên `develop`; 11 test suất B + `FakeTicketQuery`, `CustomerTestData` trên `local/b-work`; xuất `handoff/01-customer-tests.*` và `handoff/README.txt`. Đã kiểm tra: `dotnet test` trên `develop` 11 test, cả 11 đỏ; trên `local/b-work` 22 test, 2 xanh (`Constructor_InvalidEmail_ThrowsValidation`, `Constructor_InvalidPhone_ThrowsValidation`), 20 đỏ. Mọi test đỏ đều do `NotImplementedException` (2 test hiện "Assert.Throws: not an exact match" vì lời gọi bị bọc trong `Assert.Throws`, ngoại lệ thật vẫn là `NotImplementedException`). `TicketServiceTests` dùng một strategy giả lồng trong lớp test để không phụ thuộc strategy của suất B.
-- 16/11/2026 — GĐ 1 Module 6: viết `docs/tasks/stage-2-ticket.md`, `stage-3-customer.md`, `stage-4-integration.md`; sửa 5 file `.claude/rules/` theo code thật (mẫu `Restore`, `EnsureXxx`/`CanXxx`, `GetRequired`, chữ ký `Pick`, `IRepository` 5 hàm, tiền tố `mnu`/`sts`/`tab`, cách truyền ngữ cảnh cho Form, lớp trợ giúp và lớp giả của test); sửa `docs/PLAN.md` ở các chỗ lệch (cây thư mục, `Employee`, `Department`, bảng State và Strategy, quy tắc 3/7/11, ranh giới Domain, observer); thêm lệnh băm mật khẩu vào `CLAUDE.md`; commit kèm `MainForm.resx` do Visual Studio tạo. Ba điểm các phiên sau cần biết, đã ghi trong file task: (1) Form ticket ở GĐ 2 không gọi các hàm đi sang suất B lúc mở Form, vì chúng còn ném `NotImplementedException` tới khi ghép; (2) GĐ 3 thêm vài dòng vào `roomtypes.json` và `rooms.json` để bấm thử, GĐ 4 thay bằng dữ liệu đầy đủ; (3) khi đếm ticket đang mở của Agent để phân công, không tính chính ticket đang được phân công. Đã kiểm tra: build 0 lỗi 0 warning; `develop` 11 test đỏ, `local/b-work` 22 test (2 xanh, 20 đỏ) sau khi merge. Chưa kiểm tra: ba file task chưa được phiên nào chạy thử.
-- 16/11/2026 — GĐ 2 Module 1: thân hàm `Agent.CanTake`/`EnsureCanTake`, bốn lớp State (lớp cha `TicketState` từ chối mọi hành động bằng `BusinessRuleException` có tên trạng thái), `SupportTicket` (ủy quyền cho State, `MoveTo` đổi trạng thái rồi mới `Notify` trên bản sao danh sách observer, quy tắc tạo, `AssignTo`, `EnsureAssignedTo` so theo Id, hệ số ưu tiên trong hàm `private static PriorityMultiplier`), con số và `Validate` của ba lớp con. Reopen cho phép đúng mốc `ResolvedAt + reopenDays`. Đã kiểm tra: build 0 lỗi 0 warning; `dotnet test` 8 xanh (6 `TicketStateTests`, 2 `TicketRuleTests`), 3 đỏ đều do `NotImplementedException` (factory và service, thuộc Module 2–3). Người dùng duyệt; ban đầu chia 4 commit, sau đó người dùng yêu cầu gộp thành 1 commit `7d439bc` ("Implement the ticket rules and the four ticket states"), lệch khỏi đề xuất (1)–(4) của file task.
-- 16/11/2026 — GĐ 2 Module 2: ba `*TicketFactory.Create`, mỗi lớp `new` đúng một lớp ticket; chỉ `MaintenanceTicketFactory` truyền `roomId`. Đã kiểm tra: build 0 lỗi 0 warning; 9/11 test xanh, 2 test `TicketServiceTests` đỏ do `NotImplementedException` (Module 3). Commit `659990a`.
-- 16/11/2026 — Người dùng cho làm liền các module còn lại, mỗi module một commit, báo cáo một lần (không dừng sau từng module).
-- 16/11/2026 — GĐ 2 Module 3: `TicketService` (đủ 15 hàm) và `TicketQuery`. Đếm ticket đang mở của Agent bằng hàm `private CountActiveTickets(agentId, excludedTicketId)`, không tính chính ticket đang phân công. `AutoAssign` lọc ứng viên bằng `Agent.CanTake`, giữ thứ tự repository, kết quả `null` của strategy vẫn đưa vào `AssignTo` để Domain ném lỗi. `AssignManually`: nhân viên không phải Agent thì truyền `null`. Service không tự `throw`. Đã kiểm tra: build 0 lỗi 0 warning, 11/11 test xanh. Commit `885b1a1`.
-- 16/11/2026 — GĐ 2 Module 4–6: `TicketListForm`, `TicketEditForm`, `TicketDetailForm` (file Designer chỉ có gán thuộc tính và đăng ký sự kiện). Thêm hàm public `TicketDetailForm.ShowTicket(int)`. Các hàm đi sang suất B (`FindCustomers`, `GetActiveRooms`, `GetRoomNumber`) chỉ gọi khi bấm nút Find / Load Rooms / Room Number; lúc mở Form chỉ gọi `GetTicketTypes`, `GetAgents`, `Search`, `GetById`. Form không tự `try/catch`. Commit theo thứ tự 5 (`c1fd0e7`), 6 (`79a8b69`), 4 (`2d54152`) vì `TicketListForm` mở hai Form kia; cả ba commit build sạch. Đã kiểm tra bằng chương trình tạm ngoài repo (47 phép thử, đều đạt; hộp thoại được đóng tự động và ghi lại nội dung): mở 3 Form không lỗi, danh sách rỗng bấm Search không lỗi, tạo complaint (nâng Medium→High, hạn 9 giờ) và maintenance có phòng, từ chối thiếu mô tả/thiếu phòng/thiếu ghi chú, Auto Assign, Assign lại, lọc theo Agent và từ khóa, Agent không thấy nút phân công, Agent khác không Start được, Manager Close, Reopen ticket đã Closed bị từ chối, observer được gọi. Chưa kiểm tra: Designer của Visual Studio, bấm thật trên giao diện.
-- 16/11/2026 — GĐ 2 Module 7: build 0 lỗi 0 warning; `dotnet test` 11/11 xanh; không file cấm nào bị sửa (so với `develop`: không đổi `tests/`, `Data/`, `Program.cs`, `MainForm`, `Domain/Common`, `Domain/Interfaces`). Ghi nhận cho vấn đáp: thông báo "không tìm thấy" có dạng `SupportTicket 99 does not exist.` vì `RepositoryExtensions.GetRequired` (phần chung) dùng tên kiểu; không sửa vì là file cấm.
-- 17/11/2026 — GĐ 2: chạy `/code-review high` trên `develop...feature/a-ticket`, ra 10 điểm. Người dùng cho sửa 4 lỗi chính: (1) observer ném lỗi sau khi đổi trạng thái → `TicketService` lưu ticket trong `finally` (bảng lệch plan dòng 11); (2) Reopen vượt giới hạn tải → `EnsureCanTake` trước Reopen (dòng 10); (3) `TicketListForm`: ticket vừa phân công không còn khớp bộ lọc thì bỏ chọn hết thay vì để lưới tự chọn dòng đầu, `SelectedTicketId` chỉ trả Id khi dòng đang được tô; (4) `TicketDetailForm`: Load xóa form trước khi nạp nên Id sai để lại form trống, nút thao tác bị tắt; `RunOnTicket` nạp lại ticket cả khi thao tác lỗi. Không đổi Domain, chữ ký public, file Designer hay test. Đã kiểm tra: build 0 lỗi 0 warning; 11/11 test xanh (không test nào chạm 4 chỗ sửa); chương trình tạm ngoài repo, 6 phép thử đều đạt (observer ném lỗi khi Close: lỗi vẫn tới người gọi, ticket được lưu ở trạng thái Closed; Close lần nữa bị từ chối; Reopen bị chặn khi Agent đủ 2/2, được phép khi còn 1/2). Chưa kiểm tra (người dùng bấm thử): `TicketListForm` lọc theo Agent A, phân công ticket cho B → không dòng nào được chọn, bấm Assign báo "Select a ticket first."; `TicketDetailForm` Load một Id có thật rồi Load 99 → form trống, các nút bị tắt.
-- 17/11/2026 — Fetch `origin`: `origin/develop` và `origin/main` không có commit mới so với máy (không cần pull); có nhánh mới `origin/feature/b-customer` của thành viên B (xem "Trạng thái Git"). Commit bản sửa sau review trên `feature/a-ticket`, rồi theo yêu cầu của chủ repo merge `feature/a-ticket` vào `develop` (`--no-ff`) trước khi kiểm tra bằng tay. Chưa push.
-- 17/11/2026 — Chủ repo xác nhận đủ 3 bước kiểm tra bằng tay của GĐ 2 (3 Form mở được bằng Designer; chạy app mở 3 Form và Search không lỗi; Agent không thấy Auto Assign/Assign). GĐ 2 đạt. Commit 3 file `.resx` do Visual Studio tạo cho 3 Form ticket lên `develop`. Đối chiếu `origin/feature/b-customer` với yêu cầu của GĐ 1 (đủ 11 test + `FakeTicketQuery`, giống hệt patch 01) rồi merge vào `develop` (`--no-ff`).
-- 17/11/2026 — Push `develop` lên `origin` (`7a88011..870424b`) theo yêu cầu của chủ repo. Không push `feature/a-ticket` hay `local/b-work`.
-- 17/11/2026 — GĐ 3 Module 1–7 trên `local/b-work` (worktree `.claude/worktrees/b-work`), mỗi module một commit và một patch:
-  - 02 `membership-and-customer`: 4 hạng tự trả số liệu và `Next()`; `Customer` kiểm tra số định danh/quốc tịch, `UpdateProfile` kiểm tra hết rồi mới gán, `EnsureUnique`/`EnsureCanBeDeleted`, `AddPoints` lặp `Next()` để lên nhiều bậc; `InteractionHistory.Add`.
-  - 03 `rooms-and-bookings`: kiểm tra `RoomType`/`Room`/`Booking`; `Nights`, `TotalAmount`, `PointsEarned` (làm tròn xuống), `BlocksRoom`; chuyển trạng thái; `Room.IsAvailable` chỉ xét booking Reserved/CheckedIn của chính phòng.
-  - 04 `customer-service`: `CustomerService` và `CustomerDirectory`. Kèm sửa thông báo của `Customer.EnsureUnique` không nêu SĐT/email (khi `Update` thì lúc kiểm tra trùng khách vẫn mang giá trị cũ).
-  - 05 `booking-service`: `BookingService`, `StayLookup`. `CheckOut` chỉ gọi `AddPoints` khi `PointsEarned > 0` (giá phòng < 1 USD sẽ cho 0 điểm, mà `AddPoints(0)` ném lỗi).
-  - 06 `assignment-strategies`: `LeastLoaded`; `DepartmentMatch` lọc theo phòng ban rồi giao cho một `LeastLoadedStrategy` bên trong; `RoundRobin` nhớ Id lần trước.
-  - 07 `customer-forms`: `CustomerListForm`, `CustomerEditForm` (`LoadCustomer(int)`).
-  - 08 `booking-form`: `BookingForm`; thêm 2 loại phòng (Deluxe Double 120, Family Suite 210) và 4 phòng (305, 306, 501, 502).
-  - 09 `review-fixes` (sau khi tự rà soát): `Room.IsAvailable` với ngày đảo ngược (lệch plan số 14); `BookingForm` không còn xóa danh sách phòng khi đổi ngày và không nạp lại sau khi đặt, để lựa chọn cũ đi xuống service và người dùng thấy cảnh báo đặt chồng/ngày sai (trước đó bước 4 của kiểm tra bằng tay không làm được); "Find rooms" báo khi không còn phòng; ô Notes nhận Enter; handler double-click của lưới đặt `if` vào trong `ErrorHandler.Run`.
+## 7. Việc chờ người
+| Việc | Ai | Hạn | Trạng thái |
+|---|---|---|---|
+| **Dời lịch M2–M9 hay giữ** (M1 xong trễ 3 ngày; M2–M3 đã quá hạn; slide vẫn nộp 30/11) | TV1 + TV2 | 26/11 | chưa quyết |
+| Ảnh/bản mẫu biểu mẫu thật BM1–BM3 | TV1 | 23/11 | quá hạn, chưa có |
+| Ảnh/bản mẫu biểu mẫu thật BM4–BM7 | TV2 | 23/11 | quá hạn, chưa có |
+| Đồng ý tải `plantuml.jar` vào `tools/` | TV1 | trước M3 (24/11) | quá hạn, chưa quyết |
+| Cài Java (PlantUML cần Java; máy TV1 chưa có `java`) | TV1 | trước M3 | chưa làm |
+| Đối chiếu HuongdanXDHTTTQL: cây BFD mẫu có 3 nhánh chung (Quản trị hệ thống, Danh mục, Báo cáo thống kê) + nhánh nghiệp vụ; plan chia 8 nhánh theo phân hệ. Giữ hay chỉnh | TV1 + TV2 | M3 | chưa quyết |
+| Đối chiếu HuongdanXDHTTTQL: tên Form mẫu đánh số liên tiếp (`frm001_dm_…`, `frm002_nv_…`); plan đánh số theo người (1xx/2xx). Giữ hay đổi | TV1 + TV2 | M8 (trước P3) | chưa quyết |
+| Đối chiếu HuongdanXDHTTTQL: Solution Folder `Dlllib`, tên solution kèm phiên bản. Có làm theo không | TV1 | P2 | chưa quyết |
+| Mẫu báo cáo cuối của thầy (Word/LaTeX) | ai có | 10/12 | chưa có |
+| Ngày vấn đáp cụ thể của nhóm | cả hai | khi có lịch | chưa có |
+| ~~Merge PR #1 vào `develop`~~ | TV1/TV2 | 22/11 | xong 25/11 (`fd7b7e4`) |
+| ~~Xác nhận phân công v2 (PLAN mục 6.2)~~ | TV2 | 22/11 | xong 25/11 (review approve PR #4) |
+| ~~File HuongdanXDHTTTQL~~ | ai có | 26/11 | xong 25/11: `docs/slide_checklist/HuongdanXDHTTTQLv1_1.pdf`, file ngoài repo, mỗi người tự giữ bản |
+| ~~File checklist chấm điểm~~ | ai có | — | xong: `docs/slide_checklist/Checklist_BTL_HTTTQL_v2026.xlsx`, sheet "Nhóm 02 người"; file ngoài repo, mỗi người tự giữ bản |
 
-  Đã kiểm tra: build 0 lỗi 0 warning; 9 test suất B xanh, 13 đỏ đúng dự kiến; chuỗi patch 01→09 áp sạch lên `origin/develop`. Một script tạm ngoài repo (60 phép thử, đều đạt) chạy service thật trên bản sao `Data/`: trùng SĐT/email (cả khi sửa), sai định dạng, khách không hợp lệ không được lưu, đặt chồng/nối tiếp ngày, ngày đảo ngược trong phòng đã có booking, hủy sai trạng thái, check-in/out cộng điểm và ghi lịch sử, lên thẳng Gold, xóa khách còn ticket, nạp lại JSON giữ nguyên dữ liệu, ba strategy, và ba Form tạo được, nạp lưới, tìm phòng, tìm khách. Chưa kiểm tra: bấm thật trên giao diện, mở Form bằng Designer (chỉ người làm được), `/code-review`.
-- 18/11/2026 — Chép `handoff/stage3-notes.md` (do phiên GĐ 3 viết, chờ `feature/a-ticket` merge) vào file này: đánh lại số các dòng lệch plan 10–13 của ghi chú thành 12–15 vì `develop` đã có dòng 10–11; giữ dòng "patch 01 đã tới B" vì ghi chú viết rằng patch 01 chưa gửi. Chưa xóa ghi chú, chưa chép skill `export-patch`.
-- 17–18/11/2026 — Chốt kế hoạch chuyển lưu trữ JSON → SQLite qua ba vòng hỏi đáp với chủ repo; viết `docs/tasks/stage-3b-sqlite.md` (GĐ 3b, 5 module A1, A2, B1, B2, A3; Mốc 1 ngày 20/11, Mốc 2 ngày 22/11; phương án quay về JSON). Thêm dòng 16–20 vào bảng lệch plan. Chưa sửa code, `CLAUDE.md`, `docs/PLAN.md`, `.claude/rules/` (để Module A1). Commit `93c3b3a` trên `develop`, chưa push.
-- 18/11/2026 — Merge `develop` (`93c3b3a`) vào `local/b-work` trong worktree theo yêu cầu của chủ repo: merge commit `d837bb1`, không xung đột. 8 file test và `FakeTicketQuery` có ở cả hai nhánh với nội dung giống hệt nên không đổi; không file nào của suất B bị đụng. Patch 02–09 không đổi (merge commit không xuất patch). Đã kiểm tra trên `local/b-work`: build 0 lỗi 0 warning; `dotnet test` 22 test, 20 xanh, 2 đỏ (`SurveyServiceTests`, `NotImplementedException`, để GĐ 4). Chưa kiểm tra bằng tay app đã ghép hai phân hệ.
-- 18/11/2026 — Thành viên B nhận chốt GĐ 3 (tự code trên `feature/b-customer`, xem "Cách commit của suất B"). Thử áp patch 02→09 lên `origin/develop` (`93c3b3a`) trong worktree tạm: sạch, kết quả trùng `local/b-work`; worktree tạm đã xóa. Sửa "Việc tiếp theo", "Chờ người dùng" theo việc giao mới. Chưa gửi patch, chưa xóa các `.resx` chưa track.
-- 18/11/2026 — Thành viên B (trên `feature/b-customer`): fast-forward lên `origin/develop` (`7af54d0`), áp patch 02→09 thành 8 commit (`e7487fb` … `47e59d4`), mỗi bước build 0 lỗi 0 warning; `dotnet test` 22 test, 20 xanh, 2 đỏ (`SurveyServiceTests`, `NotImplementedException`). B tự mở 3 Form bằng Designer (Visual Studio tạo 3 file `.resx`) và kiểm tra bằng tay đủ 6 bước của `stage-3-customer.md`: đạt. `/code-review high` (so với `develop`) ra 10 điểm; sửa 3: (1) không xóa được khách đã có booking (dòng 21 bảng lệch plan), (2) kéo theo hết lỗi check-in/out ghi lại khách đã xóa, (5) `GetAvailableRooms` sắp theo tầng rồi số phòng (độ dài trước, rồi chuỗi). Điểm 3 (check-in trước ngày) ghi vào "Việc đang dở" là hạn chế đã biết. Không sửa: cboRoom không nạp lại (cố ý, patch 09), `btnHistory` (GĐ 4), nhánh ngày sai trong `Room.IsAvailable` (dòng 14), tìm kiếm lặp ở `CustomerDirectory`, `GetAll()` hai lần. Kiểm tra sửa lỗi bằng 4 test tạm (xóa khách có booking đã hủy bị chặn và khách vẫn còn; xóa khách không booking được; booking sai ngày không đăng ký vào khách; thứ tự phòng 99, 301, 305, 1001): đều xanh, đã xóa, không thêm test vào bộ 22. Chưa kiểm tra bằng tay lại sau khi sửa.
-- 19/11/2026 — Fetch: B đã push GĐ 3 lên `origin/feature/b-customer` (11 commit, `f3992b8..9819537`). Kiểm tra trong worktree tạm (đã xóa): build 0 lỗi 0 warning, 22 test 20 xanh 2 đỏ (`SurveyServiceTests`); không đụng `tests/`, `Data/` (code), `Program.cs`, `Domain/Common`, `Domain/Interfaces`, `Domain/Tickets`. Xóa `CustomerListForm.resx` chưa track (Designer tạo lại, trùng nội dung bản của B), merge vào `develop` (`--no-ff`, `da676e6`). Chủ repo chọn tự sửa lỗi check-in trước ngày đặt trên `develop`: `Booking.CheckIn(now)`, `BookingService.CheckIn` truyền `now`; sửa quy tắc 7 trong `docs/PLAN.md` và `docs/tasks/stage-3-customer.md`; thêm dòng 22 bảng lệch plan. Đã kiểm tra: build 0 lỗi 0 warning; 22 test, 20 xanh, 2 đỏ (`SurveyServiceTests`); script tạm ngoài repo, 7 phép thử đều đạt (trước ngày nhận bị chặn, đúng 00:00 ngày nhận được, 23:59 đêm cuối được, ngày trả bị chặn và vẫn hủy được, booking đã CheckedIn báo lỗi trạng thái trước, check-out vẫn cộng đủ điểm). Chưa kiểm tra: bấm thử trên app. Chưa commit, chưa push.
-- 19/11/2026 — Nhận checklist mới `Checklist_BTL_HTTTQL_v2026.xlsx` (MI4090, loại đề HTTTQL, sheet "Nhóm 02 người" + sheet "Rubric A-F & Vấn đáp"), thay hẳn checklist cũ `Checklist_BTL_LTHDT_v2.xlsx` đang chép trong `docs/PLAN.md`. Đã so sánh hai bản và đối chiếu với code; chưa sửa `docs/PLAN.md`, `CLAUDE.md` hay file task nào. Tạm dừng GĐ 3b (việc tiếp theo số 4) chờ chủ repo quyết định. Số đo lúc này: `git blame` trên file `.cs` của `src/` + `tests/` (bỏ `*.Designer.cs`) ra Kessential 5774 dòng, munn8726 1107 dòng (~84/16); checklist đòi 40–60 mỗi người.
-- 19/11/2026 — Thành viên B (trên `feature/b-customer`): thêm slide báo cáo tiến độ và bản tự đánh giá checklist lần 1 (`docs/slides/`), rồi rà lại slide với code và sửa các chỗ lệch (số lớp, ngày commit, bài mở rộng `OnHoldState`, `Interaction` là thực thể yếu, số commit kèm tỷ lệ mã logic theo `git blame`: TV1 79%, TV2 21%). Các chỗ sửa slide ban đầu là 12 commit nhỏ đã push; theo yêu cầu của B đã gộp thành 1 commit và force push (`--force-with-lease`) trước khi merge. Sau khi gộp: 44 commit không tính merge, TV1 28, TV2 16. Bấm lại bằng tay phần sửa sau `/code-review`: xóa khách đã có booking bị chặn, khách vẫn còn — đạt. Slide nằm sau `9819537` nên không có trong merge GĐ 3 (`da676e6`).
+## 8. Quyết định lệch khỏi plan
+Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `docs/PLAN.md`, lý do, ai đã duyệt.
+
+| Ngày | Ai | Lệch gì (mục PLAN) | Lý do | Ai duyệt |
+|---|---|---|---|---|
+| 25/11 | TV2 | Q7 (PLAN 5.3): quốc tịch Việt Nam → CCCD đúng 12 chữ số; quốc tịch khác → hộ chiếu 6–9 ký tự chữ và số. PLAN chỉ ghi "CCCD 12 số" | khách nước ngoài không có CCCD | TV1 + TV2 (PR #3 `284ee92`, PR #4) |
+| 25/11 | TV2 | Q9 (PLAN 5.3): điểm khi trả phòng tính theo hạng khách đang có **trước khi** trả phòng; hạng mới (nếu lên hạng) áp dụng từ lần ở sau | một cách tính duy nhất để bảng tính tay R5 và test khớp nhau | TV1 + TV2 (PR #3 `284ee92`, PR #4) |
+| 25/11 | TV2 | Q11 (PLAN 5.3): chiến dịch phải có ít nhất một khách; khách trở nên không đủ điều kiện giữa lúc xem trước và lúc lưu thì bị loại, các khách còn lại vẫn được lưu và được báo rõ khách nào bị loại | PLAN chưa nói trường hợp danh sách rỗng và khách đổi điều kiện giữa chừng (UC10 A3a, E3) | TV1 + TV2 (PR #3 `284ee92`, PR #4) |
+| 25/11 | TV1 | Bản kế hoạch gốc (mục 8 "Bước làm ngay", bước 3) định chuyển tài liệu v1 vào `docs/archive/`; M1 xóa hẳn khỏi cây thư mục (bản v1 vẫn còn trong lịch sử git, `fd7b7e4`) | tránh giữ hai bộ tài liệu song song trong repo | TV1 + TV2 (PR #4) |
+| 25/11 | TV1 + TV2 | File checklist và HuongdanXDHTTTQL (PLAN mục 0) không đưa lên repo; mỗi người tự giữ bản ở `docs/slide_checklist/` (đã `.gitignore`) | repo public, đây là tài liệu của giảng viên | TV1 (TV2 đề nghị có file hoặc ghi rõ là file ngoài repo, PR #4) |
+
+## 9. Nhật ký
+| Ngày | Ai | Việc |
+|---|---|---|
+| 22/11 | TV1 + TV2 | Chốt kế hoạch v2 (file ngoài repo; nội dung đưa vào `docs/PLAN.md` ở M1) |
+| 25/11 | TV1 | Merge PR #1 (`feature/b-customer` → `develop`, `fd7b7e4`) |
+| 25/11 | TV2 | Tạo nhánh `v2` từ `develop` và đẩy lên GitHub kèm commit `96149d4` "Rewrite CLAUDE.md for the v2 plan" (đẩy thẳng, không qua PR). Mở PR #2 `tv2/domain` → `v2` |
+| 25/11 | TV1 | **M1** trên nhánh `tv1/m1-setup` (tách từ `v2` = `96149d4`, để `v2` không phải force-push): viết lại `CLAUDE.md` từ bản `96149d4` (bỏ đoạn "dừng nếu PLAN còn v1", thêm ghi chú rules v1 → PLAN v1 trong lịch sử git, bỏ nhắc patch/`local/b-work`, thêm cột "Dùng cho" của interface, interface khai báo theo người); xóa tài liệu v1 khỏi cây thư mục (`docs/PLAN.md`, `docs/PROGRESS.md` bản v1 và 5 file `docs/tasks/stage-*.md`; vẫn xem được bằng `git show fd7b7e4:<đường dẫn>`); không đưa bản kế hoạch gốc vào repo; viết `docs/PLAN.md` v2, `docs/PROGRESS.md` v2, `docs/tasks/v2-p1-analysis.md` |
+| 25/11 | TV1 | Dọn đồ v1 (chỉ ở máy TV1, không đụng GitHub): xóa `docs/TEAM-BRIEF.md` và thư mục `handoff/` (patch 01–09 kèm `.msg.txt`, `README.txt`, `export-patch-SKILL.draft.md`, `stage3-notes.md`; cả hai đều bị `.gitignore`, không có trong git); bỏ 2 mục `handoff/` và `docs/TEAM-BRIEF.md` khỏi `.gitignore`; xóa worktree `.claude/worktrees/b-work` (sạch); xóa nhánh cục bộ `local/b-work` (`d837bb1`, chưa từng push) và `feature/a-ticket` (`2d06e0b`, đã merge vào `develop`) |
+| 25/11 | TV2 | Review PR #4: approve, xác nhận phân công v2; đề nghị ghi các quyết định lệch vào mục 8 và xử lý `docs/slide_checklist/`; nhận sửa PR #3 theo file task |
+| 25/11 | TV1 | Sửa PR #4 theo review (mục 8, `docs/slide_checklist/` ngoài repo + `.gitignore`), merge PR #4 vào `v2` |
