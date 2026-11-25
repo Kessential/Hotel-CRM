@@ -1,14 +1,17 @@
-# 08. Thiết kế hành vi: sơ đồ tuần tự và máy trạng thái
+# 08. Sơ đồ hành vi
 
-Module M7 của P1. [TV1] viết tuần tự L2 (đóng ticket) và máy trạng thái ticket; [TV2] viết tuần tự L3 (trả phòng) và máy trạng thái booking. Định mức N2: ≥ 4 sơ đồ, ≥ 2 mỗi người, ≥ 1 xuyên phân hệ; ở đây có 4 sơ đồ, 2 sơ đồ xuyên phân hệ (L2, L3).
+Module M7 của P1 (`docs/tasks/v2-p1-analysis.md` mục 3.6). Định mức N2: ≥ 4 sơ đồ, ≥ 2 mỗi người, ≥ 1 xuyên phân hệ; nhóm có 4 sơ đồ, 2 sơ đồ xuyên phân hệ (L2, L3). Tên lớp/hàm khớp `07-thiet-ke-lop.md`.
 
-## 1. Tuần tự L2 – Đóng ticket và máy trạng thái ticket [TV1]
-> TV1 viết. Phần của TV2 trong L2: `GoodwillPointsObserver` và `InteractionLogger` nhận sự kiện Đã đóng bên trong giao dịch của TV1, ghi dòng sổ điểm Thiện chí (`PointTransaction.ForGoodwill`), cộng điểm đã tích (`Customer.EarnPoints`), ghi tương tác. Observer lỗi → TV1 rollback.
+## 1. Tuần tự L2 — Đóng ticket (xuyên phân hệ) [TV1]
+_[TV1] chưa điền._
 
-## 2. Tuần tự L3 – Trả phòng [TV2]
-Sơ đồ: `diagrams/seq-l3-checkout.puml`. Đặc tả: UC08 luồng C (`03-use-case.md`). Quy tắc: Q6, Q8, Q9.
+## 2. Máy trạng thái ticket [TV1]
+_[TV1] chưa điền._
 
-### 2.1 Các bước
+## 3. Tuần tự L3 — Trả phòng (xuyên phân hệ) [TV2]
+Sơ đồ: `diagrams/seq-l3-checkout.puml`. Đặc tả: UC08 luồng C (`03-use-case.md` mục 5.3). Quy tắc: Q6, Q8, Q9.
+
+### 3.1 Các bước
 
 | # | Đối tượng | Việc | Quy tắc / ghi chú |
 |---|---|---|---|
@@ -24,7 +27,7 @@ Sơ đồ: `diagrams/seq-l3-checkout.puml`. Đặc tả: UC08 luồng C (`03-use
 | 10 | `IUnitOfWork` | **COMMIT** nếu mọi bước thành công; **ROLLBACK** và ném lại nếu một bước lỗi | khung `alt` trên sơ đồ |
 | 11 | `StayService` → Form | trả `CheckOutResult(points, tierName, upgraded)`; Form báo điểm và hạng mới | |
 
-### 2.2 Vì sao một giao dịch
+### 3.2 Vì sao một giao dịch
 Nếu bước 9 (phân hệ TV1) lỗi mà không có rollback:
 - booking đã Đã trả phòng và điểm đã cộng;
 - nhưng không có phiếu khảo sát; lễ tân bấm lại thì bị từ chối vì booking không còn Đang ở;
@@ -36,27 +39,27 @@ Hai lớp chặn trùng ngoài giao dịch:
 - unique index `ux_points_stay`: mỗi booking chỉ có một dòng điểm Lưu trú;
 - `surveys.BookingId` UNIQUE (bảng của TV1): mỗi booking chỉ có một phiếu khảo sát.
 
-### 2.3 Đặt breakpoint theo sơ đồ (chuẩn bị vấn đáp)
-Đặt breakpoint ở `SurveyScheduler.ScheduleFor`, bấm Trả phòng trên `frm203`. Call Stack đọc từ dưới lên:
+### 3.3 Đặt breakpoint theo sơ đồ (chuẩn bị vấn đáp)
+Đặt breakpoint ở `SurveyScheduler.ScheduleFor`, bấm Trả phòng trên `frm203`. Cửa sổ Call Stack của Visual Studio hiện khung đang dừng ở trên cùng, người gọi ở dưới:
 
 ```
-frm203_nv_luu_tru.btnCheckOut_Click
-ErrorHandler.Run
-StayService.CheckOut
+SurveyScheduler.ScheduleFor          ← dừng ở đây, đã sang phân hệ TV1
+StayService.CheckOut.AnonymousMethod (thân lambda truyền vào Execute)
 UnitOfWork.Execute
-StayService.<CheckOut>b__…   (thân lambda truyền vào Execute)
-SurveyScheduler.ScheduleFor  ← dừng ở đây, đã sang phân hệ TV1
+StayService.CheckOut
+ErrorHandler.Run
+frm203_nv_luu_tru.btnCheckOut_Click
 ```
 
 **Thử rollback:**
 - Cách làm: dừng ở breakpoint trên, ném một ngoại lệ (Immediate Window hoặc sửa tạm `FakeSurveyScheduler` trong test).
-- Kỳ vọng sau khi tiếp tục: booking vẫn Đang ở, sổ điểm và hạng không đổi. Đây cũng là integration test "L3 rollback" ở M8.
+- Kỳ vọng sau khi tiếp tục: booking vẫn Đang ở, sổ điểm và hạng không đổi. Đây cũng là integration test TC2-12 (`10-kiem-thu.md`).
 - Breakpoint nên đặt thêm: `Booking.CheckOut`, `MembershipTier.PointsFor`, `Customer.EarnPoints`.
 
-## 3. Máy trạng thái booking [TV2]
+## 4. Máy trạng thái booking [TV2]
 Sơ đồ: `diagrams/state-booking.puml`. Quy tắc: Q8.
 
-### 3.1 Bảng chuyển trạng thái
+### 4.1 Bảng chuyển trạng thái
 
 | Trạng thái \ Sự kiện | `CheckIn(now)` | `CheckOut(now)` | `Cancel()` |
 |---|---|---|---|
@@ -69,13 +72,29 @@ Sơ đồ: `diagrams/state-booking.puml`. Quy tắc: Q8.
 
 Trạng thái nào giữ phòng: Đã đặt và Đang ở (`BlocksRoom`). Chỉ hai trạng thái này được tính khi kiểm tra trùng lịch (Q8).
 
-### 3.2 Vì sao booking không dùng mẫu State (câu hỏi đánh đổi)
+### 4.2 Vì sao booking không dùng mẫu State (câu hỏi đánh đổi)
 Ticket của TV1 dùng State. Booking dùng enum `BookingStatus` và điều kiện trong từng hàm của `Booking`, vì:
 - Chỉ có 3 chuyển trạng thái, không có vòng lặp (ticket có Mở lại).
 - Mỗi chuyển có đúng một điều kiện.
 - Dùng State sẽ thêm 4 lớp và một lớp cha mà không bớt được `if` nào đáng kể.
 - Nếu sau này thêm trạng thái có hành vi riêng (ví dụ "Không đến", "Gia hạn") thì đó là lúc chuyển sang State. Lúc ấy chỉ `Booking` đổi, không đổi service hay Form, vì bên ngoài chỉ gọi `CheckIn`, `CheckOut`, `Cancel`.
 
-### 3.3 Hạn chế đã biết
+### 4.3 Hạn chế đã biết
 - **Khách đã quá ngày trả mà chưa trả phòng** (vẫn Đang ở): booking của khách sau vẫn nhận phòng được đúng ngày của mình. Lý do: quy tắc trùng lịch xét theo ngày đã đặt, không theo việc khách đã rời phòng chưa. Ghi ở báo cáo; không xử lý trong phạm vi bài.
 - **Booking Đã đặt mà quá ngày trả** (khách không đến) không tự hủy. Lễ tân hủy tay; nhận phòng lúc đó bị chặn (Q8).
+
+### 4.4 Đặt breakpoint theo sơ đồ (chuẩn bị vấn đáp)
+Mỗi mũi tên của sơ đồ là một hàm của `Booking`: `CheckIn(now)`, `CheckOut(now)`, `Cancel()`. Điều kiện chặn (guard) nằm ngay đầu hàm, nên breakpoint đặt ở dòng đầu của hàm cho thấy trạng thái trước khi chuyển.
+
+Ví dụ: đặt breakpoint ở `Booking.CheckIn`, chọn một booking Đã đặt có ngày nhận là ngày mai trên `frm203` rồi bấm Nhận phòng. Call Stack:
+
+```
+Booking.CheckIn                      ← dừng ở đây; Status = Reserved, now.Date < CheckInDate
+StayService.CheckIn.AnonymousMethod  (thân lambda truyền vào Execute)
+UnitOfWork.Execute
+StayService.CheckIn
+ErrorHandler.Run
+frm203_nv_luu_tru.btnCheckIn_Click
+```
+
+Bước qua (F10) thì `BusinessRuleException` được ném; trong cửa sổ Locals `Status` vẫn là `Reserved`, đúng với "lỗi thì trạng thái giữ nguyên" ở bảng 4.1. Kiểm thử tương ứng: TC2-04.
