@@ -1,0 +1,45 @@
+@startuml dfd-level1-f7
+' [TV2] Level-1 DFD of process 7.0 "Khách hàng thân thiết" (BFD branch F7).
+' Gane-Sarson notation as far as PlantUML allows (05-dfd.md, section 5):
+'   external entity: grey box with a bold border
+'   process: rounded box, number on top, name under a line; processes of other branches (3.0, 6.0) are dashed
+'   data store: box "Dn | name"; PlantUML cannot leave the right side open
+' Store numbers and names follow docs/tasks/v2-p1-analysis.md, section 1.5.
+left to right direction
+skinparam shadowing false
+skinparam roundCorner 20
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #333333
+}
+
+rectangle "Khách hàng" as KH #EEEEEE;line.bold
+rectangle "Quản trị hệ thống" as ADM #EEEEEE;line.bold
+
+rectangle "3.0\n──────────\nĐiều phối & xử lý" as P30 #FFFFFF;line.dashed
+rectangle "6.0\n──────────\nLưu trú" as P60 #FFFFFF;line.dashed
+
+rectangle "7.1\n──────────\nDanh mục\nquà tặng" as P71
+rectangle "7.2\n──────────\nSổ điểm\n& đổi quà" as P72
+
+rectangle "D5 │ Khách hàng" as D5 #F5F5F5
+rectangle "D9 │ Sổ điểm" as D9 #F5F5F5
+rectangle "D10 │ Quà tặng & lượt đổi" as D10 #F5F5F5
+
+ADM --> P71 : thông tin quà
+P71 --> D10 : quà mới / quà đã sửa
+D10 --> P71 : quà hiện có
+
+KH --> P72 : yêu cầu xem điểm,\nyêu cầu đổi quà / hủy đổi
+P72 --> KH : sổ điểm, số dư,\nphiếu đổi quà, thông báo từ chối
+D5 --> P72 : hạng khách
+D9 --> P72 : các giao dịch điểm
+D10 --> P72 : điểm quy đổi, hạng tối thiểu,\nsố lượng còn
+P72 --> D10 : lượt đổi (điểm chốt) / trạng thái hủy;\nsố lượng −1 / +1
+P72 --> D9 : dòng −điểm đổi quà / +điểm hoàn
+
+P60 --> D9 : dòng +điểm lưu trú
+P60 --> D5 : hạng mới
+P30 --> D9 : dòng +điểm thiện chí\n(ticket đã đóng, Q12)
+P30 --> D5 : hạng mới
+@enduml

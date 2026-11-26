@@ -1,0 +1,82 @@
+@startuml seq-l3-checkout
+' [TV2] Sequence diagram of flow L3: check-out, crossing into the TV1 subsystem, in one database transaction.
+title L3 – Trả phòng (UC08, luồng C) – một giao dịch CSDL
+
+actor "Lễ tân" as LT
+boundary "frm203_nv_luu_tru" as FRM
+participant "ErrorHandler" as EH
+control "StayService" as SVC
+participant "actor : Employee" as ACT
+participant "IUnitOfWork" as UOW
+participant "BookingRepository" as BR
+entity "booking : Booking" as BK
+participant "CustomerRepository" as CR
+entity "customer : Customer" as CU
+entity "tier : MembershipTier" as TIER
+participant "PointTransactionRepository" as PR
+participant "InteractionRepository" as IR
+box "Phân hệ TV1" #EEF3FF
+  participant "ISurveyScheduler\n(SurveyScheduler)" as SS
+end box
+database "SQLite" as DB
+
+LT -> FRM : bấm "Trả phòng"
+activate FRM
+FRM -> EH : Run(...)
+activate EH
+EH -> SVC : CheckOut(actor, bookingId)
+activate SVC
+SVC -> ACT : EnsureCanManageStays()
+note right of ACT : Q6; CSKH → AuthorizationException
+SVC -> UOW : Execute(work)
+activate UOW
+UOW -> DB : BEGIN
+
+group work: lambda của StayService chạy trong Execute
+SVC -> BR : GetRequired(bookingId)
+BR --> SVC : booking
+SVC -> BK : CheckOut(now)
+note right of BK : Q8: phải đang CheckedIn
+SVC -> BR : Save(booking)
+
+SVC -> CR : GetRequired(booking.CustomerId)
+CR --> SVC : customer (kèm LifetimePoints)
+SVC -> TIER : PointsFor(booking.TotalAmount)
+note right of TIER : Q9: hạng trước khi trả phòng\nthành tiền / 10.000 × EarnRate, làm tròn xuống
+TIER --> SVC : points
+
+opt points > 0
+  SVC -> PR : Add(PointTransaction.ForStay(...))
+  SVC -> CU : EarnPoints(points)
+  note right of CU : cộng điểm đã tích,\nnâng hạng bằng Next(), có thể nhiều bậc
+  CU --> SVC : upgraded
+  SVC -> CR : Save(customer)
+end
+
+SVC -> IR : Add(new Interaction(..., "Trả phòng, +N điểm"))
+SVC -> SS : ScheduleFor(booking.Id, now)
+activate SS
+note right of SS : tham gia cùng giao dịch;\ntạo phiếu khảo sát "Chờ"
+SS -> DB : INSERT surveys
+SS --> SVC
+deactivate SS
+end
+
+alt mọi bước thành công
+  UOW -> DB : COMMIT
+  UOW --> SVC
+  SVC --> EH : CheckOutResult(points, tierName, upgraded)
+  EH --> FRM
+  FRM --> LT : "Đã trả phòng, +N điểm" (+ "Khách lên hạng ...")
+else một bước ném ngoại lệ (sai trạng thái, lỗi SurveyScheduler, lỗi CSDL)
+  UOW -> DB : ROLLBACK
+  note over UOW, DB : booking vẫn CheckedIn; không có dòng sổ điểm,\nhạng và tương tác không đổi, không có phiếu khảo sát
+  UOW --> SVC : ngoại lệ (ném lại)
+  SVC --> EH : ngoại lệ
+  EH --> FRM : hiện thông báo tiếng Việt; lỗi không lường trước thì ghi logs/error.log
+end
+deactivate UOW
+deactivate SVC
+deactivate EH
+deactivate FRM
+@enduml

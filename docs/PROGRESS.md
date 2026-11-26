@@ -4,7 +4,7 @@ Kế hoạch: `docs/PLAN.md` (v2). Việc chi tiết giai đoạn đang làm: `d
 
 Cách cập nhật: mỗi người sửa dòng/ô của mình trong PR của mình, sau mỗi module (đánh dấu `[x]`, đổi cột trạng thái, thêm một dòng nhật ký). Không sửa dòng của người kia.
 
-Cập nhật lần cuối: 25/11/2026 (M1, TV1).
+Cập nhật lần cuối: 26/11/2026 (PR #3, TV2).
 
 ## 1. Trạng thái giai đoạn
 | Giai đoạn | Thời gian (plan) | Trạng thái | Mốc kiểm cuối giai đoạn |
@@ -19,13 +19,13 @@ Cập nhật lần cuối: 25/11/2026 (M1, TV1).
 | Module | Hạn | TV1 | TV2 | Trạng thái (25/11) |
 |---|---|---|---|---|
 | M1 Chuẩn bị | 22/11 | **Xong 25/11** (trễ 3 ngày): `CLAUDE.md`, `docs/PLAN.md` v2, file này, `docs/tasks/v2-p1-analysis.md`, xóa tài liệu v1 khỏi cây thư mục, dọn đồ v1 | PR #1 đã merge (25/11); xác nhận phân công khi approve PR #4 (25/11) | **Xong 25/11**: PR #4 (`tv1/m1-setup` → `v2`) đã được TV2 approve và merge |
-| M2 Khảo sát | 23/11 | Chưa làm | Chưa làm | **Quá hạn 2 ngày** |
-| M3 BFD + UC | 24/11 | Chưa làm | Chưa làm | **Quá hạn 1 ngày** |
-| M4 Quy tắc, quyền, DFD | 25/11 | Chưa làm | Chưa làm | **Đến hạn hôm nay, chưa làm** |
-| M5 ERD + CSDL | 26/11 | Chưa làm | Chưa làm | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
-| M6 Lớp + package + hợp đồng | 27/11 | Chưa làm | Chưa làm (đã có code Domain trong PR #2) | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
-| M7 Hành vi | 28/11 | Chưa làm | Chưa làm | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
-| M8 Giao diện + test | 28/11 | Chưa làm | Chưa làm | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M2 Khảo sát | 23/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11); ảnh BM4–BM7 thật chưa có | **Quá hạn 2 ngày** |
+| M3 BFD + UC | 24/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | **Quá hạn 1 ngày** |
+| M4 Quy tắc, quyền, DFD | 25/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | **Đến hạn hôm nay, chưa làm** |
+| M5 ERD + CSDL | 26/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M6 Lớp + package + hợp đồng | 27/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11); còn chốt hợp đồng 27/11; code Domain trong PR #2 | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M7 Hành vi | 28/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M8 Giao diện + test | 28/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
 | M9 Slide + tự đánh giá L2 | 29/11 | Chưa làm | Chưa làm | Chưa tới hạn; slide nộp **30/11 (không dời)** |
 
 Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
@@ -76,14 +76,14 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 
 ## 4. Việc của TV2 (sao từ PLAN mục 6.5)
 **Tài liệu & sơ đồ (P1)**
-- [ ] Đọc plan, xác nhận phân công; cùng merge PR #1 (22/11) — PR #1 đã merge 25/11; còn xác nhận phân công
-- [ ] Hiện trạng phần khách hàng, lưu trú, điểm, chiến dịch; biểu mẫu BM4 Phiếu đăng ký thành viên, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chiến dịch; yêu cầu chức năng F5–F8 (23/11)
-- [ ] Lá BFD F5–F8; đặc tả UC08, UC09, UC10 (24/11)
-- [ ] Q7–Q13 với tiền/hậu điều kiện và ngoại lệ; DFD mức 1 của F7 (25/11)
-- [ ] Phần ERD 10 bảng TV2; giải thích thuộc tính lịch sử (giá/đêm chốt, điểm quy đổi chốt) (26/11)
-- [ ] Sơ đồ lớp TV2; khai báo `ITicketQuery`, `ISurveyScheduler`, `ICustomerCareStats`; chốt hợp đồng với TV1 (27/11)
-- [ ] Sơ đồ tuần tự L3 (trả phòng, có khung alt rollback); máy trạng thái booking (28/11)
-- [ ] Bảng Form F5–F8; ma trận test TC2-xx; bảng tính tay R5 (28/11)
+- [x] Đọc plan, xác nhận phân công; cùng merge PR #1 (22/11) — PR #1 đã merge 25/11; xác nhận phân công khi approve PR #4 (25/11)
+- [x] Hiện trạng phần khách hàng, lưu trú, điểm, chiến dịch; biểu mẫu BM4 Phiếu đăng ký thành viên, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chiến dịch; yêu cầu chức năng F5–F8 (23/11) — PR #3; ảnh biểu mẫu thật chưa có (mục 7)
+- [x] Lá BFD F5–F8; đặc tả UC08, UC09, UC10 (24/11) — PR #3
+- [x] Q7–Q13 với tiền/hậu điều kiện và ngoại lệ; DFD mức 1 của F7 (25/11) — PR #3
+- [x] Phần ERD 10 bảng TV2; giải thích thuộc tính lịch sử (giá/đêm chốt, điểm quy đổi chốt) (26/11) — PR #3
+- [ ] Sơ đồ lớp TV2; khai báo `ITicketQuery`, `ISurveyScheduler`, `ICustomerCareStats`; chốt hợp đồng với TV1 (27/11) — sơ đồ lớp và khai báo đã viết (PR #3); còn chốt hợp đồng 27/11
+- [x] Sơ đồ tuần tự L3 (trả phòng, có khung alt rollback); máy trạng thái booking (28/11) — PR #3
+- [x] Bảng Form F5–F8; ma trận test TC2-xx; bảng tính tay R5 (28/11) — PR #3
 - [ ] Slide phần TV2; biên dịch PDF cả bộ (29/11)
 
 **Domain (P2, 1–4/12, chưa cần CSDL)**
@@ -131,9 +131,9 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 ## 6. Việc đang dở
 | Việc | Ai | Trạng thái |
 |---|---|---|
-| PR #2 `tv2/domain` → `v2` (Domain P2 đợt 1: hệ số tích điểm, sổ điểm, đổi quà, chiến dịch, 3 phân khúc + test) | TV2 mở 25/11, TV1 review | chờ TV1 review trong 24 giờ (tới 26/11) |
-| PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | TV2 rebase lên `v2` sau khi PR #4 merge, sửa theo khung của `docs/tasks/v2-p1-analysis.md`; sau đó TV1 review |
-| M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | bắt đầu sau khi M1 merge; xem `docs/tasks/v2-p1-analysis.md` |
+| PR #2 `tv2/domain` → `v2` (Domain P2 đợt 1: hệ số tích điểm, sổ điểm, đổi quà, chiến dịch, 3 phân khúc + test) | TV2 mở 25/11, TV1 review | TV1 approve 26/11, góp ý 5 điểm không chặn merge (sửa ở đợt 2); chờ TV2 merge |
+| PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | đã rebase lên `v2` (`37884a0`) và sửa theo khung của `docs/tasks/v2-p1-analysis.md` (25/11); TV1 approve 26/11, đồng ý 7 điểm hỏi; TV2 đã sửa 3 việc trước khi merge (mục 8, Q13, tiêu đề PR) (26/11); chờ TV2 merge |
+| M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | TV2: phần mình nằm trong PR #3 (M2–M8); TV1: bắt đầu sau khi M1 merge, xem `docs/tasks/v2-p1-analysis.md` |
 | Sửa đường dẫn trong slide: `sec1`, `sec3`, `sec5`, `sec6` còn trỏ `docs/PLAN.md` (v1), `docs/PROGRESS.md` (v1), `docs/tasks/stage-*.md` — các file này đã xóa (bản v1 chỉ còn trong lịch sử git, `fd7b7e4`) | TV2 | làm ở M9 |
 
 ## 7. Việc chờ người
@@ -159,11 +159,15 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 
 | Ngày | Ai | Lệch gì (mục PLAN) | Lý do | Ai duyệt |
 |---|---|---|---|---|
-| 25/11 | TV2 | Q7 (PLAN 5.3): quốc tịch Việt Nam → CCCD đúng 12 chữ số; quốc tịch khác → hộ chiếu 6–9 ký tự chữ và số. PLAN chỉ ghi "CCCD 12 số" | khách nước ngoài không có CCCD | TV1 + TV2 (PR #3 `284ee92`, PR #4) |
-| 25/11 | TV2 | Q9 (PLAN 5.3): điểm khi trả phòng tính theo hạng khách đang có **trước khi** trả phòng; hạng mới (nếu lên hạng) áp dụng từ lần ở sau | một cách tính duy nhất để bảng tính tay R5 và test khớp nhau | TV1 + TV2 (PR #3 `284ee92`, PR #4) |
-| 25/11 | TV2 | Q11 (PLAN 5.3): chiến dịch phải có ít nhất một khách; khách trở nên không đủ điều kiện giữa lúc xem trước và lúc lưu thì bị loại, các khách còn lại vẫn được lưu và được báo rõ khách nào bị loại | PLAN chưa nói trường hợp danh sách rỗng và khách đổi điều kiện giữa chừng (UC10 A3a, E3) | TV1 + TV2 (PR #3 `284ee92`, PR #4) |
+| 25/11 | TV2 | Q7 (PLAN 5.3): quốc tịch Việt Nam → CCCD đúng 12 chữ số; quốc tịch khác → hộ chiếu 6–9 ký tự chữ và số. PLAN chỉ ghi "CCCD 12 số" | khách nước ngoài không có CCCD | TV1 + TV2 (PR #3 `3ccc924`, PR #4) |
+| 25/11 | TV2 | Q9 (PLAN 5.3): điểm khi trả phòng tính theo hạng khách đang có **trước khi** trả phòng; hạng mới (nếu lên hạng) áp dụng từ lần ở sau | một cách tính duy nhất để bảng tính tay R5 và test khớp nhau | TV1 + TV2 (PR #3 `3ccc924`, PR #4) |
+| 25/11 | TV2 | Q11 (PLAN 5.3): chiến dịch phải có ít nhất một khách; khách trở nên không đủ điều kiện giữa lúc xem trước và lúc lưu thì bị loại, các khách còn lại vẫn được lưu và được báo rõ khách nào bị loại | PLAN chưa nói trường hợp danh sách rỗng và khách đổi điều kiện giữa chừng (UC10 A3a, E3) | TV1 + TV2 (PR #3 `3ccc924`, PR #4) |
 | 25/11 | TV1 | Bản kế hoạch gốc (mục 8 "Bước làm ngay", bước 3) định chuyển tài liệu v1 vào `docs/archive/`; M1 xóa hẳn khỏi cây thư mục (bản v1 vẫn còn trong lịch sử git, `fd7b7e4`) | tránh giữ hai bộ tài liệu song song trong repo | TV1 + TV2 (PR #4) |
 | 25/11 | TV1 + TV2 | File checklist và HuongdanXDHTTTQL (PLAN mục 0) không đưa lên repo; mỗi người tự giữ bản ở `docs/slide_checklist/` (đã `.gitignore`) | repo public, đây là tài liệu của giảng viên | TV1 (TV2 đề nghị có file hoặc ghi rõ là file ngoài repo, PR #4) |
+| 25/11 | TV2 | Q10 (PLAN 5.3, cột "Cài ở đâu"): bỏ `Customer.SpendPoints`; điều kiện đổi quà do `Reward.EnsureCanRedeem(tier, balance)` quyết định, số dư là tổng sổ điểm và không lưu (`07-thiet-ke-lop.md` mục 4.1) | `Customer` không giữ số dư nên không có gì để trừ; tránh hai nơi cùng giữ số dư | TV1 + TV2 (PR #3) |
+| 25/11 | TV2 | File task mục 1.1 ("mỗi người, mỗi module một nhánh"): P1 của TV2 nằm trên một nhánh `tv2/p1-analysis` (PR #3), mỗi module một commit | PR #3 mở trước khi có file task; tách lại thì mất lịch sử review | TV1 + TV2 (PR #3) |
+| 26/11 | TV2 | Q13 (PLAN 5.3): không xóa khách đã có lưu trú, ticket **hoặc đã nằm trong chiến dịch**; `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`. PLAN chỉ ghi "lưu trú hoặc ticket" | khách chưa ở lần nào vẫn có thể nằm trong chiến dịch; xóa khách này thì khóa ngoại `campaign_targets.CustomerId` (RESTRICT) chặn với lỗi khó hiểu, còn `CASCADE` làm mất số liệu R4 (`06-erd.md` mục 3.5) | TV1 + TV2 (PR #3) |
+| 26/11 | TV2 | PLAN 5.2 (`point_transactions.Reason`): bỏ giá trị "Điều chỉnh", chỉ còn `Stay`, `Goodwill`, `Redemption`; hoàn điểm khi hủy lượt đổi dùng chung `Redemption` (dòng dương cùng `RedemptionId`). R3: điểm đã tích = tổng dòng `Stay` + `Goodwill`; điểm đã đổi = −tổng dòng `Redemption` (ròng, lượt đã hủy góp 0) | không UC, Form hay quyền nào cho phép chỉnh điểm tay; thêm giá trị thì thành code chết | TV1 + TV2 (PR #3) |
 
 ## 9. Nhật ký
 | Ngày | Ai | Việc |
@@ -175,3 +179,5 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV1 | Dọn đồ v1 (chỉ ở máy TV1, không đụng GitHub): xóa `docs/TEAM-BRIEF.md` và thư mục `handoff/` (patch 01–09 kèm `.msg.txt`, `README.txt`, `export-patch-SKILL.draft.md`, `stage3-notes.md`; cả hai đều bị `.gitignore`, không có trong git); bỏ 2 mục `handoff/` và `docs/TEAM-BRIEF.md` khỏi `.gitignore`; xóa worktree `.claude/worktrees/b-work` (sạch); xóa nhánh cục bộ `local/b-work` (`d837bb1`, chưa từng push) và `feature/a-ticket` (`2d06e0b`, đã merge vào `develop`) |
 | 25/11 | TV2 | Review PR #4: approve, xác nhận phân công v2; đề nghị ghi các quyết định lệch vào mục 8 và xử lý `docs/slide_checklist/`; nhận sửa PR #3 theo file task |
 | 25/11 | TV1 | Sửa PR #4 theo review (mục 8, `docs/slide_checklist/` ngoài repo + `.gitignore`), merge PR #4 vào `v2` |
+| 25/11 | TV2 | Rebase PR #3 lên `v2` (`37884a0`; commit "Record the three decisions agreed with TV1" đổi mã từ `284ee92` thành `3ccc924`). Sửa 10 file `docs/analysis/` theo khung của file task (mục của TV1 và mục chung TV1 để dòng chờ); bỏ mã YC tự đặt, dùng mã F; ảnh biểu mẫu vào `docs/analysis/bieu-mau/`; đổi tên `use-case-tv2.iuml`, `dfd-level1-f7.puml`; DFD F7 theo Gane–Sarson với kho D5, D9, D10; mã test TC2-11…TC2-14; thêm loại ngoại lệ + thông báo cho UC08–UC10, Strategy (7.2), Observer phía nhận (7.3), cây `MembershipTier` (8.2), phác thảo bố cục 7 Form, kế hoạch tiêm lỗi |
+| 26/11 | TV2 | Sửa PR #3 theo review approve của TV1 (26/11): mục 8 đổi 2 dòng sang "TV1 + TV2", thêm dòng Q13 mở rộng và dòng bỏ "Điều chỉnh" của `PointReason` (kèm cách R3 tính điểm đã đổi); Q13 mở rộng ở `04`, `06` mục 3.5, `07` mục 4.1/4.3, `class-tv2.iuml`; thêm ca "khách chỉ nằm trong chiến dịch" vào TC2-10; sửa tiêu đề, mô tả PR |

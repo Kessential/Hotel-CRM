@@ -1,0 +1,27 @@
+@startuml state-booking
+' [TV2] State machine of a booking (Q8). Implemented as the BookingStatus enum with guards in Booking.
+title Máy trạng thái của booking (Q8)
+
+[*] --> Reserved : Booking(...)\n[ngày trả > ngày nhận,\nphòng trống]\n/ chốt RatePerNight
+
+Reserved : Đã đặt
+Reserved : giữ phòng trong [ngày nhận, ngày trả)
+
+CheckedIn : Đang ở
+CheckedIn : entry / ghi CheckedInAt
+
+CheckedOut : Đã trả phòng
+CheckedOut : entry / ghi CheckedOutAt, cộng điểm, xét hạng,\nghi tương tác, tạo phiếu khảo sát "Chờ" (L3)
+
+Cancelled : Đã hủy
+Cancelled : không giữ phòng, không tính báo cáo
+
+Reserved --> CheckedIn : CheckIn(now)\n[ngày nhận ≤ now.Date < ngày trả]
+Reserved --> Cancelled : Cancel()
+CheckedIn --> CheckedOut : CheckOut(now)
+
+CheckedOut --> [*]
+Cancelled --> [*]
+
+note "Mọi sự kiện khác (ví dụ Cancel khi Đang ở,\nCheckOut khi Đã đặt, CheckIn lần hai)\n→ BusinessRuleException, trạng thái giữ nguyên" as N1
+@enduml
