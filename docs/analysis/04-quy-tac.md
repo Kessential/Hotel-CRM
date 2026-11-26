@@ -24,7 +24,7 @@ Cách cài: service tra cứu dữ liệu và kiểm quyền; lớp Domain quy�
 | Q10 | Đổi quà đúng điều kiện, điểm chốt lúc đổi | | `Reward`, `RewardRedemption`, `PointTransaction` | có | TC2-06, TC2-07, TC2-14 |
 | Q11 | Chọn khách cho chiến dịch, ghi phản hồi đúng hạn | ✓ L4 (`ITicketQuery`) | `Campaign`, `ISegmentStrategy` | có | TC2-08, TC2-09, TC2-14 |
 | Q12 | Đóng ticket → điểm thiện chí, cùng giao dịch | ✓ L2 (`ITicketObserver`) | `GoodwillPointsObserver`, `PointTransaction` | `ForGoodwill` có; observer P3 | integration L2 của TV1 |
-| Q13 | Không xóa khách đã có lưu trú hoặc ticket | ✓ L5 (`ITicketQuery`) | `Customer` | đợt 2 | TC2-10 |
+| Q13 | Không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch | ✓ L5 (`ITicketQuery`) | `Customer` | đợt 2 | TC2-10 |
 
 ### Q7 – Hồ sơ khách hợp lệ và không trùng
 - **Phát biểu:**
@@ -134,16 +134,18 @@ Cách cài: service tra cứu dữ liệu và kiểm quyền; lớp Domain quy�
 - **Ca test:** integration của TV1 cho luồng L2 (đầy đủ và rollback).
 - **Giá trị biên:** không có.
 
-### Q13 – Không xóa khách đã có lưu trú hoặc ticket
-- **Phát biểu:** không xóa khách đã có ít nhất một booking (mọi trạng thái, kể cả Đã hủy) hoặc ít nhất một ticket (mọi trạng thái). Lý do: các bảng `bookings`, `tickets`, `point_transactions`, `interactions` trỏ tới khách; xóa khách làm mất lịch sử CRM.
+### Q13 – Không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch
+- **Phát biểu:**
+  - Không xóa khách đã có ít nhất một booking (mọi trạng thái, kể cả Đã hủy), ít nhất một ticket (mọi trạng thái), hoặc đã nằm trong ít nhất một chiến dịch (mọi phản hồi, kể cả chưa phản hồi).
+  - Lý do: các bảng `bookings`, `tickets`, `point_transactions`, `interactions`, `campaign_targets` trỏ tới khách; xóa khách làm mất lịch sử CRM và số liệu báo cáo R4.
+  - PLAN 5.3 chỉ ghi "lưu trú hoặc ticket". Phần "đã nằm trong chiến dịch" thêm vào để khách chưa ở lần nào nhưng đã được chọn vào chiến dịch (ví dụ "Sinh nhật trong tháng") bị Domain chặn với thông báo rõ ràng, thay vì lỗi khóa ngoại của CSDL (`06-erd.md` mục 3.5; TV1 + TV2 duyệt ở PR #3).
 - **Tiền điều kiện:** người thao tác là Quản lý hoặc Admin (Q6).
 - **Hậu điều kiện:** khách bị xóa, hoặc không có gì thay đổi.
-- **Vi phạm:** còn booking hoặc ticket → `BusinessRuleException` nêu số booking/ticket, ví dụ "Không xóa được khách đã có 2 lần đặt phòng và 1 ticket."; thiếu quyền → `AuthorizationException`. Khóa ngoại `ON DELETE RESTRICT` là lớp chặn thứ hai ở CSDL.
-- **Lớp/hàm:** `Customer.EnsureCanBeDeleted(hasStays, hasTickets)` (đợt 2; bản v1 chỉ xét ticket chưa đóng).
+- **Vi phạm:** còn booking, ticket hoặc chiến dịch → `BusinessRuleException` nêu lý do, ví dụ "Không xóa được khách đã có lần đặt phòng, ticket hoặc đã nằm trong chiến dịch chăm sóc."; thiếu quyền → `AuthorizationException`. Khóa ngoại `ON DELETE RESTRICT` là lớp chặn thứ hai ở CSDL.
+- **Lớp/hàm:** `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)` (đợt 2; bản v1 chỉ xét ticket chưa đóng). `CustomerService` tra cứu ba giá trị rồi gọi hàm này; `hasStays` và `inCampaigns` đọc từ bảng của TV2 (`bookings`, `campaign_targets`).
 - **Liên phân hệ (L5):** "khách có ticket không" hỏi phân hệ TV1 qua `ITicketQuery.HasAnyTicket`.
 - **Ca test:** TC2-10.
-- **Giá trị biên:** 0 booking và 0 ticket (xóa được) / 1 booking Đã hủy (lỗi) / 1 ticket Đã đóng (lỗi).
-- **Câu hỏi còn mở:** khách chỉ nằm trong chiến dịch (chưa ở, chưa có ticket) thì sao; xem `06-erd.md` mục 3.5.
+- **Giá trị biên:** không có booking, ticket, chiến dịch (xóa được) / 1 booking Đã hủy (lỗi) / 1 ticket Đã đóng (lỗi) / chỉ nằm trong 1 chiến dịch, chưa phản hồi (lỗi).
 
 ### Việc phát sinh cho code [TV2]
-- Đợt 2 (`Customer`, `Booking`): cài Q7 theo quốc tịch, Q9 `EarnPoints`, Q13 theo `hasStays`/`hasTickets`, `Booking.CheckOut(now)`.
+- Đợt 2 (`Customer`, `Booking`): cài Q7 theo quốc tịch, Q9 `EarnPoints`, Q13 theo `hasStays`/`hasTickets`/`inCampaigns`, `Booking.CheckOut(now)`.

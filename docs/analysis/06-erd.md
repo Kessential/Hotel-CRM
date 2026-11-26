@@ -168,13 +168,14 @@ Khóa ghép `(CampaignId, CustomerId)` chính là quy tắc "mỗi khách một 
   - Ngoài ra, phân hệ TV1 hỏi hạng theo lô để tính SLA (`ICustomerDirectory`). Có cột `Tier` thì không phải tính tổng sổ điểm cho từng khách.
   - Cột chỉ được ghi ở một chỗ: `Customer.EarnPoints`, sau khi cộng điểm.
 
-### 3.5 Câu hỏi còn mở
-1. **Xóa khách chỉ có trong chiến dịch.** Q13 chỉ chặn khách có lưu trú hoặc ticket. Khách chưa ở lần nào vẫn có thể nằm trong chiến dịch "Sinh nhật trong tháng". Khi xóa khách này, khóa ngoại `campaign_targets.CustomerId` (RESTRICT) sẽ chặn ở CSDL với một lỗi khó hiểu.
-   - **Đề xuất:** mở rộng Q13 thành "không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch", để Domain báo lỗi rõ ràng.
-   - **Cách khác:** dùng `CASCADE` cho cột này, nhưng như vậy làm mất số liệu của báo cáo R4.
-
-   Cần TV1 đồng ý.
-2. **Quy ước kiểu dữ liệu ở mục 3.1** (tiền là `INTEGER`, ngày là `TEXT`) do TV2 đề xuất; TV1 chốt khi viết khung `schema.sql`.
+### 3.5 Quyết định đã chốt với TV1 (PR #3, 26/11)
+1. **Xóa khách chỉ có trong chiến dịch.** Bản đầu của Q13 chỉ chặn khách có lưu trú hoặc ticket. Khách chưa ở lần nào vẫn có thể nằm trong chiến dịch "Sinh nhật trong tháng". Khi xóa khách này, khóa ngoại `campaign_targets.CustomerId` (RESTRICT) sẽ chặn ở CSDL với một lỗi khó hiểu.
+   - **Đã chốt:** mở rộng Q13 thành "không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch" (`04-quy-tac.md` Q13), để Domain báo lỗi rõ ràng: `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`.
+   - **Cách đã loại:** dùng `CASCADE` cho cột này, vì như vậy làm mất số liệu của báo cáo R4.
+2. **Quy ước kiểu dữ liệu ở mục 3.1** (tiền `INTEGER`, ngày `TEXT 'yyyy-MM-dd'`, thời điểm `TEXT 'yyyy-MM-dd HH:mm:ss'`, trạng thái `TEXT` + `CHECK`): TV1 đồng ý, áp dụng khi viết khung `schema.sql`.
+3. **`point_transactions.Reason` chỉ có 3 giá trị** (`Stay`, `Goodwill`, `Redemption`), bỏ "Điều chỉnh" của PLAN 5.2, vì không UC, Form hay quyền nào cho phép chỉnh điểm tay. Hoàn điểm khi hủy lượt đổi dùng chung `Redemption` (dòng dương, cùng `RedemptionId` với dòng âm). Vì vậy R3 tính:
+   - **Điểm đã tích** = `SUM(Points)` của các dòng `Stay` và `Goodwill`.
+   - **Điểm đã đổi** = `-SUM(Points)` của các dòng `Redemption`, tức số điểm đổi quà ròng sau khi trừ phần đã hoàn. Lượt đổi đã hủy có dòng −x và +x nên góp 0.
 
 ## 4. Khóa ngoại nối hai phân hệ [Chung – TV1 + TV2]
 

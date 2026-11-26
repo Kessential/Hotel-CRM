@@ -17,7 +17,7 @@ Sơ đồ: `diagrams/class-tv2.iuml`. Cột "Trạng thái": «đã có» là l�
 ### 4.1 Lớp Domain
 | Lớp | Vai trò | Hành vi chính (quyết định quy tắc) | Trạng thái |
 |---|---|---|---|
-| `Customer` : `Person` | hồ sơ khách | `UpdateProfile`, `EnsureUnique` (Q7), `EnsureCanBeDeleted` (Q13), `EarnPoints` (Q9: cộng điểm đã tích, nâng hạng bằng `Next()`, trả `true` nếu lên hạng) | đợt 2 |
+| `Customer` : `Person` | hồ sơ khách | `UpdateProfile`, `EnsureUnique` (Q7), `EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)` (Q13), `EarnPoints` (Q9: cộng điểm đã tích, nâng hạng bằng `Next()`, trả `true` nếu lên hạng) | đợt 2 |
 | `MembershipTier` (abstract) + `StandardTier`, `SilverTier`, `GoldTier`, `VipTier` | hạng, mỗi hạng tự trả số liệu của mình | `PointsFor`, `IsAtLeast`, `Next` | đã có |
 | `Interaction` | một lần liên hệ với khách | kiểm tra nội dung không rỗng | đợt 2 |
 | `RoomType`, `Room` | danh mục phòng (kết tập ◇) | `Room.EnsureAvailable` (Q8) | có (v1), sửa đợt 2 |
@@ -28,7 +28,7 @@ Sơ đồ: `diagrams/class-tv2.iuml`. Cột "Trạng thái": «đã có» là l�
 | `Receptionist` : `Employee` | vai trò Lễ tân | override các hàm quyền mà TV1 khai báo ở `Employee` | đợt 2, sau khi TV1 viết lại `Employee` |
 | enum `ContactChannel`, `BookingStatus`, `PointReason`, `RedemptionStatus`, `CampaignResponse` | | | |
 
-Một chỗ lệch so với PLAN 5.3 (ghi ở `docs/PROGRESS.md` mục 8, chờ TV1 duyệt trong PR #3) và một ghi chú thiết kế:
+Một chỗ lệch so với PLAN 5.3 (ghi ở `docs/PROGRESS.md` mục 8, TV1 + TV2 duyệt trong PR #3) và một ghi chú thiết kế:
 - **Không có `Customer.SpendPoints`.** Quy tắc đổi quà (Q10) đã do `Reward.EnsureCanRedeem(tier, balance)` quyết định. Số dư là tổng sổ điểm (không lưu, mục 3.4 của `06-erd.md`), nên `Customer` không giữ số dư để trừ.
 - **`Customer.LifetimePoints`** (điểm đã tích) không phải cột CSDL. Repository tính bằng tổng các dòng Lưu trú và Thiện chí khi nạp khách. `EarnPoints` cộng vào con số này rồi xét hạng.
 
@@ -37,7 +37,7 @@ Một chỗ lệch so với PLAN 5.3 (ghi ở `docs/PROGRESS.md` mục 8, chờ 
 | Lớp | Vai trò | Phụ thuộc (qua constructor) |
 |---|---|---|
 | `ISegmentStrategy` + `VipSegment`, `LapsedGuestSegment`, `BirthdayMonthSegment`, `SegmentCandidate` | Strategy chọn khách (đã có) | – |
-| `CustomerService` | UC07 | repository khách, `ITicketQuery` (L5) |
+| `CustomerService` | UC07 | repository khách, booking, chiến dịch (Q13); `ITicketQuery` (L5) |
 | `StayService` | UC08 | repository phòng, booking, khách, sổ điểm, tương tác; `ISurveyScheduler` (L3); `IUnitOfWork`; `IClock` |
 | `LoyaltyService` | UC09 | repository quà, lượt đổi, sổ điểm, khách; `IUnitOfWork`; `IClock` |
 | `CampaignService` | UC10, Context của Strategy | danh sách `ISegmentStrategy`; repository chiến dịch, khách; `ITicketQuery` (L4); `IUnitOfWork`; `IClock` |
@@ -51,7 +51,8 @@ Mọi hàm ghi của service nhận `Employee actor` và gọi kiểm quyền tr
 
 ### 4.3 Câu hỏi còn mở
 1. Tên hàm quyền ở `Employee` v2 (TV1 quyết) để `Receptionist` override.
-2. Q13 mở rộng sang khách đã nằm trong chiến dịch (`06-erd.md` mục 3.5). Nếu đồng ý thì `EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`.
+
+Đã chốt với TV1 (PR #3, 26/11): Q13 mở rộng sang khách đã nằm trong chiến dịch (`06-erd.md` mục 3.5), nên hàm là `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`. `CustomerService` tra cứu ba giá trị, `Customer` quyết định và ném `BusinessRuleException`.
 
 ## 5. Package diagram và chiều phụ thuộc [Chung – TV1]
 _[Chung – TV1] chưa điền._

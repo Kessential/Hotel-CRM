@@ -16,7 +16,7 @@ package "Domain.Customers" {
     + Customer(id, fullName, phone, email, identityNumber, nationality, dateOfBirth, marketingConsent, notes, now)
     + UpdateProfile(...) : void
     + EnsureUnique(phoneTaken, emailTaken, identityTaken) : void
-    + EnsureCanBeDeleted(hasStays, hasTickets) : void
+    + EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns) : void
     + EarnPoints(points) : bool
   }
   abstract class MembershipTier <<đã có>> {
