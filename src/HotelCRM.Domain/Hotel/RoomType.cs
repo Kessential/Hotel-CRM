@@ -4,7 +4,7 @@ using HotelCRM.Domain.Interfaces;
 namespace HotelCRM.Domain.Hotel;
 
 /// <summary>
-/// A category of rooms with one price. Aggregates the rooms of that category: rooms register
+/// A category of rooms with one current price. Aggregates the rooms of that category: rooms register
 /// themselves here when they are created.
 /// </summary>
 public sealed class RoomType : IEntity
@@ -12,27 +12,32 @@ public sealed class RoomType : IEntity
     private readonly List<Room> _rooms = new();
 
     /// <summary>Creates a room type.</summary>
-    /// <param name="id">Id obtained from the room type repository.</param>
-    /// <param name="name">Display name, for example "Deluxe Double"; required.</param>
-    /// <param name="pricePerNight">Price of one night in USD; must be greater than 0.</param>
+    /// <param name="id">Id assigned by the room type repository.</param>
+    /// <param name="name">Display name, for example "Deluxe đôi"; required.</param>
+    /// <param name="pricePerNight">Current price of one night in VND; must be greater than 0.</param>
     /// <param name="capacity">Number of guests the room sleeps; must be greater than 0.</param>
     /// <exception cref="ValidationException">The name is empty, or price or capacity is not positive.</exception>
     public RoomType(int id, string name, decimal pricePerNight, int capacity)
-        : this(id, name, pricePerNight, capacity, validate: true)
     {
-    }
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ValidationException("Tên loại phòng không được để trống.");
+        }
 
-    private RoomType(int id, string name, decimal pricePerNight, int capacity, bool validate)
-    {
+        if (pricePerNight <= 0)
+        {
+            throw new ValidationException("Giá mỗi đêm phải lớn hơn 0.");
+        }
+
+        if (capacity <= 0)
+        {
+            throw new ValidationException("Sức chứa phải lớn hơn 0.");
+        }
+
         Id = id;
-        Name = name;
+        Name = name.Trim();
         PricePerNight = pricePerNight;
         Capacity = capacity;
-
-        if (validate)
-        {
-            Validate();
-        }
     }
 
     /// <summary>Identifier assigned by the repository.</summary>
@@ -41,7 +46,7 @@ public sealed class RoomType : IEntity
     /// <summary>Display name; never empty.</summary>
     public string Name { get; }
 
-    /// <summary>Price of one night in USD; greater than 0.</summary>
+    /// <summary>Current price of one night in VND. A booking copies it into <see cref="Booking.RatePerNight"/>.</summary>
     public decimal PricePerNight { get; }
 
     /// <summary>Number of guests the room sleeps; greater than 0.</summary>
@@ -56,37 +61,12 @@ public sealed class RoomType : IEntity
         return Name;
     }
 
-    /// <summary>Rebuilds a room type from stored data.</summary>
-    internal static RoomType Restore(int id, string name, decimal pricePerNight, int capacity)
-    {
-        return new RoomType(id, name, pricePerNight, capacity, validate: false);
-    }
-
     /// <summary>Called by <see cref="Room"/> when a room of this type is created.</summary>
     internal void AddRoom(Room room)
     {
         if (!_rooms.Contains(room))
         {
             _rooms.Add(room);
-        }
-    }
-
-    /// <summary>Throws <see cref="ValidationException"/> when the name is empty or price or capacity is not positive.</summary>
-    private void Validate()
-    {
-        if (string.IsNullOrWhiteSpace(Name))
-        {
-            throw new ValidationException("Room type name is required.");
-        }
-
-        if (PricePerNight <= 0)
-        {
-            throw new ValidationException("Price per night must be greater than 0.");
-        }
-
-        if (Capacity <= 0)
-        {
-            throw new ValidationException("Capacity must be greater than 0.");
         }
     }
 }

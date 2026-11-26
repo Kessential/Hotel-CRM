@@ -1,59 +1,61 @@
 using HotelCRM.Domain.Common;
-using HotelCRM.Domain.Customers;
 using HotelCRM.Domain.Interfaces;
 
 namespace HotelCRM.Domain.Hotel;
 
 /// <summary>
-/// A stay of one customer in one room. Holds the customer and the room as objects because all three
-/// belong to the same subsystem. Enforces the date rule and the status changes of rule 7.
+/// One stay of one customer in one room (BM5, UC08). Decides Q8: dates in order, the price per night
+/// fixed at booking time, and the status changes Reserved → CheckedIn → CheckedOut or Reserved → Cancelled
+/// (state machine in <c>08-hanh-vi.md</c> section 4). Refers to the customer, the room and the employee by Id.
 /// </summary>
 public sealed class Booking : IEntity
 {
-    /// <summary>Creates a new booking with status Reserved.</summary>
-    /// <param name="id">Id obtained from the booking repository.</param>
-    /// <param name="customer">Guest; required.</param>
-    /// <param name="room">Room; required. The service checks its availability with <see cref="Room.EnsureAvailable"/> first.</param>
+    /// <summary>Creates a booking with status Reserved.</summary>
+    /// <param name="id">Id assigned by the booking repository.</param>
+    /// <param name="customerId">Guest.</param>
+    /// <param name="room">
+    /// Booked room. Its current <see cref="RoomType.PricePerNight"/> is copied into <see cref="RatePerNight"/>.
+    /// The service checks <see cref="Room.EnsureAvailable"/> first.
+    /// </param>
     /// <param name="checkInDate">Arrival day; the time of day is discarded.</param>
     /// <param name="checkOutDate">Departure day; the time of day is discarded. Must be after <paramref name="checkInDate"/>.</param>
-    /// <exception cref="ValidationException">
-    /// Customer or room is missing, or the check-out date is not after the check-in date (rule 7).
-    /// </exception>
-    public Booking(int id, Customer customer, Room room, DateTime checkInDate, DateTime checkOutDate)
-        : this(id, customer, room, checkInDate.Date, checkOutDate.Date, BookingStatus.Reserved, validate: true)
-    {
-    }
-
-    private Booking(
+    /// <param name="createdById">Employee who made the booking.</param>
+    /// <param name="now">Current time, from <c>IClock</c>.</param>
+    /// <exception cref="ValidationException">The check-out date is not after the check-in date (Q8).</exception>
+    public Booking(
         int id,
-        Customer customer,
+        int customerId,
         Room room,
         DateTime checkInDate,
         DateTime checkOutDate,
-        BookingStatus status,
-        bool validate)
+        int createdById,
+        DateTime now)
     {
-        Id = id;
-        Customer = customer;
-        Room = room;
-        CheckInDate = checkInDate;
-        CheckOutDate = checkOutDate;
-        Status = status;
-
-        if (validate)
+        ArgumentNullException.ThrowIfNull(room);
+        if (checkOutDate.Date <= checkInDate.Date)
         {
-            ValidateNewBooking();
+            throw new ValidationException("Ngày trả phòng phải sau ngày nhận phòng.");
         }
+
+        Id = id;
+        CustomerId = customerId;
+        RoomId = room.Id;
+        CheckInDate = checkInDate.Date;
+        CheckOutDate = checkOutDate.Date;
+        RatePerNight = room.RoomType.PricePerNight;
+        Status = BookingStatus.Reserved;
+        CreatedById = createdById;
+        CreatedAt = now;
     }
 
     /// <summary>Identifier assigned by the repository.</summary>
     public int Id { get; }
 
     /// <summary>Guest who made the booking.</summary>
-    public Customer Customer { get; }
+    public int CustomerId { get; }
 
     /// <summary>Booked room.</summary>
-    public Room Room { get; }
+    public int RoomId { get; }
 
     /// <summary>Arrival day (midnight).</summary>
     public DateTime CheckInDate { get; }
@@ -61,104 +63,101 @@ public sealed class Booking : IEntity
     /// <summary>Departure day (midnight); always after <see cref="CheckInDate"/>.</summary>
     public DateTime CheckOutDate { get; }
 
+    /// <summary>
+    /// Q8, historical attribute: price of one night in VND when the booking was made. Later price changes
+    /// of the room type do not affect it, so old totals, points (Q9) and spending reports stay correct.
+    /// </summary>
+    public decimal RatePerNight { get; }
+
     /// <summary>Current status; changed only by <see cref="CheckIn"/>, <see cref="CheckOut"/> and <see cref="Cancel"/>.</summary>
     public BookingStatus Status { get; private set; }
 
-    /// <summary>Number of nights: days between <see cref="CheckInDate"/> and <see cref="CheckOutDate"/>.</summary>
+    /// <summary>Employee who made the booking.</summary>
+    public int CreatedById { get; }
+
+    /// <summary>When the booking was made.</summary>
+    public DateTime CreatedAt { get; }
+
+    /// <summary>When the guest checked in; set exactly when the status is CheckedIn or CheckedOut.</summary>
+    public DateTime? CheckedInAt { get; private set; }
+
+    /// <summary>When the guest checked out; set exactly when the status is CheckedOut.</summary>
+    public DateTime? CheckedOutAt { get; private set; }
+
+    /// <summary>Number of booked nights. An early check-out still pays every booked night (Q8).</summary>
     public int Nights => (CheckOutDate - CheckInDate).Days;
 
-    /// <summary>Price of the stay in USD: <see cref="Nights"/> x <see cref="RoomType.PricePerNight"/> of the room.</summary>
-    public decimal TotalAmount => Nights * Room.RoomType.PricePerNight;
+    /// <summary>Amount of the stay in VND: <see cref="Nights"/> x <see cref="RatePerNight"/>.</summary>
+    public decimal TotalAmount => Nights * RatePerNight;
 
-    /// <summary>Rule 8: loyalty points awarded at check-out, 1 point per whole USD of <see cref="TotalAmount"/>.</summary>
-    public int PointsEarned => (int)decimal.Floor(TotalAmount);
-
-    /// <summary>Rule 7: whether this booking keeps its room occupied: true for Reserved and CheckedIn.</summary>
+    /// <summary>Q8: whether the booking keeps its room occupied for its dates (Reserved or CheckedIn).</summary>
     public bool BlocksRoom => Status is BookingStatus.Reserved or BookingStatus.CheckedIn;
 
     /// <summary>
-    /// Reserved to CheckedIn: the guest arrives and the stay becomes active. Allowed only from
-    /// <see cref="CheckInDate"/> up to the day before <see cref="CheckOutDate"/>.
+    /// Q8: Reserved → CheckedIn. Allowed only from <see cref="CheckInDate"/> up to the day before
+    /// <see cref="CheckOutDate"/>, so the range is half-open: [check-in, check-out).
     /// </summary>
     /// <param name="now">Current time; only its date is compared with the stay.</param>
     /// <exception cref="BusinessRuleException">
-    /// The booking is not Reserved, or <paramref name="now"/> is before <see cref="CheckInDate"/>
-    /// or on or after <see cref="CheckOutDate"/>.
+    /// The booking is not Reserved, or <paramref name="now"/> is outside [check-in, check-out). The status does not change.
     /// </exception>
     public void CheckIn(DateTime now)
     {
-        if (Status != BookingStatus.Reserved)
-        {
-            throw new BusinessRuleException($"Booking {Id} is {Status}; only a Reserved booking can be checked in.");
-        }
+        EnsureStatus(BookingStatus.Reserved, "nhận phòng");
 
-        if (now.Date < CheckInDate)
+        if (now.Date < CheckInDate || now.Date >= CheckOutDate)
         {
             throw new BusinessRuleException(
-                $"Booking {Id} starts on {CheckInDate:yyyy-MM-dd}; the guest cannot check in before that day.");
-        }
-
-        if (now.Date >= CheckOutDate)
-        {
-            throw new BusinessRuleException(
-                $"Booking {Id} ended on {CheckOutDate:yyyy-MM-dd}; cancel it instead of checking in.");
+                $"Đặt phòng {Id} chỉ nhận phòng được từ {CheckInDate:dd/MM/yyyy} đến trước {CheckOutDate:dd/MM/yyyy}.");
         }
 
         Status = BookingStatus.CheckedIn;
+        CheckedInAt = now;
     }
 
-    /// <summary>CheckedIn to CheckedOut: the guest leaves. The service then awards <see cref="PointsEarned"/>.</summary>
+    /// <summary>
+    /// Q8: CheckedIn → CheckedOut. The service then earns the points of <see cref="TotalAmount"/> (Q9)
+    /// and schedules the survey (L3) in the same transaction.
+    /// </summary>
+    /// <param name="now">Current time, stored in <see cref="CheckedOutAt"/>.</param>
     /// <exception cref="BusinessRuleException">The booking is not CheckedIn.</exception>
-    public void CheckOut()
+    public void CheckOut(DateTime now)
     {
-        if (Status != BookingStatus.CheckedIn)
-        {
-            throw new BusinessRuleException($"Booking {Id} is {Status}; only a CheckedIn booking can be checked out.");
-        }
+        EnsureStatus(BookingStatus.CheckedIn, "trả phòng");
 
         Status = BookingStatus.CheckedOut;
+        CheckedOutAt = now;
     }
 
-    /// <summary>Rule 7: Reserved to Cancelled. A booking that was checked in or out cannot be cancelled.</summary>
+    /// <summary>Q8: Reserved → Cancelled. A booking already checked in or out cannot be cancelled.</summary>
     /// <exception cref="BusinessRuleException">The booking is not Reserved.</exception>
     public void Cancel()
     {
-        if (Status != BookingStatus.Reserved)
-        {
-            throw new BusinessRuleException($"Booking {Id} is {Status}; only a Reserved booking can be cancelled.");
-        }
+        EnsureStatus(BookingStatus.Reserved, "hủy");
 
         Status = BookingStatus.Cancelled;
     }
 
-    /// <summary>Rebuilds a booking from stored data, including its status.</summary>
-    internal static Booking Restore(
-        int id,
-        Customer customer,
-        Room room,
-        DateTime checkInDate,
-        DateTime checkOutDate,
-        BookingStatus status)
+    /// <summary>Throws when the booking is not in the status an action starts from.</summary>
+    private void EnsureStatus(BookingStatus required, string action)
     {
-        return new Booking(id, customer, room, checkInDate, checkOutDate, status, validate: false);
+        if (Status != required)
+        {
+            throw new BusinessRuleException(
+                $"Đặt phòng {Id} đang ở trạng thái {Describe(Status)}, không thể {action}.");
+        }
     }
 
-    /// <summary>Throws <see cref="ValidationException"/> when customer or room is missing or the dates are not in order.</summary>
-    private void ValidateNewBooking()
+    /// <summary>Vietnamese name of a status for error messages.</summary>
+    private static string Describe(BookingStatus status)
     {
-        if (Customer is null)
+        return status switch
         {
-            throw new ValidationException("A booking needs a customer.");
-        }
-
-        if (Room is null)
-        {
-            throw new ValidationException("A booking needs a room.");
-        }
-
-        if (CheckOutDate <= CheckInDate)
-        {
-            throw new ValidationException("Check-out date must be after check-in date.");
-        }
+            BookingStatus.Reserved => "Đã đặt",
+            BookingStatus.CheckedIn => "Đang ở",
+            BookingStatus.CheckedOut => "Đã trả phòng",
+            BookingStatus.Cancelled => "Đã hủy",
+            _ => status.ToString(),
+        };
     }
 }

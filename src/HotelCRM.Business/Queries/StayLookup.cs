@@ -24,7 +24,7 @@ public sealed class StayLookup : IStayLookup
     /// <inheritdoc />
     public bool IsRoomInActiveStay(int customerId, int roomId)
     {
-        return ActiveStays(customerId).Any(b => b.Room.Id == roomId);
+        return ActiveStays(customerId).Any(b => b.RoomId == roomId);
     }
 
     /// <inheritdoc />
@@ -33,7 +33,7 @@ public sealed class StayLookup : IStayLookup
         Dictionary<int, string> rooms = new();
         foreach (Booking booking in ActiveStays(customerId))
         {
-            rooms[booking.Room.Id] = booking.Room.Number;
+            rooms[booking.RoomId] = GetRoomNumber(booking.RoomId);
         }
 
         return rooms;
@@ -48,6 +48,6 @@ public sealed class StayLookup : IStayLookup
     private IEnumerable<Booking> ActiveStays(int customerId)
     {
         return _bookings.GetAll()
-            .Where(b => b.Customer.Id == customerId && b.Status == BookingStatus.CheckedIn);
+            .Where(b => b.CustomerId == customerId && b.Status == BookingStatus.CheckedIn);
     }
 }

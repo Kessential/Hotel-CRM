@@ -3,32 +3,32 @@ using HotelCRM.Domain.Interfaces;
 
 namespace HotelCRM.Domain.Hotel;
 
-/// <summary>A physical room of the hotel. Decides whether it is free for a date range (rule 7).</summary>
+/// <summary>A physical room of the hotel. Decides whether it is free for a date range (Q8).</summary>
 public sealed class Room : IEntity
 {
     /// <summary>Creates a room and registers it in its room type.</summary>
-    /// <param name="id">Id obtained from the room repository.</param>
+    /// <param name="id">Id assigned by the room repository.</param>
     /// <param name="number">Room number shown to staff and guests, for example "305"; required.</param>
     /// <param name="floor">Floor the room is on; must be greater than 0.</param>
-    /// <param name="roomType">Category and price of the room; required.</param>
-    /// <exception cref="ValidationException">The number is empty, the floor is not positive, or the room type is missing.</exception>
+    /// <param name="roomType">Category and current price of the room.</param>
+    /// <exception cref="ValidationException">The number is empty or the floor is not positive.</exception>
     public Room(int id, string number, int floor, RoomType roomType)
-        : this(id, number, floor, roomType, validate: true)
     {
-    }
-
-    private Room(int id, string number, int floor, RoomType roomType, bool validate)
-    {
-        Id = id;
-        Number = number;
-        Floor = floor;
-        RoomType = roomType;
-
-        if (validate)
+        ArgumentNullException.ThrowIfNull(roomType);
+        if (string.IsNullOrWhiteSpace(number))
         {
-            Validate();
+            throw new ValidationException("Số phòng không được để trống.");
         }
 
+        if (floor <= 0)
+        {
+            throw new ValidationException("Tầng phải lớn hơn 0.");
+        }
+
+        Id = id;
+        Number = number.Trim();
+        Floor = floor;
+        RoomType = roomType;
         roomType.AddRoom(this);
     }
 
@@ -41,43 +41,31 @@ public sealed class Room : IEntity
     /// <summary>Floor the room is on.</summary>
     public int Floor { get; }
 
-    /// <summary>Category and price of the room.</summary>
+    /// <summary>Category and current price of the room.</summary>
     public RoomType RoomType { get; }
 
     /// <summary>
-    /// Rule 7: whether the room is free from <paramref name="checkInDate"/> up to, but not including,
-    /// <paramref name="checkOutDate"/>. Only bookings of this room that block it
-    /// (<see cref="Booking.BlocksRoom"/>: Reserved or CheckedIn) are considered. Two stays overlap when
-    /// each starts before the other ends, so a guest may check in on the day another one checks out.
-    /// A range whose check-out is not after its check-in overlaps nothing, so the date error is reported
-    /// by the <see cref="Booking"/> constructor rather than as a double booking.
+    /// Q8: whether the room is free for the nights from <paramref name="checkInDate"/> up to, but not including,
+    /// <paramref name="checkOutDate"/>. Only bookings of this room that still block it (Reserved or CheckedIn)
+    /// count, so a cancelled booking frees its dates. Ranges are half-open, so a guest may check in on the
+    /// day another one checks out.
     /// </summary>
     /// <param name="checkInDate">First night of the requested stay.</param>
     /// <param name="checkOutDate">Departure day of the requested stay.</param>
     /// <param name="bookings">Existing bookings; bookings of other rooms are ignored.</param>
     public bool IsAvailable(DateTime checkInDate, DateTime checkOutDate, IEnumerable<Booking> bookings)
     {
-        DateTime start = checkInDate.Date;
-        DateTime end = checkOutDate.Date;
-        if (end <= start)
-        {
-            return true;
-        }
-
-        return !bookings.Any(b => b.Room.Id == Id
-            && b.BlocksRoom
-            && start < b.CheckOutDate
-            && b.CheckInDate < end);
+        return FindConflict(checkInDate, checkOutDate, bookings) is null;
     }
 
-    /// <summary>Rule 7: stops a booking when <see cref="IsAvailable"/> returns false.</summary>
-    /// <exception cref="BusinessRuleException">The room is already booked for part of the requested dates.</exception>
+    /// <summary>Q8: stops a booking that would overlap a booking still holding this room.</summary>
+    /// <exception cref="BusinessRuleException">The room is booked for part of the requested dates; the message gives the dates of that booking.</exception>
     public void EnsureAvailable(DateTime checkInDate, DateTime checkOutDate, IEnumerable<Booking> bookings)
     {
-        if (!IsAvailable(checkInDate, checkOutDate, bookings))
+        if (FindConflict(checkInDate, checkOutDate, bookings) is { } conflict)
         {
             throw new BusinessRuleException(
-                $"Room {Number} is already booked for part of {checkInDate:yyyy-MM-dd} to {checkOutDate:yyyy-MM-dd}.");
+                $"Phòng {Number} đã có đặt phòng từ {conflict.CheckInDate:dd/MM/yyyy} đến {conflict.CheckOutDate:dd/MM/yyyy}.");
         }
     }
 
@@ -87,28 +75,19 @@ public sealed class Room : IEntity
         return Number;
     }
 
-    /// <summary>Rebuilds a room from stored data.</summary>
-    internal static Room Restore(int id, string number, int floor, RoomType roomType)
+    /// <summary>
+    /// First blocking booking of this room that overlaps the range, or null. Two ranges overlap when each
+    /// starts before the other ends. A range whose check-out is not after its check-in overlaps nothing,
+    /// so that date error is reported by the <see cref="Booking"/> constructor, not as a double booking.
+    /// </summary>
+    private Booking? FindConflict(DateTime checkInDate, DateTime checkOutDate, IEnumerable<Booking> bookings)
     {
-        return new Room(id, number, floor, roomType, validate: false);
-    }
+        DateTime start = checkInDate.Date;
+        DateTime end = checkOutDate.Date;
 
-    /// <summary>Throws <see cref="ValidationException"/> when the number is empty, the floor is not positive or the room type is missing.</summary>
-    private void Validate()
-    {
-        if (string.IsNullOrWhiteSpace(Number))
-        {
-            throw new ValidationException("Room number is required.");
-        }
-
-        if (Floor <= 0)
-        {
-            throw new ValidationException("Floor must be greater than 0.");
-        }
-
-        if (RoomType is null)
-        {
-            throw new ValidationException("Room type is required.");
-        }
+        return bookings.FirstOrDefault(b => b.RoomId == Id
+            && b.BlocksRoom
+            && start < b.CheckOutDate
+            && b.CheckInDate < end);
     }
 }

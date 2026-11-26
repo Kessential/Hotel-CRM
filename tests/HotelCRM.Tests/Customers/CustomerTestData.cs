@@ -27,10 +27,19 @@ internal static class CustomerTestData
             marketingConsent: true, "Thích phòng yên tĩnh.", Now);
     }
 
-    /// <summary>Room 305, a Deluxe Double at 120 USD per night.</summary>
+    /// <summary>Id of the receptionist who makes the bookings in the tests.</summary>
+    public const int ReceptionistId = 3;
+
+    /// <summary>Room 305, a "Deluxe đôi" at 1.250.000đ per night.</summary>
     public static Room NewRoom()
     {
-        RoomType deluxe = new(1, "Deluxe Double", 120m, 2);
+        RoomType deluxe = new(1, "Deluxe đôi", 1_250_000m, 2);
         return new Room(1, "305", 3, deluxe);
+    }
+
+    /// <summary>A Reserved booking of <paramref name="room"/> for customer 1, made at <see cref="Now"/>.</summary>
+    public static Booking NewBooking(Room room, DateTime checkInDate, DateTime checkOutDate, int id = 1)
+    {
+        return new Booking(id, customerId: 1, room, checkInDate, checkOutDate, ReceptionistId, Now);
     }
 }
