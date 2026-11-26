@@ -4,13 +4,13 @@ Kế hoạch: `docs/PLAN.md` (v2). Việc chi tiết giai đoạn đang làm: `d
 
 Cách cập nhật: mỗi người sửa dòng/ô của mình trong PR của mình, sau mỗi module (đánh dấu `[x]`, đổi cột trạng thái, thêm một dòng nhật ký). Không sửa dòng của người kia.
 
-Cập nhật lần cuối: 26/11/2026 (PR #3, TV2).
+Cập nhật lần cuối: 26/11/2026 (nhánh `tv2/domain-2`, TV2).
 
 ## 1. Trạng thái giai đoạn
 | Giai đoạn | Thời gian (plan) | Trạng thái | Mốc kiểm cuối giai đoạn |
 |---|---|---|---|
 | P1 Phân tích thiết kế | 22–29/11, nộp slide 30/11 | **Đang làm**, trễ 3 ngày (M1 xong 25/11) | mọi `.puml` xuất ảnh; bảng 5.10 đạt; slide biên dịch được |
-| P2 Hạ tầng | 1–4/12 | Chưa làm (TV2 đã bắt đầu Domain sớm, PR #2) | đăng nhập 4 vai trò trên SQLite; TV2 có 10 unit test xanh |
+| P2 Hạ tầng | 1–4/12 | Chưa làm (TV2 đã làm Domain sớm: PR #2 đã merge, đợt 2 trên `tv2/domain-2`) | đăng nhập 4 vai trò trên SQLite; TV2 có 10 unit test xanh |
 | P3 Phân hệ | 5–10/12 | Chưa làm | đủ 13 Form, R1–R4, seed ≥150 dòng |
 | P4 Ghép & đóng gói | 11–12/12 | Chưa làm | 28 test xanh; chạy máy sạch ≤3 phút |
 | P5 Vấn đáp | 13/12 → 30/12 | Chưa làm | buổi vấn đáp; nộp cuối 30/12 |
@@ -87,9 +87,9 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 - [ ] Slide phần TV2; biên dịch PDF cả bộ (29/11)
 
 **Domain (P2, 1–4/12, chưa cần CSDL)**
-- [ ] Sửa `Customer` (CCCD, ngày sinh, đồng ý nhận ưu đãi), `MembershipTier` (hệ số tích điểm), `Booking` (giá/đêm chốt)
-- [ ] Thêm `PointTransaction`, `Reward`, `RewardRedemption`, `Campaign`, `CampaignTarget`, `Receptionist`
-- [ ] `ISegmentStrategy` + `VipSegment`, `LapsedGuestSegment`, `BirthdayMonthSegment`
+- [x] Sửa `Customer` (CCCD, ngày sinh, đồng ý nhận ưu đãi), `MembershipTier` (hệ số tích điểm), `Booking` (giá/đêm chốt) — `MembershipTier` ở PR #2; `Customer`, `Interaction`, `Booking`, `Room` viết lại ở `tv2/domain-2` (26/11)
+- [ ] Thêm `PointTransaction`, `Reward`, `RewardRedemption`, `Campaign`, `CampaignTarget`, `Receptionist` — đã có trừ `Receptionist` (chờ TV1 viết lại `Employee`)
+- [x] `ISegmentStrategy` + `VipSegment`, `LapsedGuestSegment`, `BirthdayMonthSegment` — PR #2
 - [ ] `schema.sql` 10 bảng TV2
 
 **Phân hệ quan hệ khách hàng (P3, 5–10/12)**
@@ -103,7 +103,7 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 
 **Test (P2–P4)**
 - [ ] `FakeTicketQuery`, `FakeSurveyScheduler`, `FakeCustomerCareStats`
-- [ ] 10 unit test (PLAN mục 5.8)
+- [ ] 10 unit test (PLAN mục 5.8) — phần Domain đã có cho TC2-01…05, 07, 08 và một phần TC2-09, 10; còn TC2-06 và phần service (P3)
 - [ ] 4 integration: R5 khớp tính tay; RBAC; L3 luồng đầy đủ; L3 rollback
 
 **Ghép (P4, 11–12/12)**
@@ -131,8 +131,9 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 ## 6. Việc đang dở
 | Việc | Ai | Trạng thái |
 |---|---|---|
-| PR #2 `tv2/domain` → `v2` (Domain P2 đợt 1: hệ số tích điểm, sổ điểm, đổi quà, chiến dịch, 3 phân khúc + test) | TV2 mở 25/11, TV1 review | TV1 approve 26/11, góp ý 5 điểm không chặn merge (sửa ở đợt 2); chờ TV2 merge |
-| PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | đã rebase lên `v2` (`37884a0`) và sửa theo khung của `docs/tasks/v2-p1-analysis.md` (25/11); TV1 approve 26/11, đồng ý 7 điểm hỏi; TV2 đã sửa 3 việc trước khi merge (mục 8, Q13, tiêu đề PR) (26/11); chờ TV2 merge |
+| PR #2 `tv2/domain` → `v2` (Domain P2 đợt 1: hệ số tích điểm, sổ điểm, đổi quà, chiến dịch, 3 phân khúc + test) | TV2 mở 25/11, TV1 review | ~~chờ merge~~ đã merge 26/11 (`45f9df8`); 5 góp ý của TV1 xử lý ở `tv2/domain-2` |
+| PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | ~~chờ merge~~ đã merge 26/11 (`e6264a3`) sau khi sửa 3 việc TV1 yêu cầu |
+| Nhánh `tv2/domain-2` → `v2` (Domain đợt 2: bỏ JSON phần TV2; `Customer`, `Interaction`, `Booking`, `Room` v2; góp ý PR #2) | TV2 làm 26/11, TV1 review | chờ mở PR. Từ lúc merge tới khi có repository SQLite (P3), app không có khách và phòng: frm "New Ticket" của TV1 có danh sách khách rỗng |
 | M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | TV2: phần mình nằm trong PR #3 (M2–M8); TV1: bắt đầu sau khi M1 merge, xem `docs/tasks/v2-p1-analysis.md` |
 | Sửa đường dẫn trong slide: `sec1`, `sec3`, `sec5`, `sec6` còn trỏ `docs/PLAN.md` (v1), `docs/PROGRESS.md` (v1), `docs/tasks/stage-*.md` — các file này đã xóa (bản v1 chỉ còn trong lịch sử git, `fd7b7e4`) | TV2 | làm ở M9 |
 
@@ -168,6 +169,7 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV2 | File task mục 1.1 ("mỗi người, mỗi module một nhánh"): P1 của TV2 nằm trên một nhánh `tv2/p1-analysis` (PR #3), mỗi module một commit | PR #3 mở trước khi có file task; tách lại thì mất lịch sử review | TV1 + TV2 (PR #3) |
 | 26/11 | TV2 | Q13 (PLAN 5.3): không xóa khách đã có lưu trú, ticket **hoặc đã nằm trong chiến dịch**; `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`. PLAN chỉ ghi "lưu trú hoặc ticket" | khách chưa ở lần nào vẫn có thể nằm trong chiến dịch; xóa khách này thì khóa ngoại `campaign_targets.CustomerId` (RESTRICT) chặn với lỗi khó hiểu, còn `CASCADE` làm mất số liệu R4 (`06-erd.md` mục 3.5) | TV1 + TV2 (PR #3) |
 | 26/11 | TV2 | PLAN 5.2 (`point_transactions.Reason`): bỏ giá trị "Điều chỉnh", chỉ còn `Stay`, `Goodwill`, `Redemption`; hoàn điểm khi hủy lượt đổi dùng chung `Redemption` (dòng dương cùng `RedemptionId`). R3: điểm đã tích = tổng dòng `Stay` + `Goodwill`; điểm đã đổi = −tổng dòng `Redemption` (ròng, lượt đã hủy góp 0) | không UC, Form hay quyền nào cho phép chỉnh điểm tay; thêm giá trị thì thành code chết | TV1 + TV2 (PR #3) |
+| 26/11 | TV2 | PLAN 6.4 (nền chung P2 của TV1: "bỏ JSON"): TV2 bỏ trước phần JSON của phân hệ mình (mapper, record, 4 file dữ liệu khách/booking/phòng/loại phòng), service và Form v1 của khách/đặt phòng; `Program.cs` dùng `InMemoryRepository` rỗng cho khách, booking, phòng tới P3. Sửa kèm file của TV1: `MainForm` (bỏ menu khách/đặt phòng), `SurveyForm` (bỏ tham số `CustomerService` chưa dùng) | viết lại `Customer`/`Booking` theo v2 không cần chờ P2, và không phải viết mapper tạm sẽ bỏ ngay ở P3 | TV1 (đồng ý trước khi làm, 26/11); xác nhận trong PR `tv2/domain-2` |
 
 ## 9. Nhật ký
 | Ngày | Ai | Việc |
@@ -181,3 +183,4 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV1 | Sửa PR #4 theo review (mục 8, `docs/slide_checklist/` ngoài repo + `.gitignore`), merge PR #4 vào `v2` |
 | 25/11 | TV2 | Rebase PR #3 lên `v2` (`37884a0`; commit "Record the three decisions agreed with TV1" đổi mã từ `284ee92` thành `3ccc924`). Sửa 10 file `docs/analysis/` theo khung của file task (mục của TV1 và mục chung TV1 để dòng chờ); bỏ mã YC tự đặt, dùng mã F; ảnh biểu mẫu vào `docs/analysis/bieu-mau/`; đổi tên `use-case-tv2.iuml`, `dfd-level1-f7.puml`; DFD F7 theo Gane–Sarson với kho D5, D9, D10; mã test TC2-11…TC2-14; thêm loại ngoại lệ + thông báo cho UC08–UC10, Strategy (7.2), Observer phía nhận (7.3), cây `MembershipTier` (8.2), phác thảo bố cục 7 Form, kế hoạch tiêm lỗi |
 | 26/11 | TV2 | Sửa PR #3 theo review approve của TV1 (26/11): mục 8 đổi 2 dòng sang "TV1 + TV2", thêm dòng Q13 mở rộng và dòng bỏ "Điều chỉnh" của `PointReason` (kèm cách R3 tính điểm đã đổi); Q13 mở rộng ở `04`, `06` mục 3.5, `07` mục 4.1/4.3, `class-tv2.iuml`; thêm ca "khách chỉ nằm trong chiến dịch" vào TC2-10; sửa tiêu đề, mô tả PR |
+| 26/11 | TV2 | Merge PR #2 (`45f9df8`) và PR #3 (`e6264a3`) vào `v2`. Nhánh `tv2/domain-2` (Domain đợt 2, 5 commit): (1) bỏ JSON, service, Form và test service v1 của phân hệ TV2 (TV1 đồng ý trước); (2) viết lại `Customer` (Q7 giấy tờ theo quốc tịch, ngày sinh, đồng ý ưu đãi; Q9 `EarnPoints`; Q13 `EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`) và `Interaction` thành thực thể riêng, bỏ `InteractionHistory`; (3) viết lại `Booking` (tham chiếu bằng Id, `RatePerNight` chốt, `CheckOut(now)`) và `Room` (Q8, thông báo nêu ngày booking đang giữ phòng); (4) xử lý góp ý PR #2 (`ForRedemption` kiểm trạng thái, `MembershipTier.FromName` đi dọc `Next()`, giữ `ResponseRate` và ghi phản hồi trước ngày bắt đầu có chủ ý); (5) tài liệu. Test 107/109 xanh (2 đỏ là `SurveyServiceTests` của TV1, đỏ sẵn) |
