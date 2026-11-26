@@ -1,0 +1,76 @@
+% [TV1][TV2] Tự đánh giá lần 2. TV2 viết bản đầu; TV1 bổ sung phần TV1 và cả hai chốt điểm chung.
+% Số liệu Git đo ngày 26/11/2026.
+
+\begin{frame}{Tự kê khai khối lượng theo thiết kế v2 so với định mức N2 \TC}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}YL{3.6cm}L{1.6cm}L{1.6cm}L{3.0cm}@{}}
+\toprule
+\textbf{Hạng mục} & \textbf{Định mức N2} & \textbf{TV1} & \textbf{TV2} & \textbf{Tổng} \\
+\midrule
+Nhánh BFD cấp 2 & $\geq$6, $\geq$3/TV & 4 & 4 & 8 \\
+Use Case & $\geq$8, $\geq$4/TV, $\geq$4 phức hợp, $\geq$2 liên PH & 6 & 5 & 11; 5 phức hợp; 7 liên PH \\
+Form nghiệp vụ & $\geq$9, $\geq$4/TV, $\leq$40\% danh mục & 6 & 7 & 13 \\
+Form Master-Detail & $\geq$4, $\geq$2/TV & 3 & 4 & 7 \\
+Báo cáo & $\geq$5, $\geq$2/TV, $\geq$1 biểu đồ & 2 & 3 & 5; 2 biểu đồ \\
+Bảng 3NF & $\geq$11, $\geq$3 n--n, $\geq$2 khóa nối & 7 & 10 & 17; 4 n--n; 5 khóa nối \\
+Quy tắc nghiệp vụ & $\geq$8, $\geq$4/TV, $\geq$2 liên PH & 5 (+Q6) & 7 & 13; 6 liên PH \\
+Mẫu GoF & $\geq$3, $\geq$2 nhóm, 1 cầu nối & State, Factory M. & Strategy & + Observer cầu nối \\
+Sơ đồ Sequence/State & $\geq$4, $\geq$2/TV, $\geq$1 xuyên PH & 2 & 2 & 4; 2 xuyên PH \\
+Unit / Integration test & $\geq$18 ($\geq$9/TV) / $\geq$8 & 10 / 4 & 10 / 4 & 20 / 8 \\
+Vai trò & $\geq$3 & & & 4 \\
+\bottomrule
+\end{tabularx}
+{\tiny Đây là con số theo thiết kế (P1); sản phẩm v2 làm ở P2--P4 (1--12/12).\par}
+\end{frame}
+
+\begin{frame}{Tự đánh giá lần 2 theo 5 khía cạnh (thang 10) \TC}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}L{2.7cm}YL{2.9cm}C{1.05cm}C{1.05cm}@{}}
+\toprule
+\textbf{Khía cạnh (trọng số)} & \textbf{Minh chứng TV2} & \textbf{Còn thiếu (TV2)} & \textbf{TV2 /10} & \textbf{TV1 /10} \\
+\midrule
+1. Khối lượng, hoàn thiện chức năng (2,0) & 4 nhánh F5--F8 phân rã cấp 4; 5 UC; 7 Form, 3 báo cáo thiết kế; Domain có code & Form, seed, đóng gói & 4 & \\
+2. Chất lượng, độ tin cậy (2,0) & Domain kiểm tra dữ liệu, bất biến, 0 warning; L3 một giao dịch (thiết kế) & UI, SQLite, rollback chưa code & 4 & \\
+3. Hiểu sâu phân tích (1,5) & 4W+1H, hệ thống tham khảo, quy trình theo bước, BM ô $\to$ cột $\to$ control, Q7--Q13 & ảnh biểu mẫu thật, nguồn khảo sát & 7 & \\
+4. Hiểu sâu thiết kế (3,0) & ERD + thuộc tính lịch sử; lớp TV2 khớp code; Strategy có code + test; tuần tự L3 & \code{schema.sql}, Live OCP chưa tập & 7 & \\
+5. Kiểm thử (1,5) & TC2 có lỗi tiêm thử; 95 ca xanh; bảng tính tay R5 & integration, service test & 6 & \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2mm}
+{\tiny Điểm TV2 là \textbf{đề xuất}, hai người chốt chung; cột TV1 do TV1 điền. Chấm theo minh chứng có thật tới 26/11: sản phẩm v2 chưa chạy trên SQLite nên Cổng sản phẩm hiện là \textbf{FAIL\_RUN} (P2 xử lý). Điểm chữ từng tiêu chí: \code{Checklist_BTL_HTTTQL_v2026_TuDanhGia_L2.xlsx}.\par}
+\end{frame}
+
+\begin{frame}{Git, tiến độ và kế hoạch P2--P5 \TC}
+\begin{columns}[T]
+\column{0.44\textwidth}
+\begin{block}{Git (26/11, mọi nhánh, không tính merge)}
+\scriptsize
+Commit: TV1 30, TV2 55; rải từ 15/11.\\
+PR đã merge: \#1, \#2, \#3, \#4. \ PR \#5 (TV2, Domain đợt 2) chờ TV1 review.
+\end{block}
+\begin{alertblock}{Tỷ lệ code logic (\code{git blame}, .cs, bỏ Designer)}
+\scriptsize
+Trên \code{v2}: TV1 72,0\% -- TV2 \textbf{28,0\%}. \ Sau PR \#5: TV2 \textbf{31,6\%}.\\[1mm]
+\tiny PR \#5: TV2 tự viết lại \code{Customer}, \code{Interaction}, \code{Booking}, \code{Room} và xóa phần v1 của TV2. Phần còn lại để lên 40--60\%: repository, 4 service, Form F5--F8, xuất Excel, định dạng, biểu đồ (P3) đều là code mới của TV2. Đo lại mỗi Chủ nhật (29/11, 6/12, 13/12).
+\end{alertblock}
+\column{0.53\textwidth}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}L{1.4cm}L{1.1cm}Y@{}}
+\toprule
+\textbf{Giai đoạn} & \textbf{Thời gian} & \textbf{TV2} \\
+\midrule
+P1 Phân tích & 22--30/11 & M2--M8 xong (PR \#3); slide, tự đánh giá \\
+P2 Hạ tầng & 1--4/12 & Domain đợt 2 (PR \#5), \code{Receptionist}, \code{schema.sql} 10 bảng \\
+P3 Phân hệ & 5--10/12 & repository, 4 service, frm201--207, R3, R4, seed, Excel, biểu đồ \\
+P4 Ghép & 11--12/12 & L3, R5, integration, README \\
+P5 Vấn đáp & 13--30/12 & Live OCP \code{FrequentGuestSegment} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2mm}
+\begin{block}{Chờ chốt giữa hai người}
+\tiny Biên bản hợp đồng interface (27/11); cây BFD tổng theo 3 nhánh chung; tên hàm quyền của \code{Employee} v2; thêm chức năng 5.2.5 ``Ghi tương tác''.
+\end{block}
+\end{columns}
+\end{frame}

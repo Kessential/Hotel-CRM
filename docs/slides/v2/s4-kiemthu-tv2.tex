@@ -1,0 +1,61 @@
+% [TV2] Kiểm thử: ma trận TC2-01..10 với lỗi tiêm thử và trạng thái code; kịch bản demo.
+% Nguồn: docs/analysis/10-kiem-thu.md, 03-use-case.md mục 6. Integration và R5 ở phụ lục.
+
+\begin{frame}{Unit test TC2-01..10: lỗi tiêm thử phải bắt và trạng thái code \TB}
+\scriptsize
+\renewcommand{\arraystretch}{0.95}
+\begin{tabularx}{\textwidth}{@{}L{0.95cm}L{0.75cm}YL{2.9cm}L{1.55cm}@{}}
+\toprule
+\textbf{Mã} & \textbf{QT} & \textbf{Biên / phân lớp (kỳ vọng tính tay)} & \textbf{Lỗi tiêm thử} & \textbf{Code 26/11} \\
+\midrule
+TC2-01 & Q7 & SĐT 9/10/11 số; CCCD 11/12/13; hộ chiếu 5/6/9/10; ngày sinh hôm nay/mai & \code{== 12} $\to$ \code{>= 12} & \stOK \\
+TC2-02 & Q7 & trùng SĐT, email, giấy tờ; sửa không so với chính mình & bỏ điều kiện ``khác chính khách'' & \stPART\ (P3) \\
+TC2-03 & Q8 & 11--13 chồng 10--12: lỗi; 12--14: được; booking đã hủy: không chặn & \code{<} $\to$ \code{<=} & \stOK \\
+TC2-04 & Q8 & nhận phòng 09/12 23:59: lỗi; 10/12 00:00: được; 12/12: lỗi & bỏ kiểm tra ngày nhận & \stOK \\
+TC2-05 & Q9 & 900 + 4.200 $\to$ 5.100 = Gold (bỏ qua Silver); biên 999 / 1.000 & bỏ vòng lặp \code{Next()} & \stOK \\
+TC2-06 & Q9--10 & Gold 5.100 đổi quà 600 $\to$ số dư 4.500, vẫn Gold & xét hạng theo số dư & \stNO\ (P3) \\
+TC2-07 & Q10 & số dư = giá: được; thiếu 1 điểm, thiếu hạng, hết quà: lỗi & \code{<} $\to$ \code{<=} & \stOK \\
+TC2-08 & Q11 & 180 ngày: có, 179: không; sinh 01/12, 31/12: có, 30/11: không & \code{>=} $\to$ \code{>} & \stOK \\
+TC2-09 & Q11 & 1 không đồng ý, 1 đang khiếu nại $\to$ còn 2; rỗng: không lưu & bỏ lời gọi \code{ITicketQuery} & \stPART\ (P3) \\
+TC2-10 & Q13 & booking đã hủy / ticket đã đóng / \textbf{chỉ nằm trong chiến dịch}: chặn & chỉ xét ticket chưa đóng & \stPART\ (P3) \\
+\bottomrule
+\end{tabularx}
+
+\vspace{1.5mm}
+\begin{block}{Kết quả chạy (nhánh PR \#5)}
+\scriptsize \code{CustomerTests} 31 · \code{BookingTests} 9 · \code{RoomTests} 4 · \code{InteractionTests} 4 · \code{MembershipTierTests} 16 · \code{RewardTests} 6 · \code{PointTransactionTests} 4 · \code{CampaignTests} 10 · \code{SegmentStrategyTests} 11 $=$ \textbf{95 ca của TV2, xanh 100\%}. \code{dotnet build}: 0 lỗi, 0 warning; \code{dotnet test}: 107/109, 2 đỏ là \code{SurveyServiceTests} của TV1 (có từ trước).\\[0.5mm]
+Kỹ thuật: BVA, EP, chuyển trạng thái; kỳ vọng lấy từ bảng tính tay, không chép công thức của code; Fake chéo \code{FakeTicketQuery} (TC2-09, 10). Integration TC2-11..14 và bảng tính tay R5: phụ lục.
+\end{block}
+\end{frame}
+
+\begin{frame}{Kịch bản demo phân hệ TV2 ($\approx$4 phút) và chức năng còn thiếu \TB}
+\begin{columns}[T]
+\column{0.62\textwidth}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}L{0.25cm}L{1.05cm}YL{1.35cm}@{}}
+\toprule
+\textbf{\#} & \textbf{Ai} & \textbf{Thao tác $\to$ phải thấy} & \textbf{CN, QT} \\
+\midrule
+1 & Lễ tân & thêm khách Việt Nam, CCCD 11 số $\to$ báo lỗi; sửa 12 số $\to$ lưu, hạng Standard & 5.1.1, Q7 \\
+2 & Lễ tân & đặt phòng 305 ngày 10--14/12, giá chốt 1.250.000đ; đặt chồng 11--13/12 $\to$ bị chặn & 6.2.2, Q8 \\
+3 & Lễ tân & nhận phòng 10/12, trả 14/12: 4 đêm = 5.000.000đ $\to$ +500 điểm, 900 $\to$ 1.400, \textbf{lên Silver}; bên TV1 có phiếu khảo sát Chờ & 6.2.4, Q9, L3 \\
+4 & Lễ tân & đổi quà 2.000 điểm $\to$ bị chặn; đổi Voucher spa 800 $\to$ số dư 600; hủy $\to$ 1.400, vẫn Silver & 7.2, Q10 \\
+5 & Quản lý & tạo chiến dịch ``Sinh nhật tháng 12'', xem trước $\to$ khách đang khiếu nại bị loại & 8.1, Q11, L4 \\
+6 & CSKH & ghi phản hồi ``Đã đặt phòng'' $\to$ tỷ lệ phản hồi tăng ngay & 8.1.4 \\
+7 & Quản lý & báo cáo R4, dashboard R5, xuất Excel & 8.2 \\
+8 & Lễ tân & thử tạo chiến dịch $\to$ ``Bạn không có quyền\ldots'' & Q6 \\
+\bottomrule
+\end{tabularx}
+\column{0.35\textwidth}
+\begin{block}{Người dùng mong muốn}
+\scriptsize Lễ tân: tìm đúng 1 hồ sơ, không tự cộng điểm, đổi quà tự kiểm tra. Quản lý: ưu đãi đúng người, đo được hiệu quả, thấy toàn cảnh khách.
+\end{block}
+\begin{alertblock}{Quy trình còn thiếu gì (so với hệ thống tham khảo)}
+\scriptsize
+\textbf{Ghi tương tác thủ công} (khách gọi, gửi email): \textbf{đề xuất thêm} 5.2.5 trên frm201.\\[0.5mm]
+Gộp hồ sơ trùng: không làm, Q7 chặn trùng từ đầu.\\[0.5mm]
+Điểm hết hạn, gửi email/SMS tự động, khách tự đổi quà: ngoài phạm vi.
+\end{alertblock}
+{\tiny Kịch bản dựng với AI (Claude) từ prompt + mẫu phân rã (phụ lục); TV2 đối chiếu từng bước với BFD.\par}
+\end{columns}
+\end{frame}

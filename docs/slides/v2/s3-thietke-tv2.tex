@@ -1,0 +1,108 @@
+% [TV2] Thiết kế: lớp TV2, Strategy phân khúc, tuần tự L3.
+% Nguồn: docs/analysis/07..09, code nhánh v2 và PR #5. Hợp đồng, máy trạng thái, Form ở phụ lục.
+
+\begin{frame}{Biểu đồ lớp TV2 (Domain + Strategy) \TB}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[every node/.append style={anchor=north}]
+\cls[umlcls=common, at={(0,0)}]{per}{Person (chung)}{Id, FullName, Phone, Email}{}
+\cls[umlcls=tvB, at={(0,-2.0)}]{cu}{Customer}{IdentityNumber, Nationality\\DateOfBirth?, MarketingConsent\\Tier, LifetimePoints}{UpdateProfile(...)\\EnsureUnique(...)\\EnsureCanBeDeleted(...)\\EarnPoints(points) : bool}
+\cls[umlcls=tvB, at={(5.6,0)}]{mt}{\textit{MembershipTier}}{\textit{MinPoints, EarnRate}\\\textit{SlaFactor, PriorityBoost}}{PointsFor(amountVnd) : int\\IsAtLeast(other) : bool\\\textit{Next()} : MembershipTier?}
+\node[sbox=tvB, minimum width=4.8cm] (tiers) at (5.6,-3.6) {StandardTier \ SilverTier \ GoldTier \ VipTier};
+\cls[umlcls=tvB, at={(11.2,0)}]{rw}{Reward}{PointsCost, MinTier\\Quantity, IsActive}{EnsureCanRedeem(tier, balance)\\Redeem(...) : RewardRedemption\\CancelRedemption(r)}
+\cls[umlcls=tvB, at={(16.4,0)}]{rr}{RewardRedemption}{CustomerId, RewardId\\\textbf{PointsSpent} (chốt)\\Status}{\textit{internal} Cancel()}
+\cls[umlcls=tvB, at={(13.8,-3.6)}]{pt}{PointTransaction}{CustomerId, Points ($\pm$)\\Reason, BookingId?\\TicketId?, RedemptionId?}{\textit{static} ForStay(...)\\\textit{static} ForGoodwill(...)\\\textit{static} ForRedemption(...)\\\textit{static} ForRefund(...)}
+\cls[umlcls=tvB, at={(0,-6.4)}]{rt}{RoomType}{Name, PricePerNight}{}
+\cls[umlcls=tvB, at={(0,-8.4)}]{rm}{Room}{Number, Floor}{EnsureAvailable(...)}
+\cls[umlcls=tvB, at={(5.6,-6.4)}]{bk}{Booking}{CustomerId, RoomId\\\textbf{RatePerNight} (chốt)\\Status, Nights, TotalAmount}{CheckIn(now)\\CheckOut(now)\\Cancel()}
+\cls[umlcls=tvB, at={(11.2,-6.6)}]{cp}{Campaign}{SegmentCode\\StartDate, EndDate\\ResponseRate}{\textit{static} IsEligible(...)\\AddTarget(...)\\EnsureHasTargets()\\RecordResponse(...)}
+\cls[umlcls=tvB, at={(16.4,-6.6)}]{ct}{CampaignTarget}{CustomerId, Channel\\SentAt, Response?}{\textit{internal} Record(...)}
+\node[sbox=tvB, minimum width=4.2cm, font=\scriptsize\itshape] (iseg) at (21.4,0) {«interface» ISegmentStrategy\\Code, DisplayName\\Includes(customer, date) : bool};
+\node[sbox=tvB, minimum width=4.2cm] (segs) at (21.4,-2.6) {VipSegment\\LapsedGuestSegment\\BirthdayMonthSegment};
+\node[sbox=tvB, minimum width=4.2cm] (cs) at (21.4,-6.6) {CampaignService\\(Context, P3)};
+\draw[inh] (cu.north) -- (per.south);
+\draw[nav] (cu.east) -- node[mult, above] {Tier 1} (mt.west);
+\draw[inh] (tiers.north) -- (mt.south);
+\draw[nav] (rw.west) -- node[mult, above] {MinTier 1} (mt.east);
+\draw[dep] (rw.east) -- node[mult, above] {«create»} (rr.west);
+\draw[dep] (pt.north) -- (rr.south);
+\draw[aggr] (rt.south) -- node[mult, right, pos=0.2] {1} node[mult, right, pos=0.8] {0..*} (rm.north);
+\draw[dep] (bk.west) -- node[mult, above] {giá chốt} (rm.east);
+\draw[comp] (cp.east) -- node[mult, above, pos=0.2] {1} node[mult, above, pos=0.8] {1..*} (ct.west);
+\draw[impl] (segs.north) -- (iseg.south);
+\draw[nav] (cs.north) -- node[mult, right] {*} (segs.south);
+\end{tikzpicture}}
+
+\vspace{1mm}
+{\tiny Đã có code: PR \#2 (\code{MembershipTier} + 4 hạng, \code{Reward}, \code{RewardRedemption}, \code{PointTransaction}, \code{Campaign}, \code{CampaignTarget}, \code{ISegmentStrategy} + 3 phân khúc) và PR \#5 (\code{Customer}, \code{Interaction}, \code{Booking}, \code{Room}). Còn \code{Receptionist : Employee}, chờ \code{Employee} v2 của TV1. Giữa các aggregate chỉ giữ Id.\par}
+\end{frame}
+
+\begin{frame}[fragile]{Mẫu Strategy (TV2): chọn khách cho chiến dịch \TB}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\begin{lstlisting}
+public interface ISegmentStrategy
+{
+    string Code { get; }        // campaigns.SegmentCode
+    string DisplayName { get; } // shown on frm206
+    bool Includes(SegmentCandidate customer,
+                  DateTime referenceDate);
+}
+
+public sealed class LapsedGuestSegment : ISegmentStrategy
+{
+    private readonly int _lapsedDays; // appsettings
+    public bool Includes(SegmentCandidate c, DateTime d)
+    {
+        if (c.LastCheckOut is not { } last)
+            return false;            // never stayed
+        return (d.Date - last.Date).Days >= _lapsedDays;
+    }
+}
+\end{lstlisting}
+\column{0.47\textwidth}
+\scriptsize
+\begin{block}{Vai trò}
+\tiny \textbf{Strategy}: \code{ISegmentStrategy}. \textbf{ConcreteStrategy}: \code{VipSegment}, \code{LapsedGuestSegment}, \code{BirthdayMonthSegment}. \textbf{Context}: \code{CampaignService} (nhận danh sách strategy qua constructor, tìm theo \code{Code} quản lý chọn trên Form). Đầu vào \code{SegmentCandidate}: service gom dữ liệu 1 lần $\Rightarrow$ strategy không đọc CSDL, không N+1, test không cần CSDL.
+\end{block}
+\begin{block}{Live OCP: \code{FrequentGuestSegment} (ở $\geq$ 3 lần/năm)}
+\tiny 1 lớp mới đếm \code{StayCheckOutDates} trong 365 ngày trước \code{referenceDate} + 1 dòng đăng ký ở \code{Program.cs}. Không sửa service, record hay truy vấn.
+\end{block}
+\begin{alertblock}{Nhược điểm}
+\tiny (1) Thêm lớp cho cả điều kiện 1 dòng. (2) Mọi strategy chung một chữ ký: phân khúc cần dữ liệu mới phải sửa \code{SegmentCandidate} và truy vấn.
+\end{alertblock}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Tuần tự L3 -- Trả phòng, xuyên phân hệ, 1 giao dịch \TB}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  msg/.style={-{Stealth[length=1.8mm]}, draw=black!80},
+  ret/.style={dashed, -{Stealth[length=1.8mm]}, draw=black!60},
+  ml/.style={font=\tiny, above, inner sep=1pt}]
+\foreach \x/\n/\t/\c in {0/lt/Lễ tân/common, 2.6/fm/frm203/tvB, 5.2/sv/StayService/tvB, 7.8/uw/IUnitOfWork/common, 10.4/bk/Booking/tvB, 13.0/mt/MembershipTier/tvB, 15.6/cu/Customer/tvB, 18.2/ss/ISurveyScheduler/tvA}{
+  \node[ll=\c, minimum width=2.1cm, minimum height=0.55cm] (\n) at (\x,0) {\t};
+  \draw[black!35, dashed] (\n.south) -- (\x,-8.6);}
+\draw[msg] (0,-0.9) -- node[ml] {bấm Trả phòng} (2.6,-0.9);
+\draw[msg] (2.6,-1.4) -- node[ml] {ErrorHandler.Run $\to$ CheckOut(actor, id)} (5.2,-1.4);
+\node[font=\tiny, right] at (5.25,-1.9) {actor.EnsureCan\ldots() -- kiểm quyền (Q6)};
+\draw[msg] (5.2,-2.4) -- node[ml] {Execute(work): BEGIN} (7.8,-2.4);
+\draw[draw=navy, rounded corners=1pt] (4.6,-2.7) rectangle (19.4,-6.6);
+\node[font=\tiny\bfseries, anchor=north west, fill=navy!15] at (4.6,-2.7) {work (trong giao dịch)};
+\draw[msg] (5.2,-3.2) -- node[ml] {CheckOut(now) (Q8)} (10.4,-3.2);
+\draw[msg] (5.2,-3.8) -- node[ml] {PointsFor(TotalAmount) -- hạng trước khi trả (Q9)} (13.0,-3.8);
+\draw[ret] (13.0,-4.15) -- node[ml] {points} (5.2,-4.15);
+\draw[msg] (5.2,-4.7) -- node[ml] {[points > 0] ghi ForStay; EarnPoints(points) $\to$ nâng hạng} (15.6,-4.7);
+\draw[msg] (5.2,-5.3) -- node[ml] {ghi Interaction ``Trả phòng, +N điểm''} (7.8,-5.3);
+\draw[msg] (5.2,-5.9) -- node[ml] {ScheduleFor(bookingId, now) -- phiếu khảo sát Chờ (TV1)} (18.2,-5.9);
+\draw[draw=warn, rounded corners=1pt] (1.9,-6.8) rectangle (19.4,-8.4);
+\node[font=\tiny\bfseries, anchor=north west, fill=warn!15] at (1.9,-6.8) {alt};
+\draw[ret] (7.8,-7.25) -- node[ml] {[thành công] COMMIT $\to$ CheckOutResult(points, tier, upgraded)} (2.6,-7.25);
+\draw[black!40] (1.9,-7.55) -- (19.4,-7.55);
+\draw[ret, draw=warn] (7.8,-8.05) -- node[ml, text=warn] {[ngoại lệ ở bất kỳ bước nào] ROLLBACK, ném lại $\to$ thông báo tiếng Việt} (2.6,-8.05);
+\end{tikzpicture}}
+
+\vspace{1mm}
+{\tiny Rollback: booking vẫn Đang ở, không có dòng sổ điểm, hạng và tương tác không đổi, không có phiếu khảo sát $\Rightarrow$ lễ tân thử lại được. Breakpoint ở \code{SurveyScheduler.ScheduleFor}: Call Stack \code{btnCheckOut_Click} $\to$ \code{ErrorHandler.Run} $\to$ \code{StayService.CheckOut} $\to$ \code{UnitOfWork.Execute} $\to$ lambda $\to$ \code{ScheduleFor}.\par}
+\end{frame}
