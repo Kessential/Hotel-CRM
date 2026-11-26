@@ -40,6 +40,27 @@ public class MembershipTierTests
     }
 
     [Theory]
+    [InlineData(StandardTier.TierName, typeof(StandardTier))]
+    [InlineData(SilverTier.TierName, typeof(SilverTier))]
+    [InlineData(GoldTier.TierName, typeof(GoldTier))]
+    [InlineData(VipTier.TierName, typeof(VipTier))]
+    public void FromName_StoredName_ReturnsThatTier(string tierName, Type expected)
+    {
+        // Act
+        MembershipTier tier = MembershipTier.FromName(tierName);
+
+        // Assert
+        Assert.IsType(expected, tier);
+    }
+
+    [Fact]
+    public void FromName_UnknownName_ThrowsArgument()
+    {
+        // Act + Assert: "Platinum" is not on the ladder Standard → Silver → Gold → VIP.
+        Assert.Throws<ArgumentException>(() => MembershipTier.FromName("Platinum"));
+    }
+
+    [Theory]
     [InlineData(GoldTier.TierName, SilverTier.TierName, true)]
     [InlineData(GoldTier.TierName, GoldTier.TierName, true)]
     [InlineData(SilverTier.TierName, GoldTier.TierName, false)]
