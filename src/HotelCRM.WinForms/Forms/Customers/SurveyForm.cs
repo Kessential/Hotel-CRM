@@ -8,15 +8,12 @@ namespace HotelCRM.WinForms.Forms.Customers;
 public partial class SurveyForm : Form
 {
     private readonly SurveyService _surveyService;
-    private readonly CustomerService _customerService;
 
     /// <summary>Creates the form.</summary>
     /// <param name="surveyService">Lists the tickets that can be surveyed and saves the survey.</param>
-    /// <param name="customerService">Finds the customer whose ticket is surveyed.</param>
-    public SurveyForm(SurveyService surveyService, CustomerService customerService)
+    public SurveyForm(SurveyService surveyService)
     {
         _surveyService = surveyService;
-        _customerService = customerService;
         InitializeComponent();
     }
 }

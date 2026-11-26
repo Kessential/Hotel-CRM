@@ -55,8 +55,6 @@ internal static class Program
             using MainForm mainForm = new(
                 services.Auth,
                 services.Tickets,
-                services.Customers,
-                services.Bookings,
                 services.Surveys,
                 services.Reports,
                 services.Notifications);
@@ -83,14 +81,11 @@ internal static class Program
             config.GetDataFilePath("departments.json"), new DepartmentMapper());
         IRepository<Employee> employees = new JsonRepository<Employee, EmployeeRecord>(
             config.GetDataFilePath("employees.json"), new EmployeeMapper(departments));
-        IRepository<RoomType> roomTypes = new JsonRepository<RoomType, RoomTypeRecord>(
-            config.GetDataFilePath("roomtypes.json"), new RoomTypeMapper());
-        IRepository<Room> rooms = new JsonRepository<Room, RoomRecord>(
-            config.GetDataFilePath("rooms.json"), new RoomMapper(roomTypes));
-        IRepository<Customer> customers = new JsonRepository<Customer, CustomerRecord>(
-            config.GetDataFilePath("customers.json"), new CustomerMapper());
-        IRepository<Booking> bookings = new JsonRepository<Booking, BookingRecord>(
-            config.GetDataFilePath("bookings.json"), new BookingMapper(customers, rooms));
+        // Customer subsystem (TV2): the v1 JSON files were removed; empty in-memory repositories keep
+        // CustomerDirectory, StayLookup and the observers working until the SQLite repositories of P3.
+        IRepository<Room> rooms = new InMemoryRepository<Room>();
+        IRepository<Customer> customers = new InMemoryRepository<Customer>();
+        IRepository<Booking> bookings = new InMemoryRepository<Booking>();
         IRepository<SupportTicket> tickets = new JsonRepository<SupportTicket, TicketRecord>(
             config.GetDataFilePath("tickets.json"), new TicketMapper(employees));
         IRepository<SatisfactionSurvey> surveys = new JsonRepository<SatisfactionSurvey, SurveyRecord>(
@@ -135,8 +130,6 @@ internal static class Program
         return new AppServices(
             new AuthService(employees),
             new TicketService(tickets, employees, customerDirectory, stayLookup, strategy, factories, observers, config.Rules),
-            new CustomerService(customers, ticketQuery),
-            new BookingService(bookings, rooms, customers),
             new SurveyService(surveys, ticketQuery),
             new ReportService(ticketQuery, employees, departments, surveys),
             notifications);
@@ -146,8 +139,6 @@ internal static class Program
     private sealed record AppServices(
         AuthService Auth,
         TicketService Tickets,
-        CustomerService Customers,
-        BookingService Bookings,
         SurveyService Surveys,
         ReportService Reports,
         UiNotificationObserver Notifications);
