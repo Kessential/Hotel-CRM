@@ -25,6 +25,24 @@ _[TV1] chưa điền._
 #### Phạm vi phân hệ
 Phân hệ quản lý mọi thứ khách sạn biết về một khách và dùng nó để giữ chân khách: hồ sơ khách 360 (F5), lưu trú làm nguồn dữ liệu cho CRM (F6), sổ điểm và đổi quà (F7), chiến dịch chăm sóc theo phân khúc và báo cáo khách hàng (F8). Phân hệ không quản lý hóa đơn, công nợ, doanh thu hay công suất phòng: đó là việc của phần mềm quản lý khách sạn (PMS), nằm ngoài đề CRM.
 
+#### Khảo sát cái gì, tham khảo hệ thống nào
+Nội dung khảo sát (What):
+1. Quy trình nghiệp vụ hiện tại ở quầy lễ tân và bộ phận CSKH: lập hồ sơ, đặt–nhận–trả phòng, cộng điểm, đổi quà, gửi ưu đãi, ghi phản hồi (mục "Cách làm hiện tại").
+2. Biểu mẫu đang dùng: BM4–BM7 (mục 4.2).
+3. Quy tắc nghiệp vụ: giá phòng, cách tính điểm, ngưỡng hạng, điều kiện đổi quà, điều kiện nhận ưu đãi (Q7–Q13, `04-quy-tac.md`).
+4. Báo cáo người quản lý cần: khách theo hạng, hiệu quả chiến dịch, toàn cảnh một khách (R3–R5).
+5. Các hệ thống cùng loại đang có trên thị trường, để tách phần chung (hệ thống nào cũng có, nên làm) và phần riêng (không đưa vào, có lý do).
+
+Hệ thống tham khảo (TV2 bổ sung link và ngày xem vào bảng "Nguồn khảo sát"):
+
+| Hệ thống | Loại | Chức năng đã xem | Phần chung → đưa vào phân hệ | Phần riêng → không đưa vào (lý do) |
+|---|---|---|---|---|
+| Oracle OPERA Cloud (hồ sơ khách) | PMS khách sạn | hồ sơ khách, lịch sử lưu trú, ghi chú sở thích, đặt/nhận/trả phòng | hồ sơ một khách duy nhất, lịch sử lưu trú, giá chốt trên phiếu (F5, F6) | hóa đơn, công nợ, công suất phòng, kênh bán phòng: việc của PMS |
+| Marriott Bonvoy, Hilton Honors | chương trình thành viên khách sạn | tích điểm theo chi tiêu, hạng thành viên, đổi điểm lấy quà | sổ điểm từng giao dịch, hạng theo điểm đã tích, đổi quà theo hạng và số dư (F7) | điểm hết hạn, tích điểm qua đối tác (hãng bay, thẻ), xét hạng theo số đêm: vượt quy mô một khách sạn |
+| HubSpot CRM, Salesforce | CRM đa ngành | phân khúc danh sách, chiến dịch, ghi phản hồi, báo cáo hiệu quả, nhật ký tương tác | chọn khách theo phân khúc, danh sách chiến dịch, phản hồi, tỷ lệ (F8, R4); nhật ký tương tác (F5.2) | gửi email/SMS tự động, chấm điểm khách tiềm năng, quy trình bán hàng: không phải nghiệp vụ khách sạn nhỏ |
+
+Phần chung cả ba nhóm hệ thống đều có, và phân hệ giữ lại: một hồ sơ duy nhất cho mỗi khách (khóa theo SĐT, email, giấy tờ), lịch sử tương tác, phân khúc khách, báo cáo theo khách. Những chức năng các hệ thống có mà phân hệ chưa có được rà ở `03-use-case.md` mục 6 (kịch bản demo).
+
 #### 4W+1H của phân hệ
 
 | Câu hỏi | Kết quả khảo sát |

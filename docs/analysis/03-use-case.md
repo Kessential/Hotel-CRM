@@ -179,3 +179,38 @@ Số dư điểm = tổng mọi dòng sổ điểm của khách. Điểm đã t�
 | E6 | Ghi phản hồi cho khách không có trong danh sách | `BusinessRuleException` | "Khách 12 không có trong danh sách của chiến dịch này." |
 
 Trong A4a, `CampaignService` không để `Campaign.AddTarget` ném lỗi cho khách bị loại mà hỏi `Campaign.IsEligible` trước, gom các khách bị loại vào kết quả trả về để Form báo lại.
+
+## 6. Kịch bản demo và rà soát chức năng phân hệ TV2 [TV2]
+Theo góp ý của thầy: có kịch bản demo nêu người dùng mong muốn gì, đi qua quy trình theo từng bước, và chỉ ra quy trình còn thiếu chức năng gì. Kịch bản được dựng với sự hỗ trợ của AI (Claude) từ prompt ở `02-bfd.md` mục 2.5; TV2 đối chiếu từng bước với BFD và quyết định.
+
+### 6.1 Người dùng mong muốn gì
+| Vai trò | Mong muốn | Chức năng đáp ứng |
+|---|---|---|
+| Lễ tân | Khách quay lại thì tìm thấy đúng một hồ sơ và thấy toàn bộ lịch sử | F5.1.4, F5.2 |
+| Lễ tân | Trả phòng xong không phải tự cộng điểm, tự xét hạng | F6.2.4 (Q9, L3) |
+| Lễ tân | Đổi quà thì hệ thống tự chặn khi thiếu điểm, thiếu hạng, hết quà | F7.2.2 (Q10) |
+| Quản lý | Gửi ưu đãi đúng nhóm khách, không làm phiền khách đang khiếu nại, đo được hiệu quả | F8.1 (Q11, L4), F8.2.2 (R4) |
+| Quản lý | Xem toàn cảnh một khách: chi tiêu, số ticket, mức hài lòng | F8.2.3 (R5, L6) |
+
+### 6.2 Kịch bản demo (khoảng 4 phút)
+Dữ liệu chuẩn bị: khách Nguyễn Văn An hạng Standard, 900 điểm đã tích; phòng 305 loại Deluxe đôi 1.250.000đ/đêm; quà "Voucher spa" 800 điểm và quà "Đêm phòng miễn phí" 2.000 điểm, cả hai hạng tối thiểu Standard.
+
+| Bước | Ai | Thao tác | Kết quả phải thấy | Chức năng, quy tắc |
+|---|---|---|---|---|
+| 1 | Lễ tân | Thêm khách mới quốc tịch Việt Nam, nhập CCCD 11 số, rồi sửa thành 12 số | Lần đầu báo "Số CCCD phải gồm đúng 12 chữ số.", lần sau lưu được, hạng Standard | F5.1.1, Q7 |
+| 2 | Lễ tân | Đặt phòng 305 cho khách An từ 10/12 đến 14/12, sau đó đặt thử 11/12–13/12 cho khách khác | Booking Đã đặt, giá/đêm 1.250.000đ được chốt; lần đặt thứ hai bị chặn, thông báo nêu ngày đang bị giữ | F6.2.2, Q8 |
+| 3 | Lễ tân | Nhận phòng ngày 10/12, trả phòng ngày 14/12 | 4 đêm × 1.250.000 = 5.000.000đ → +500 điểm → 1.400 điểm, lên Silver; bên TV1 có phiếu khảo sát Chờ | F6.2.3, F6.2.4, Q9, L3 |
+| 4 | Lễ tân | Đổi "Đêm phòng miễn phí" (2.000 điểm, thiếu điểm), rồi đổi Voucher spa, rồi hủy lượt đổi | Lần đầu bị chặn; lần hai số dư 600; hủy thì số dư về 1.400, hạng vẫn Silver | F7.2.2–F7.2.4, Q10 |
+| 5 | Quản lý | Tạo chiến dịch "Sinh nhật tháng 12", Xem trước | Danh sách bỏ khách không đồng ý và khách đang có khiếu nại chưa đóng (hỏi phân hệ TV1) | F8.1.1–F8.1.3, Q11, L4 |
+| 6 | CSKH | Ghi phản hồi "Đã đặt phòng" cho một khách | Tỷ lệ phản hồi ở cuối danh sách tăng ngay | F8.1.4 |
+| 7 | Quản lý | Mở báo cáo hiệu quả chiến dịch, dashboard 360, xuất Excel | Số liệu khớp các bước trên; file .xlsx mở được | F8.2.2–F8.2.4 |
+| 8 | Lễ tân | Thử tạo chiến dịch | Bị chặn: "Bạn không có quyền tạo chiến dịch." | Q6 |
+
+### 6.3 Quy trình còn thiếu chức năng gì (so với hệ thống tham khảo)
+| Chức năng hệ thống tham khảo có | Có ở | Phân hệ hiện tại | Quyết định |
+|---|---|---|---|
+| Ghi tương tác thủ công (khách gọi điện, gửi email) | HubSpot, OPERA | hồ sơ 360 chỉ có tương tác do hệ thống ghi (trả phòng, ticket đóng) | **đề xuất thêm** F5.2.5 "Ghi tương tác" trên frm201 (`Interaction` đã hỗ trợ kênh có nhân viên); chờ chốt |
+| Gộp hai hồ sơ trùng của một khách | OPERA | Q7 chặn trùng SĐT, email, giấy tờ ngay lúc nhập | không làm: chặn từ đầu thay cho gộp về sau |
+| Điểm hết hạn khi không hoạt động | Marriott Bonvoy, Hilton Honors | điểm không hết hạn | ngoài phạm vi; ghi ở hướng phát triển |
+| Gửi email/SMS tự động | HubSpot | hệ thống lập danh sách; CSKH gửi tay, ghi kênh và phản hồi | ngoài phạm vi (cần dịch vụ gửi tin bên ngoài) |
+| Khách tự xem điểm, tự đổi quà | Marriott Bonvoy, Hilton Honors | khách không đăng nhập (4W+1H) | ngoài phạm vi: app nội bộ cho nhân viên |

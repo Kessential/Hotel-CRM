@@ -4,7 +4,7 @@ Kế hoạch: `docs/PLAN.md` (v2). Việc chi tiết giai đoạn đang làm: `d
 
 Cách cập nhật: mỗi người sửa dòng/ô của mình trong PR của mình, sau mỗi module (đánh dấu `[x]`, đổi cột trạng thái, thêm một dòng nhật ký). Không sửa dòng của người kia.
 
-Cập nhật lần cuối: 26/11/2026 (PR #3, TV2).
+Cập nhật lần cuối: 26/11/2026 (nhánh `tv2/m9-slides`, TV2).
 
 ## 1. Trạng thái giai đoạn
 | Giai đoạn | Thời gian (plan) | Trạng thái | Mốc kiểm cuối giai đoạn |
@@ -168,6 +168,8 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV2 | File task mục 1.1 ("mỗi người, mỗi module một nhánh"): P1 của TV2 nằm trên một nhánh `tv2/p1-analysis` (PR #3), mỗi module một commit | PR #3 mở trước khi có file task; tách lại thì mất lịch sử review | TV1 + TV2 (PR #3) |
 | 26/11 | TV2 | Q13 (PLAN 5.3): không xóa khách đã có lưu trú, ticket **hoặc đã nằm trong chiến dịch**; `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`. PLAN chỉ ghi "lưu trú hoặc ticket" | khách chưa ở lần nào vẫn có thể nằm trong chiến dịch; xóa khách này thì khóa ngoại `campaign_targets.CustomerId` (RESTRICT) chặn với lỗi khó hiểu, còn `CASCADE` làm mất số liệu R4 (`06-erd.md` mục 3.5) | TV1 + TV2 (PR #3) |
 | 26/11 | TV2 | PLAN 5.2 (`point_transactions.Reason`): bỏ giá trị "Điều chỉnh", chỉ còn `Stay`, `Goodwill`, `Redemption`; hoàn điểm khi hủy lượt đổi dùng chung `Redemption` (dòng dương cùng `RedemptionId`). R3: điểm đã tích = tổng dòng `Stay` + `Goodwill`; điểm đã đổi = −tổng dòng `Redemption` (ròng, lượt đã hủy góp 0) | không UC, Form hay quyền nào cho phép chỉnh điểm tay; thêm giá trị thì thành code chết | TV1 + TV2 (PR #3) |
+| 26/11 | TV2 | PLAN 4.2 (tên nhánh BFD): F5–F8 đổi sang động từ (F5 Quản lý hồ sơ khách hàng, F6 Quản lý lưu trú, F7 Quản lý khách hàng thân thiết, F8 Chăm sóc khách hàng theo chiến dịch); thêm F7.3 Cộng điểm thiện chí (tự động); phân rã F5–F8 đến cấp 4 (`02-bfd.md` mục 2.3). Mã F giữ nguyên | góp ý của thầy: mọi chức năng là động từ, BFD thể hiện đủ mọi chức năng | chờ TV1 (PR `tv2/m9-slides`); TV1 đổi tên tiến trình 5.0–8.0 của DFD mức 0 theo |
+| 26/11 | TV2 | PLAN 4.2 (cấu trúc cây): đề xuất cây tổng theo chuẩn 3 nhánh chung (Quản trị hệ thống, Quản lý danh mục, Báo cáo thống kê) + nhánh nghiệp vụ; F6.1, F7.1 xếp vào Quản lý danh mục, F8.2 vào Báo cáo thống kê (`02-bfd.md` mục 2.4) | góp ý của thầy; checklist ghi chuẩn "3 nhánh chung + nhánh riêng" | chờ TV1 chốt cây tổng (mục 7, dòng "Đối chiếu HuongdanXDHTTTQL: cây BFD mẫu") |
 
 ## 9. Nhật ký
 | Ngày | Ai | Việc |
@@ -181,3 +183,4 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV1 | Sửa PR #4 theo review (mục 8, `docs/slide_checklist/` ngoài repo + `.gitignore`), merge PR #4 vào `v2` |
 | 25/11 | TV2 | Rebase PR #3 lên `v2` (`37884a0`; commit "Record the three decisions agreed with TV1" đổi mã từ `284ee92` thành `3ccc924`). Sửa 10 file `docs/analysis/` theo khung của file task (mục của TV1 và mục chung TV1 để dòng chờ); bỏ mã YC tự đặt, dùng mã F; ảnh biểu mẫu vào `docs/analysis/bieu-mau/`; đổi tên `use-case-tv2.iuml`, `dfd-level1-f7.puml`; DFD F7 theo Gane–Sarson với kho D5, D9, D10; mã test TC2-11…TC2-14; thêm loại ngoại lệ + thông báo cho UC08–UC10, Strategy (7.2), Observer phía nhận (7.3), cây `MembershipTier` (8.2), phác thảo bố cục 7 Form, kế hoạch tiêm lỗi |
 | 26/11 | TV2 | Sửa PR #3 theo review approve của TV1 (26/11): mục 8 đổi 2 dòng sang "TV1 + TV2", thêm dòng Q13 mở rộng và dòng bỏ "Điều chỉnh" của `PointReason` (kèm cách R3 tính điểm đã đổi); Q13 mở rộng ở `04`, `06` mục 3.5, `07` mục 4.1/4.3, `class-tv2.iuml`; thêm ca "khách chỉ nằm trong chiến dịch" vào TC2-10; sửa tiêu đề, mô tả PR |
+| 26/11 | TV2 | Theo góp ý của thầy: thêm "Khảo sát cái gì, tham khảo hệ thống nào" (OPERA Cloud, Marriott Bonvoy, Hilton Honors, HubSpot/Salesforce; phần chung/riêng) vào `01-khao-sat.md`; phân rã F5–F8 đến cấp 4, tên động từ, đề xuất xếp vào 3 nhánh chung, prompt + mẫu phân rã cho AI (`02-bfd.md` mục 2.3–2.5, `bfd-tv2.iuml`); kịch bản demo 8 bước và bảng "quy trình còn thiếu chức năng gì" (`03-use-case.md` mục 6). Rút slide phần TV2 cho buổi trình bày 15–20 phút, chi tiết chuyển sang phụ lục |
