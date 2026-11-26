@@ -10,7 +10,7 @@ namespace HotelCRM.Domain.Hotel;
 /// </summary>
 public sealed class Booking : IEntity
 {
-    /// <summary>Creates a new booking with status Reserved and registers it in the customer's <see cref="Customer.Bookings"/>.</summary>
+    /// <summary>Creates a new booking with status Reserved.</summary>
     /// <param name="id">Id obtained from the booking repository.</param>
     /// <param name="customer">Guest; required.</param>
     /// <param name="room">Room; required. The service checks its availability with <see cref="Room.EnsureAvailable"/> first.</param>
@@ -44,8 +44,6 @@ public sealed class Booking : IEntity
         {
             ValidateNewBooking();
         }
-
-        customer.AddBooking(this);
     }
 
     /// <summary>Identifier assigned by the repository.</summary>
@@ -133,7 +131,7 @@ public sealed class Booking : IEntity
         Status = BookingStatus.Cancelled;
     }
 
-    /// <summary>Rebuilds a booking from stored data, including its status, and registers it in the customer.</summary>
+    /// <summary>Rebuilds a booking from stored data, including its status.</summary>
     internal static Booking Restore(
         int id,
         Customer customer,

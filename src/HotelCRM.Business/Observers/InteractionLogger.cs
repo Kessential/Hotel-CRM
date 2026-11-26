@@ -6,10 +6,9 @@ using HotelCRM.Domain.Tickets.States;
 namespace HotelCRM.Business.Observers;
 
 /// <summary>
-/// Observer that writes one entry into the customer's interaction history every time one of their
-/// tickets changes state: channel <see cref="ContactChannel.System"/>, time
-/// <see cref="SupportTicket.UpdatedAt"/>, the ticket Id, and a summary naming the ticket and both states.
-/// It changes the customer and saves it through the repository itself.
+/// Observer that records one <see cref="Interaction"/> every time a ticket of a customer changes state:
+/// channel <see cref="ContactChannel.System"/>, time <see cref="SupportTicket.UpdatedAt"/>, the ticket Id,
+/// and a summary naming the ticket and both states. Rewritten on the SQLite repositories in P3.
 /// </summary>
 public sealed class InteractionLogger : ITicketObserver
 {

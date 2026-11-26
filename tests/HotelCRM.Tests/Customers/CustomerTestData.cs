@@ -10,12 +10,21 @@ internal static class CustomerTestData
     public static readonly DateTime Now = new(2026, 11, 16, 9, 0, 0);
 
     public const string ValidPhone = "0912345678";
-    public const string ValidEmail = "emma.stone@example.com";
+    public const string ValidEmail = "nguyen.an@example.com";
+    public const string ValidCitizenId = "001203004567";
 
-    /// <summary>A valid new customer: Standard tier, 0 points.</summary>
-    public static Customer NewCustomer(int id = 1, string phone = ValidPhone, string email = ValidEmail)
+    /// <summary>A valid new Vietnamese customer: Standard tier, 0 lifetime points.</summary>
+    public static Customer NewCustomer(
+        int id = 1,
+        string phone = ValidPhone,
+        string email = ValidEmail,
+        string identityNumber = ValidCitizenId,
+        string nationality = Customer.VietnameseNationality,
+        DateTime? dateOfBirth = null)
     {
-        return new Customer(id, "Emma Stone", phone, email, "P1234567", "British", "Prefers a quiet room.");
+        return new Customer(
+            id, "Nguyễn Văn An", phone, email, identityNumber, nationality, dateOfBirth,
+            marketingConsent: true, "Thích phòng yên tĩnh.", Now);
     }
 
     /// <summary>Room 305, a Deluxe Double at 120 USD per night.</summary>
