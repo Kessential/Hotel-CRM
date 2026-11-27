@@ -3,7 +3,7 @@
 title L3 – Trả phòng (UC08, luồng C) – một giao dịch CSDL
 
 actor "Lễ tân" as LT
-boundary "frm203_nv_luu_tru" as FRM
+boundary "frm203_nv_stay" as FRM
 participant "ErrorHandler" as EH
 control "StayService" as SVC
 participant "actor : Employee" as ACT
@@ -20,7 +20,7 @@ box "Phân hệ TV1" #EEF3FF
 end box
 database "SQLite" as DB
 
-LT -> FRM : bấm "Trả phòng"
+LT -> FRM : bấm "Trả phòng" (POST, OnPostCheckOut)
 activate FRM
 FRM -> EH : Run(...)
 activate EH
@@ -67,13 +67,13 @@ alt mọi bước thành công
   UOW --> SVC
   SVC --> EH : CheckOutResult(points, tierName, upgraded)
   EH --> FRM
-  FRM --> LT : "Đã trả phòng, +N điểm" (+ "Khách lên hạng ...")
+  FRM --> LT : toast "Đã trả phòng, +N điểm" (+ "Khách lên hạng ...")
 else một bước ném ngoại lệ (sai trạng thái, lỗi SurveyScheduler, lỗi CSDL)
   UOW -> DB : ROLLBACK
   note over UOW, DB : booking vẫn CheckedIn; không có dòng sổ điểm,\nhạng và tương tác không đổi, không có phiếu khảo sát
   UOW --> SVC : ngoại lệ (ném lại)
   SVC --> EH : ngoại lệ
-  EH --> FRM : hiện thông báo tiếng Việt; lỗi không lường trước thì ghi logs/error.log
+  EH --> FRM : toast lỗi tiếng Việt; lỗi không lường trước thì ghi logs/error.log
 end
 deactivate UOW
 deactivate SVC

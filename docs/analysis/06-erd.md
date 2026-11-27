@@ -22,7 +22,7 @@ Sơ đồ: `diagrams/erd-tv2.iuml`.
 | `rewards` | **danh mục** | `Reward` | |
 | `reward_redemptions` | **n–n** khách–quà, có thuộc tính | `RewardRedemption` | |
 | `campaigns` | giao dịch | `Campaign` | |
-| `campaign_targets` | **n–n** chiến dịch–khách, có thuộc tính | `CampaignTarget` | khóa ghép |
+| `campaign_targets` | **n–n** chương trình–khách, có thuộc tính | `CampaignTarget` | khóa ghép |
 
 ### 3.1 Quy ước tên và kiểu (TV2 đề xuất, TV1 chốt khi viết khung `schema.sql`)
 - **Tên:** bảng là danh từ số nhiều, `snake_case` (`room_types`); cột là `PascalCase` trùng tên thuộc tính C# (`RatePerNight`). Khóa chính `Id INTEGER PRIMARY KEY` (tự tăng), trừ bảng n–n thuần dùng khóa ghép.
@@ -63,7 +63,7 @@ Sơ đồ: `diagrams/erd-tv2.iuml`.
 | Channel | TEXT | NOT NULL, `CHECK (Channel IN ('FrontDesk', 'Phone', 'Email', 'System'))` |
 | Summary | TEXT | NOT NULL |
 | EmployeeId | INTEGER | NULL, FK → `employees` RESTRICT; NULL = hệ thống tự ghi (observer) |
-| TicketId | INTEGER | NULL, FK → `tickets` RESTRICT; có khi tương tác do đóng ticket (Q12) |
+| TicketId | INTEGER | NULL, FK → `tickets` RESTRICT; có khi tương tác do đóng phiếu yêu cầu (Q12) |
 
 **`room_types`**: Id PK; Name TEXT NOT NULL UNIQUE; PricePerNight INTEGER NOT NULL `CHECK (> 0)`; Capacity INTEGER NOT NULL `CHECK (> 0)`.
 
@@ -108,7 +108,7 @@ CHECK (
   OR (Reason = 'Redemption'                AND RedemptionId IS NOT NULL AND BookingId IS NULL AND TicketId IS NULL)
 )
 CREATE UNIQUE INDEX ux_points_stay     ON point_transactions(BookingId) WHERE Reason = 'Stay';      -- mỗi lần ở cộng điểm một lần (Q9)
-CREATE UNIQUE INDEX ux_points_goodwill ON point_transactions(TicketId)  WHERE Reason = 'Goodwill';  -- mỗi ticket một lần (Q12)
+CREATE UNIQUE INDEX ux_points_goodwill ON point_transactions(TicketId)  WHERE Reason = 'Goodwill';  -- mỗi phiếu yêu cầu một lần (Q12)
 ```
 
 **`rewards`**: Id PK; Name TEXT NOT NULL UNIQUE; PointsCost INTEGER NOT NULL `CHECK (> 0)`; MinTier TEXT NOT NULL `CHECK (IN ('Standard', 'Silver', 'Gold', 'VIP'))`; Quantity INTEGER NOT NULL `CHECK (Quantity >= 0)` (Q10, chặn hai người cùng đổi món cuối); IsActive INTEGER NOT NULL `CHECK (IN (0, 1))`.
@@ -141,7 +141,7 @@ CREATE UNIQUE INDEX ux_points_goodwill ON point_transactions(TicketId)  WHERE Re
 | RespondedAt | TEXT | NULL; `CHECK ((Response IS NULL) = (RespondedAt IS NULL))` |
 | RecordedById | INTEGER | NULL, FK → `employees` RESTRICT; `CHECK ((Response IS NULL) = (RecordedById IS NULL))` |
 
-Khóa ghép `(CampaignId, CustomerId)` chính là quy tắc "mỗi khách một lần trong một chiến dịch" (Q11), lớp chặn thứ hai sau `Campaign.AddTarget`.
+Khóa ghép `(CampaignId, CustomerId)` chính là quy tắc "mỗi khách một lần trong một chương trình" (Q11), lớp chặn thứ hai sau `Campaign.AddTarget`.
 
 ### 3.3 Quan hệ trong phân hệ
 
@@ -156,12 +156,12 @@ Khóa ghép `(CampaignId, CustomerId)` chính là quy tắc "mỗi khách một 
 | `reward_redemptions` – `point_transactions` | 1 – 1..2 (trừ, hoàn) | kết hợp | RESTRICT |
 
 ### 3.4 Chuẩn hóa các bảng TV2
-- **1NF:** mọi cột là giá trị đơn. Lịch sử tương tác, các lần ở, các giao dịch điểm, danh sách khách của chiến dịch đều tách thành bảng riêng, không gộp vào một cột của `customers`.
-- **2NF:** chỉ `campaign_targets` có khóa ghép. `Channel`, `SentAt`, `Response`, `RespondedAt`, `RecordedById` phụ thuộc vào cả cặp (chiến dịch, khách), không phụ thuộc vào một nửa khóa.
+- **1NF:** mọi cột là giá trị đơn. Lịch sử tương tác, các lần ở, các giao dịch điểm, danh sách khách của chương trình đều tách thành bảng riêng, không gộp vào một cột của `customers`.
+- **2NF:** chỉ `campaign_targets` có khóa ghép. `Channel`, `SentAt`, `Response`, `RespondedAt`, `RecordedById` phụ thuộc vào cả cặp (chương trình, khách), không phụ thuộc vào một nửa khóa.
 - **3NF:**
   - Số đêm, thành tiền: không lưu, tính từ ngày và `RatePerNight`.
   - Số dư điểm, điểm đã tích: không lưu, tính bằng tổng `point_transactions`.
-  - Tỷ lệ phản hồi chiến dịch: không lưu, tính từ `campaign_targets`.
+  - Tỷ lệ phản hồi của chương trình: không lưu, tính từ `campaign_targets`.
   - Loại phòng của booking: lấy qua `rooms`, không chép vào `bookings`.
 - **Dữ liệu dẫn xuất được lưu có chủ đích: `customers.Tier`.**
   - Hạng tính được từ điểm đã tích, nhưng được lưu vì quy tắc "hạng không bao giờ hạ" (Q9). Nếu sau này đổi ngưỡng hạng, khách đã lên hạng vẫn giữ hạng; tức hạng là một sự kiện đã xảy ra, không chỉ là kết quả tính.
@@ -169,11 +169,11 @@ Khóa ghép `(CampaignId, CustomerId)` chính là quy tắc "mỗi khách một 
   - Cột chỉ được ghi ở một chỗ: `Customer.EarnPoints`, sau khi cộng điểm.
 
 ### 3.5 Quyết định đã chốt với TV1 (PR #3, 26/11)
-1. **Xóa khách chỉ có trong chiến dịch.** Bản đầu của Q13 chỉ chặn khách có lưu trú hoặc ticket. Khách chưa ở lần nào vẫn có thể nằm trong chiến dịch "Sinh nhật trong tháng". Khi xóa khách này, khóa ngoại `campaign_targets.CustomerId` (RESTRICT) sẽ chặn ở CSDL với một lỗi khó hiểu.
-   - **Đã chốt:** mở rộng Q13 thành "không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch" (`04-quy-tac.md` Q13), để Domain báo lỗi rõ ràng: `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`.
+1. **Xóa khách chỉ có trong chương trình chăm sóc.** Bản đầu của Q13 chỉ chặn khách có lưu trú hoặc phiếu yêu cầu. Khách chưa ở lần nào vẫn có thể nằm trong chương trình "Sinh nhật trong tháng". Khi xóa khách này, khóa ngoại `campaign_targets.CustomerId` (RESTRICT) sẽ chặn ở CSDL với một lỗi khó hiểu.
+   - **Đã chốt:** mở rộng Q13 thành "không xóa khách đã có lưu trú, phiếu yêu cầu hoặc đã nằm trong chương trình chăm sóc" (`04-quy-tac.md` Q13), để Domain báo lỗi rõ ràng: `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`.
    - **Cách đã loại:** dùng `CASCADE` cho cột này, vì như vậy làm mất số liệu của báo cáo R4.
 2. **Quy ước kiểu dữ liệu ở mục 3.1** (tiền `INTEGER`, ngày `TEXT 'yyyy-MM-dd'`, thời điểm `TEXT 'yyyy-MM-dd HH:mm:ss'`, trạng thái `TEXT` + `CHECK`): TV1 đồng ý, áp dụng khi viết khung `schema.sql`.
-3. **`point_transactions.Reason` chỉ có 3 giá trị** (`Stay`, `Goodwill`, `Redemption`), bỏ "Điều chỉnh" của PLAN 5.2, vì không UC, Form hay quyền nào cho phép chỉnh điểm tay. Hoàn điểm khi hủy lượt đổi dùng chung `Redemption` (dòng dương, cùng `RedemptionId` với dòng âm). Vì vậy R3 tính:
+3. **`point_transactions.Reason` chỉ có 3 giá trị** (`Stay`, `Goodwill`, `Redemption`), bỏ "Điều chỉnh" của PLAN 5.2, vì không UC, trang hay quyền nào cho phép chỉnh điểm tay. Hoàn điểm khi hủy lượt đổi dùng chung `Redemption` (dòng dương, cùng `RedemptionId` với dòng âm). Vì vậy R3 tính:
    - **Điểm đã tích** = `SUM(Points)` của các dòng `Stay` và `Goodwill`.
    - **Điểm đã đổi** = `-SUM(Points)` của các dòng `Redemption`, tức số điểm đổi quà ròng sau khi trừ phần đã hoàn. Lượt đổi đã hủy có dòng −x và +x nên góp 0.
 
@@ -183,8 +183,8 @@ Khóa ghép `(CampaignId, CustomerId)` chính là quy tắc "mỗi khách một 
 
 | Khóa ngoại | Trỏ tới | NULL? | ON DELETE | Ý nghĩa |
 |---|---|---|---|---|
-| `interactions.TicketId` | `tickets` | có | RESTRICT | tương tác sinh ra khi đóng ticket (Q12, L2) |
-| `point_transactions.TicketId` | `tickets` | có | RESTRICT | dòng điểm thiện chí của ticket (Q12, L2) |
+| `interactions.TicketId` | `tickets` | có | RESTRICT | tương tác sinh ra khi đóng phiếu yêu cầu (Q12, L2) |
+| `point_transactions.TicketId` | `tickets` | có | RESTRICT | dòng điểm thiện chí của phiếu yêu cầu (Q12, L2) |
 | `interactions.EmployeeId`, `bookings.CreatedById`, `reward_redemptions.ProcessedById`, `campaigns.CreatedById`, `campaign_targets.RecordedById` | `employees` | theo bảng ở mục 3.2 | RESTRICT | nhân viên đã làm (ghi người làm) |
 
 Các khóa này chỉ tồn tại ở CSDL. Trong code, hai phân hệ vẫn chỉ giữ Id và nói chuyện qua interface; repository của TV2 không đọc bảng `tickets`, `employees`.

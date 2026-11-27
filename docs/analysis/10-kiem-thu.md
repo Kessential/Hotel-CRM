@@ -20,9 +20,9 @@ Unit test không cần CSDL, dùng Fake cho interface của phân hệ TV1 và `
 | TC2-05 | Unit | tính tay | Q9, UC08 | khách Standard 900 điểm đã tích, thành tiền 42.000.000đ; khách Silver, thành tiền 2.500.000đ | +4.200 → 5.100 điểm → Gold (lên 2 bậc); khách Silver +300 điểm | – | `MembershipTierTests`, `CustomerTests` |
 | TC2-06 | Unit | tính tay | Q9, Q10, UC09 | khách Gold 5.100 điểm đã tích, số dư 5.100; đổi quà 600 điểm | số dư 4.500; điểm đã tích 5.100; vẫn Gold | – | `CustomerTests` |
 | TC2-07 | Unit | BVA số dư, EP | Q10, UC09 | quà 500 điểm: số dư 500 / 499; khách Silver đổi quà hạng Gold; quà số lượng 0; quà ngừng áp dụng | số dư 500 → được; còn lại → `BusinessRuleException`, số lượng quà không đổi | – | `RewardTests`, `PointTransactionTests` |
-| TC2-08 | Unit | BVA ngày | Q11, UC10 | chiến dịch bắt đầu 01/12; lần trả phòng gần nhất cách 180 / 179 ngày; sinh 01/12, 31/12, 30/11; khách hạng Gold, VIP | lâu chưa quay lại: 180 có, 179 không; sinh nhật: 01/12 và 31/12 có, 30/11 không; VIP: chỉ khách VIP | – | `SegmentStrategyTests` |
+| TC2-08 | Unit | BVA ngày | Q11, UC10 | chương trình bắt đầu 01/12; lần trả phòng gần nhất cách 180 / 179 ngày; sinh 01/12, 31/12, 30/11; khách hạng Gold, VIP | lâu chưa quay lại: 180 có, 179 không; sinh nhật: 01/12 và 31/12 có, 30/11 không; VIP: chỉ khách VIP | – | `SegmentStrategyTests` |
 | TC2-09 | Unit | EP | Q11, UC10, L4 | 4 khách thuộc phân khúc: 1 không đồng ý ưu đãi, 1 đang khiếu nại (Fake trả về), 2 hợp lệ; phân khúc không có khách nào hợp lệ | xem trước còn 2 khách, báo loại 1 + 1; danh sách rỗng → `BusinessRuleException` khi lưu | `FakeTicketQuery` | `CampaignTests`, `CampaignServiceTests` |
-| TC2-10 | Unit | EP | Q13, UC07, L5 | khách có 1 ticket đã đóng (Fake); khách có 1 booking đã hủy; khách chỉ nằm trong 1 chiến dịch, chưa phản hồi (chưa ở, không ticket); khách không có gì | ba khách đầu → `BusinessRuleException`; khách cuối → xóa được | `FakeTicketQuery` | `CustomerServiceTests` |
+| TC2-10 | Unit | EP | Q13, UC07, L5 | khách có 1 phiếu yêu cầu đã đóng (Fake); khách có 1 booking đã hủy; khách chỉ nằm trong 1 chương trình chăm sóc, chưa phản hồi (chưa ở, không có phiếu); khách không có gì | ba khách đầu → `BusinessRuleException`; khách cuối → xóa được | `FakeTicketQuery` | `CustomerServiceTests` |
 | TC2-11 | Integration | luồng đầy đủ | L3, Q8, Q9, UC08 | CSDL tạm; khách Standard 900 điểm; booking Đang ở 2 đêm × 2.500.000đ; `StayService.CheckOut(lễ tân, booking)` | booking Đã trả phòng; 1 dòng sổ điểm Lưu trú +500; hạng Silver (1.400 điểm); 1 tương tác; 1 phiếu khảo sát Chờ của booking | – (`SurveyScheduler` thật khi có, trước đó Fake ghi nhận lời gọi) | `StayServiceIntegrationTests` |
 | TC2-12 | Integration | Rollback | L3, UC08 | như TC2-11, `ISurveyScheduler` là Fake ném ngoại lệ | ngoại lệ tới người gọi; đọc lại CSDL: booking vẫn Đang ở, 0 dòng sổ điểm mới, hạng Standard, 0 tương tác mới | `FakeSurveyScheduler` | `StayServiceIntegrationTests` |
 | TC2-13 | Integration | tính tay | R5, L6, UC11 | bộ dữ liệu ở mục 5.2; `DashboardService.GetDashboard()` | từng dòng và dòng tổng khớp bảng 5.3 | `FakeCustomerCareStats` (tới khi `CustomerCareStats` của TV1 xong, 8/12) | `DashboardServiceIntegrationTests` |
@@ -43,7 +43,7 @@ _[TV1] chưa điền._
 ### 5.1 Định nghĩa
 - **Số lần ở:** số booking Đã trả phòng của khách.
 - **Tổng chi tiêu:** Σ (số đêm × `RatePerNight`) của các booking Đã trả phòng. Không tính Đã đặt, Đang ở, Đã hủy.
-- **Số ticket, số khiếu nại:** lấy từ `ICustomerCareStats.GetTicketCounts` (TV1), mọi trạng thái.
+- **Số phiếu yêu cầu, số khiếu nại:** lấy từ `ICustomerCareStats.GetTicketCounts` (TV1), mọi trạng thái.
 - **Điểm hài lòng TB của khách:** trung bình cộng điểm TB các phiếu đã khảo sát của khách. Điểm TB một phiếu = trung bình điểm các tiêu chí. Khách chưa có phiếu nào → để trống. Làm tròn 2 chữ số khi hiển thị.
 - **Dòng tổng:** cộng các cột đếm và tiền. Cột điểm hài lòng = trung bình điểm TB của **mọi phiếu** đã khảo sát, không phải trung bình các dòng.
 
@@ -60,13 +60,13 @@ Loại phòng Deluxe đổi giá từ 1.200.000đ lên 1.500.000đ giữa B1 và
 | B6 | KH2 Bình | 202 Standard | 1 | 800.000 | Đã trả phòng | 3, 3, 3, 3, 3 |
 | – | KH3 Chi | – | – | – | không có booking | – |
 
-Ticket (số liệu `ICustomerCareStats` trả về): KH1 3 ticket, 1 khiếu nại; KH2 2 ticket, 2 khiếu nại; KH3 0 ticket.
+Phiếu yêu cầu (số liệu `ICustomerCareStats` trả về): KH1 3 phiếu, 1 khiếu nại; KH2 2 phiếu, 2 khiếu nại; KH3 0 phiếu.
 
 ### 5.3 Kết quả kỳ vọng
 
 Điểm TB từng phiếu: B1 = 23 / 5 = 4,60; B2 = 20 / 5 = 4,00; B6 = 15 / 5 = 3,00.
 
-| Mã KH | Họ tên | Số lần ở | Tổng chi tiêu (đ) | Số ticket | Số khiếu nại | Điểm hài lòng TB |
+| Mã KH | Họ tên | Số lần ở | Tổng chi tiêu (đ) | Số phiếu yêu cầu | Số khiếu nại | Điểm hài lòng TB |
 |---|---|---|---|---|---|---|
 | KH1 | An | 2 (B1, B2) | 3 × 1.200.000 + 2 × 1.500.000 = **6.600.000** | 3 | 1 | (4,60 + 4,00) / 2 = **4,30** |
 | KH2 | Bình | 2 (B4, B6) | 800.000 + 800.000 = **1.600.000** | 2 | 2 | 3,00 / 1 = **3,00** |
@@ -95,7 +95,7 @@ Tiêm từng lỗi vào code, chạy test: ca tương ứng phải chuyển đ�
 | TC2-07 | đổi `<` thành `<=` khi so số dư; trừ kho trước khi kiểm tra | `Reward.EnsureCanRedeem`, `Reward.Redeem` | TV2 |
 | TC2-08 | đổi `>=` thành `>` | `LapsedGuestSegment.Includes` | TV2 |
 | TC2-09 | bỏ lời gọi `ITicketQuery` | `CampaignService.PreviewTargets` | TV2 |
-| TC2-10 | chỉ xét ticket chưa đóng (cách của v1) | `Customer.EnsureCanBeDeleted` | TV2 |
+| TC2-10 | chỉ xét phiếu yêu cầu chưa đóng (cách của v1) | `Customer.EnsureCanBeDeleted` | TV2 |
 | TC2-11 | bỏ lời gọi `ScheduleFor` | `StayService.CheckOut` | TV2 |
 | TC2-12 | bỏ `IUnitOfWork.Execute` (ghi từng bước) | `StayService.CheckOut` | TV2 |
 | TC2-13 | tính chi tiêu theo giá hiện tại của loại phòng; tính cả booking chưa trả phòng | truy vấn R5 (DAL) / `DashboardService` | TV2 |
