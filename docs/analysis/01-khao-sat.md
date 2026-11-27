@@ -16,11 +16,15 @@ _[TV1] chưa điền._
 ### 3.2 Quan hệ khách hàng & khách hàng thân thiết [TV2]
 
 #### Nguồn khảo sát
-> Cần điền trước khi nộp: khách sạn hoặc nguồn tham khảo đã khảo sát, người được hỏi (vai trò), ngày khảo sát, cách thu thập (phỏng vấn, quan sát, xin mẫu phiếu). Nếu không khảo sát được một khách sạn thật thì ghi rõ đây là kịch bản do nhóm dựng từ tài liệu tham khảo, và nêu tên tài liệu.
+Phần này khảo sát qua tài liệu đã công bố (nghiên cứu tài liệu, tra cứu với sự hỗ trợ của AI Claude), chưa phỏng vấn trực tiếp nhân viên khách sạn.
 
 | Nguồn | Người cung cấp / vai trò | Ngày | Cách thu thập |
 |---|---|---|---|
-| … | … | …/…/2026 | … |
+| Chu Thúy Quỳnh, *Tìm hiểu hoạt động quản trị nhân lực bộ phận lễ tân tại khách sạn Lạc Long – Hải Phòng*, khóa luận tốt nghiệp, Trường ĐH Quản lý và Công nghệ Hải Phòng, 2020, mục 2.2.6 ([lib.hpu.edu.vn](https://lib.hpu.edu.vn/jspui/bitstream/123456789/33955/1/Chu-Thuy-Quynh-DL2001.pdf)) | tác giả khảo sát khách sạn Lạc Long (Hải Phòng); GVHD ThS. Đào Thị Thanh Mai | đọc 28/11/2026 | nghiên cứu tài liệu: quy trình đặt, nhận, trả phòng của lễ tân |
+| Oracle, tài liệu OPERA Cloud: [Profiles](https://docs.oracle.com/en/industries/hospitality/opera-cloud/24.1/ocsuh/ch_profiles_intro.htm), [Stay and Revenue Statistics](https://docs.oracle.com/en/industries/hospitality/opera-cloud/26.2/ocsuh/t_application_client_relations_profiles_guest_stay_statistics.htm), [Checking in Reservations](https://docs.oracle.com/en/industries/hospitality/opera-cloud/26.2/ocsuh/t_checking_in_reservations.htm), [Reservation Rate Information](https://docs.oracle.com/en/industries/hospitality/opera-cloud/23.4/ocsuh/t_managing_reservations_viewing_reservation_rate_information.htm) | tài liệu hướng dẫn của phần mềm quản lý khách sạn | đọc 28/11/2026 | nghiên cứu tài liệu: hồ sơ khách, gộp hồ sơ trùng, lịch sử lưu trú, nhận phòng, giá của từng đặt phòng |
+| Marriott, [Marriott Bonvoy Loyalty Program Terms & Conditions](https://www.marriott.com/loyalty/terms/default.mi) (bản cập nhật 11/2026) | điều khoản chương trình thành viên | đọc 28/11/2026 | nghiên cứu tài liệu: tích điểm, hạng, đổi điểm, điểm hết hạn, đối tác |
+| HubSpot, [Create segments](https://knowledge.hubspot.com/segments/create-active-or-static-lists), [Filter activity index pages and record timelines](https://knowledge.hubspot.com/records/filter-activities-on-a-record-timeline) | tài liệu hướng dẫn CRM | đọc 28/11/2026 | nghiên cứu tài liệu: phân khúc, gắn chiến dịch tiếp thị, dòng thời gian tương tác |
+| Salesforce Trailhead, [Campaign Members Tracking](https://trailhead.salesforce.com/content/learn/modules/campaign_basics/campaigns_basics_unit_3), [Campaign Reports](https://trailhead.salesforce.com/content/learn/modules/campaign_basics/campaigns_basics_unit_4) | bài học của hãng CRM | đọc 28/11/2026 | nghiên cứu tài liệu: danh sách khách của chiến dịch, trạng thái phản hồi, báo cáo |
 
 #### Phạm vi phân hệ
 Phân hệ quản lý mọi thứ khách sạn biết về một khách và dùng nó để giữ chân khách: hồ sơ khách 360 (F5), lưu trú làm nguồn dữ liệu cho CRM (F6), sổ điểm và đổi quà (F7), chương trình chăm sóc theo phân khúc và báo cáo khách hàng (F8). Phân hệ không quản lý hóa đơn, công nợ, doanh thu hay công suất phòng: đó là việc của phần mềm quản lý khách sạn (PMS), nằm ngoài đề CRM.
@@ -33,15 +37,15 @@ Nội dung khảo sát (What):
 4. Báo cáo người quản lý cần: khách theo hạng, hiệu quả chương trình chăm sóc, toàn cảnh một khách (R3–R5).
 5. Các hệ thống cùng loại đang có trên thị trường, để tách phần chung (hệ thống nào cũng có, nên làm) và phần riêng (không đưa vào, có lý do).
 
-Hệ thống tham khảo (TV2 bổ sung link và ngày xem vào bảng "Nguồn khảo sát"):
+Hệ thống tham khảo (đường dẫn và ngày đọc ở bảng "Nguồn khảo sát"):
 
 | Hệ thống | Loại | Chức năng đã xem | Phần chung → đưa vào phân hệ | Phần riêng → không đưa vào (lý do) |
 |---|---|---|---|---|
-| Oracle OPERA Cloud (hồ sơ khách) | PMS khách sạn | hồ sơ khách, lịch sử lưu trú, ghi chú sở thích, đặt/nhận/trả phòng | hồ sơ một khách duy nhất, lịch sử lưu trú, giá chốt trên phiếu (F5, F6) | hóa đơn, công nợ, công suất phòng, kênh bán phòng: việc của PMS |
-| Marriott Bonvoy, Hilton Honors | chương trình thành viên khách sạn | tích điểm theo chi tiêu, hạng thành viên, đổi điểm lấy quà | sổ điểm từng giao dịch, hạng theo điểm đã tích, đổi quà theo hạng và số dư (F7) | điểm hết hạn, tích điểm qua đối tác (hãng bay, thẻ), xét hạng theo số đêm: vượt quy mô một khách sạn |
-| HubSpot CRM, Salesforce | CRM đa ngành | phân khúc danh sách, chương trình tiếp thị, ghi phản hồi, báo cáo hiệu quả, nhật ký tương tác | chọn khách theo phân khúc, danh sách chăm sóc theo chương trình, phản hồi, tỷ lệ (F8, R4); nhật ký tương tác (F5.2) | gửi email/SMS tự động, chấm điểm khách tiềm năng, quy trình bán hàng: không phải nghiệp vụ khách sạn nhỏ |
+| Oracle OPERA Cloud | PMS khách sạn | hồ sơ khách (sở thích, hạng thành viên), gộp hồ sơ trùng, thống kê lưu trú và doanh thu, nhận phòng, giá theo từng ngày của đặt phòng | hồ sơ khách, lịch sử lưu trú, nhận phòng, giá gắn với từng phiếu đặt (F5, F6; nhóm chốt giá lúc đặt) | thống kê doanh thu, thuế, thanh toán: việc của PMS; gộp hồ sơ: thay bằng chặn trùng lúc nhập |
+| Marriott Bonvoy, Hilton Honors | chương trình thành viên khách sạn | tích điểm, hạng thành viên, đổi điểm | sổ điểm, hạng thành viên (nhóm xét theo điểm đã tích), đổi quà theo hạng và số dư (F7) | điểm hết hạn, tích điểm qua đối tác (hãng bay, thẻ), xét hạng theo số đêm: vượt quy mô một khách sạn |
+| HubSpot CRM, Salesforce | CRM đa ngành | phân khúc, danh sách khách của chiến dịch tiếp thị, trạng thái phản hồi, báo cáo, dòng thời gian tương tác | chọn khách theo phân khúc, danh sách chăm sóc theo chương trình, phản hồi, tỷ lệ (F8, R4); lịch sử tương tác (F5.2) | gửi email tiếp thị, báo cáo theo cơ hội bán hàng: không phải nghiệp vụ khách sạn nhỏ |
 
-Phần chung cả ba nhóm hệ thống đều có, và phân hệ giữ lại: một hồ sơ duy nhất cho mỗi khách (khóa theo SĐT, email, giấy tờ), lịch sử tương tác, phân khúc khách, báo cáo theo khách. Những chức năng các hệ thống có mà phân hệ chưa có được rà ở `03-use-case.md` mục 6 (kịch bản demo).
+Hilton Honors nêu theo hiểu biết chung, chưa đọc lại tài liệu (trang chính thức chặn công cụ tự động). Phân hệ giữ lại từ các nguồn: hồ sơ khách và lịch sử lưu trú, lịch sử tương tác, điểm và hạng, phân khúc, phản hồi và báo cáo. Những chức năng các hệ thống có mà phân hệ chưa có được rà ở `03-use-case.md` mục 6 (kịch bản demo).
 
 #### 4W+1H của phân hệ
 
@@ -54,6 +58,7 @@ Phần chung cả ba nhóm hệ thống đều có, và phân hệ giữ lại: 
 | **How** – hiện làm thế nào | Xem "Cách làm hiện tại" và "Nhược điểm" dưới đây. |
 
 #### Cách làm hiện tại
+Khóa luận về khách sạn Lạc Long (mục 2.2.6) cho thấy lễ tân báo giá phòng ngay khi nhận đặt, ghi yêu cầu vào sổ đặt phòng và lấy xác nhận của khách; khi nhận phòng thì tìm phiếu đăng ký, kiểm giấy tờ, nhập thông tin vào máy tính và lấy chữ ký; khi trả phòng thì in hóa đơn cho khách ký rồi lưu hồ sơ; khách ở lâu được tặng hoa dịp sinh nhật. Nguồn không nói tới tích điểm, hạng, đổi quà hay danh sách gửi ưu đãi: các dòng đó và việc dùng Excel là kịch bản nhóm dựng cho một khách sạn quy mô vừa.
 
 | Nghiệp vụ | Cách làm hiện tại | Giấy tờ dùng |
 |---|---|---|
