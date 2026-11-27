@@ -1,0 +1,143 @@
+% [TV2] Phân tích: phân rã chức năng F5-F8, Use Case, quy tắc Q7-Q13, ERD 10 bảng.
+% Nguồn: docs/analysis/02..06. DFD F7 và 3NF ở phụ lục.
+
+\begin{frame}{Phân rã chức năng F5--F8: đủ mọi chức năng, tên là động từ \TB}
+\forestset{
+  dq/.style={for tree={folder, grow'=0, font=\scriptsize, inner xsep=1.5pt, inner ysep=0.5pt,
+    s sep=0.4pt, l sep=4pt, folder indent=2.5pt, edge={black!50}}},
+  b2/.style={draw=tvB!70!black, fill=tvB!20, font=\scriptsize\bfseries, rounded corners=1pt},
+  b3/.style={font=\scriptsize\bfseries, text=tvB!70!black},
+  dm/.style={font=\scriptsize\bfseries, text=black!70, fill=common!20},
+}
+\begin{columns}[T]
+\column{0.245\textwidth}
+\begin{forest} dq
+[F5 Quản lý hồ sơ khách hàng, b2
+  [5.1 Cập nhật hồ sơ khách, b3
+    [Thêm khách mới] [Sửa hồ sơ khách] [Xóa khách] [Tìm và lọc khách]]
+  [5.2 Tra cứu hồ sơ 360, b3
+    [Xem lịch sử lưu trú] [Xem lịch sử tương tác] [Xem sổ điểm]
+    [{Tính chi tiêu, số lần ở, số dư}]]]
+\end{forest}
+\column{0.245\textwidth}
+\begin{forest} dq
+[F6 Quản lý lưu trú, b2
+  [6.1 Cập nhật danh mục phòng, dm
+    [{Thêm, sửa loại phòng}] [{Thêm, sửa phòng}]]
+  [{6.2 Đặt, nhận, trả phòng}, b3
+    [Tìm phòng trống] [Đặt phòng] [Nhận phòng] [Trả phòng] [Hủy đặt phòng]
+    [Tìm và lọc đặt phòng]]]
+\end{forest}
+\column{0.245\textwidth}
+\begin{forest} dq
+[F7 Quản lý KH thân thiết, b2
+  [7.1 Cập nhật danh mục quà, dm
+    [{Thêm, sửa quà}] [Ngừng áp dụng quà]]
+  [{7.2 Theo dõi sổ điểm, đổi quà}, b3
+    [{Tra cứu sổ điểm, số dư}] [Kiểm tra điều kiện đổi quà] [Ghi nhận đổi quà]
+    [{Hủy lượt đổi, hoàn điểm}]]
+  [7.3 Cộng điểm thiện chí (tự động), b3]]
+\end{forest}
+\column{0.245\textwidth}
+\begin{forest} dq
+[{F8 Chăm sóc KH\\theo chương trình}, b2, align=left
+  [{8.1 Lập, theo dõi chương trình}, b3
+    [Chọn phân khúc khách] [Xem trước danh sách] [Lưu chương trình]
+    [Ghi phản hồi của khách] [Tìm và xem chương trình]]
+  [8.2 Lập báo cáo khách hàng, dm
+    [{Lập BC khách theo hạng (R3)}] [{Lập BC hiệu quả (R4)}]
+    [{Xem dashboard 360 (R5)}] [Xuất báo cáo ra Excel]]]
+\end{forest}
+\end{columns}
+
+\vspace{1mm}
+\begin{block}{Đối chiếu HuongdanXDHTTTQL: nhóm chốt 27/11 giữ 8 nhánh theo phân hệ}
+\scriptsize
+\colorbox{common!20}{\textbf{Nền xám}} $\to$ chức năng danh mục (6.1, 7.1) và báo cáo thống kê (8.2: R3, R4, R5), slide 11 gom thành nhánh chung; nhóm để trong nhánh của từng phân hệ vì checklist đòi $\geq$3 nhánh mỗi người. Mỗi chức năng cấp 3 $\leftrightarrow$ 1 trang web (frm201--frm207), trừ 7.3 chạy tự động. Chỉ có chức năng, không ghi dữ liệu (dữ liệu ở ERD). Mẫu phân rã + prompt cho AI: phụ lục.
+\end{block}
+\end{frame}
+
+\begin{frame}{Use Case TV2: 5 UC, 3 phức hợp, 4 liên phân hệ \TB}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}L{0.9cm}YL{0.7cm}L{0.9cm}@{}}
+\toprule
+\textbf{UC} & \textbf{Tên} & \textbf{Phức hợp} & \textbf{Liên PH} \\
+\midrule
+UC07 & Quản lý hồ sơ khách 360 & & L5 \\
+UC08 & Đặt phòng và lưu trú & \checkmark & L3 \\
+UC09 & Đổi quà & \checkmark & \\
+UC10 & Chương trình chăm sóc & \checkmark & L4 \\
+UC11 & Báo cáo KH, dashboard 360 & & L6 \\
+\bottomrule
+\end{tabularx}
+
+\vspace{2mm}
+{\tiny «include»: UC08 $\to$ Trả phòng. «extend»: danh mục phòng $\to$ UC08; danh mục quà $\to$ UC09; ghi phản hồi $\to$ UC10.\par}
+\column{0.47\textwidth}
+\begin{block}{UC08 luồng C -- Trả phòng (L3, 1 giao dịch)}
+\tiny
+1. Booking Đang ở $\to$ Đã trả phòng (Q8)\\
+2. Điểm = thành tiền / 10.000 × hệ số hạng \textbf{trước} khi trả (Q9)\\
+3. Dòng sổ điểm Lưu trú; nâng hạng (có thể nhiều bậc)\\
+4. Ghi tương tác\\
+5. \code{ISurveyScheduler} (TV1) tạo phiếu khảo sát Chờ\\
+6. Commit. \textbf{Bước nào lỗi $\to$ rollback tất cả}
+\end{block}
+\begin{block}{UC09 -- Đổi quà}
+\tiny Số dư = tổng sổ điểm; điểm đã tích = tổng Lưu trú + Thiện chí $\Rightarrow$ đổi quà không làm tụt hạng. Hủy lượt đổi: ghi dòng hoàn điểm, không xóa dòng cũ.
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Quy tắc nghiệp vụ Q7--Q13: Domain quyết định, service tra cứu \TB}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}L{0.6cm}YL{4.6cm}L{1.6cm}@{}}
+\toprule
+\textbf{Mã} & \textbf{Quy tắc} & \textbf{Lớp / hàm quyết định} & \textbf{Domain} \\
+\midrule
+Q7 & SĐT 10 số; email; Việt Nam $\to$ CCCD 12 số, quốc tịch khác $\to$ hộ chiếu 6--9 ký tự; không trùng & \code{Person}, \code{Customer.EnsureUnique} & \stOK \\
+Q8 & ngày trả > ngày nhận; không trùng lịch; giá chốt; nhận phòng trong [nhận, trả) & \code{Booking}, \code{Room.EnsureAvailable} & \stOK \\
+Q9 & điểm theo hạng trước khi trả phòng; hạng theo điểm đã tích, nhiều bậc, không hạ & \code{MembershipTier.PointsFor}, \code{Customer.EarnPoints} & \stOK \\
+Q10 & đổi quà: còn áp dụng, còn hàng, đủ hạng, đủ điểm; điểm chốt; số dư $\geq 0$ & \code{Reward.EnsureCanRedeem}, \code{Redeem} & \stOK \\
+Q11 & phân khúc $\cap$ đồng ý $-$ đang khiếu nại; mỗi khách 1 lần; $\geq 1$ khách; phản hồi tới hết ngày kết thúc & \code{Campaign.AddTarget}, \code{EnsureHasTargets} & \stOK \\
+Q12 & phiếu yêu cầu Đã đóng $\to$ +50 (khiếu nại) / +10, cùng giao dịch & \code{GoodwillPointsObserver}, \code{PointTransaction.ForGoodwill} & một phần \\
+Q13 & không xóa khách đã có lưu trú, phiếu yêu cầu hoặc đã nằm trong chương trình chăm sóc & \code{Customer.EnsureCanBeDeleted} & \stOK \\
+\bottomrule
+\end{tabularx}
+
+\vspace{1mm}
+{\tiny Liên phân hệ: Q11 (L4), Q12 (L2), Q13 (L5). Ngoại lệ: \code{ValidationException} (dữ liệu 1 đối tượng), \code{BusinessRuleException} (giữa các đối tượng, trạng thái), \code{AuthorizationException} (quyền). Đủ tiền/hậu điều kiện: \code{docs/analysis/04-quy-tac.md}.\par}
+\end{frame}
+
+\begin{frame}{ERD -- 10 bảng TV2 (2 n--n, 2 danh mục, 2 khóa nối sang TV1) \TB}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[every node/.append style={anchor=north}]
+\node[ent=tvB] (cu) at (0,0) {{\centering\textbf{customers}\par}\nodepart{second}\textbf{PK} Id\\FullName, Phone \textsc{uq}, Email \textsc{uq}\\IdentityNumber \textsc{uq}, Nationality\\DateOfBirth, MarketingConsent\\Tier, Notes, CreatedAt};
+\node[ent=tvB] (in) at (0,-3.2) {{\centering\textbf{interactions}\par}\nodepart{second}\textbf{PK} Id, \textbf{FK} CustomerId\\OccurredAt, Channel, Summary\\\textbf{FK} EmployeeId \textcolor{tvA}{$\to$ employees}\\\textbf{FK} TicketId \textcolor{tvA}{$\to$ tickets}};
+\node[ent=tvB] (bk) at (5,0) {{\centering\textbf{bookings}\par}\nodepart{second}\textbf{PK} Id\\\textbf{FK} CustomerId, \textbf{FK} RoomId\\CheckInDate, CheckOutDate\\\textbf{RatePerNight} (chốt)\\Status, CheckedInAt, CheckedOutAt\\\textbf{FK} CreatedById};
+\node[ent=tvB] (rm) at (10,0) {{\centering\textbf{rooms}\par}\nodepart{second}\textbf{PK} Id, Number \textsc{uq}\\Floor, \textbf{FK} RoomTypeId};
+\node[ent=tvB] (rt) at (10,-2.3) {{\centering\textbf{room\_types} (danh mục)\par}\nodepart{second}\textbf{PK} Id, Name\\PricePerNight, Capacity};
+\node[ent=tvB] (pt) at (5,-3.6) {{\centering\textbf{point\_transactions}\par}\nodepart{second}\textbf{PK} Id, \textbf{FK} CustomerId\\Points ($\neq$0), Reason\\\textbf{FK} BookingId | TicketId \textcolor{tvA}{$\to$ tickets}\\\quad | RedemptionId, CreatedAt};
+\node[ent=tvB] (rr) at (10,-4.6) {{\centering\textbf{reward\_redemptions} (n--n)\par}\nodepart{second}\textbf{PK} Id\\\textbf{FK} CustomerId, \textbf{FK} RewardId\\\textbf{PointsSpent} (chốt)\\RedeemedAt, Status, \textbf{FK} ProcessedById};
+\node[ent=tvB] (rw) at (14.6,-4.6) {{\centering\textbf{rewards} (danh mục)\par}\nodepart{second}\textbf{PK} Id, Name, PointsCost\\MinTier, Quantity ($\geq$0), IsActive};
+\node[ent=tvB] (cp) at (-5,0) {{\centering\textbf{campaigns}\par}\nodepart{second}\textbf{PK} Id, Name, Offer\\SegmentCode\\StartDate, EndDate\\\textbf{FK} CreatedById};
+\node[ent=tvB] (ct) at (-5,-3.2) {{\centering\textbf{campaign\_targets} (n--n)\par}\nodepart{second}\textbf{PK,FK} CampaignId\\\textbf{PK,FK} CustomerId\\Channel, SentAt\\Response, RespondedAt\\\textbf{FK} RecordedById};
+\draw[assoc] (cu.east) -- node[mult, above, pos=0.15] {1} node[mult, above, pos=0.85] {0..*} (bk.west);
+\draw[assoc] (rm.west) -- node[mult, above, pos=0.15] {1} node[mult, above, pos=0.85] {0..*} (bk.east);
+\draw[aggr] (rt.north) -- node[mult, right, pos=0.2] {1} node[mult, right, pos=0.8] {0..*} (rm.south);
+\draw[assoc] (cu.south) -- node[mult, right, pos=0.2] {1} node[mult, right, pos=0.8] {0..*} (in.north);
+\draw[assoc] (cu.south east) -- node[mult, above, pos=0.2] {1} node[mult, above, pos=0.85] {0..*} (pt.north west);
+\draw[assoc] (bk.south) -- node[mult, right, pos=0.2] {0..1} node[mult, right, pos=0.8] {0..1} (pt.north);
+\draw[assoc] (rr.west) -- node[mult, above, pos=0.15] {0..1} node[mult, above, pos=0.85] {1..*} (pt.east);
+\draw[assoc] (rw.west) -- node[mult, above, pos=0.15] {1} node[mult, above, pos=0.85] {0..*} (rr.east);
+\draw[comp] (cp.south) -- node[mult, right, pos=0.2] {1} node[mult, right, pos=0.8] {1..*} (ct.north);
+\draw[assoc] (cu.west) -- node[mult, above, pos=0.15] {1} node[mult, above, pos=0.85] {0..*} (ct.north east);
+\end{tikzpicture}}
+
+\vspace{1mm}
+{\tiny \compo\ hợp thành $\to$ \code{ON DELETE CASCADE}; còn lại \code{RESTRICT}. Khóa nối sang TV1: \code{interactions.TicketId}, \code{point_transactions.TicketId}; TV1 trỏ về: \code{tickets.CustomerId}, \code{tickets.RoomId}, \code{surveys.BookingId}.\par}
+\vspace{1mm}{\scriptsize\raggedright \textbf{BFD $\to$ ERD:} chức năng cấp 3 cần lưu gì thì thành thực thể: 5.1 $\to$ \code{customers}; 5.2 $\to$ \code{interactions}; 6.1 $\to$ \code{room_types}, \code{rooms}; 6.2 $\to$ \code{bookings}; 7.1 $\to$ \code{rewards}; 7.2, 7.3 $\to$ \code{reward_redemptions}, \code{point_transactions}; 8.1 $\to$ \code{campaigns}, \code{campaign_targets}; 8.2 chỉ đọc, không thêm bảng.\par}
+\end{frame}

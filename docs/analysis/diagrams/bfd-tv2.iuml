@@ -1,15 +1,48 @@
-' [TV2] BFD branches F5-F8 (level 2) and their leaves (level 3).
+' [TV2] BFD branches F5-F8 (level 2), their functions (level 3) and sub-functions (level 4).
 ' Included by bfd.puml (TV1) inside @startwbs, right after the root node "* Hệ thống CRM khách sạn".
-' Branch names match PLAN 4.2 and the level-0 DFD processes 5.0-8.0; each leaf maps to one Form (02-bfd.md, section 2.2).
-** F5 Hồ sơ khách hàng 360
-*** F5.1 Cập nhật hồ sơ khách\n(frm201)
-*** F5.2 Tra cứu hồ sơ 360 của khách\n(frm201, chi tiết)
-** F6 Lưu trú
-*** F6.1 Cập nhật danh mục loại phòng và phòng\n(frm202)
-*** F6.2 Đặt phòng, nhận phòng, trả phòng\n(frm203)
-** F7 Khách hàng thân thiết
-*** F7.1 Cập nhật danh mục quà tặng\n(frm204)
-*** F7.2 Theo dõi sổ điểm và đổi quà\n(frm205)
-** F8 Chiến dịch & báo cáo khách hàng
-*** F8.1 Lập và theo dõi chiến dịch chăm sóc\n(frm206)
-*** F8.2 Lập báo cáo khách hàng và dashboard 360\n(frm207)
+' Every name is a verb phrase; no data and no page names (02-bfd.md, sections 2.3-2.4).
+' On the shared tree F6.1 and F7.1 may move under "Quản lý danh mục" and F8.2 under "Báo cáo thống kê" (TV1 decides).
+** F5 Quản lý hồ sơ khách hàng
+*** F5.1 Cập nhật hồ sơ khách
+**** F5.1.1 Thêm khách mới
+**** F5.1.2 Sửa hồ sơ khách
+**** F5.1.3 Xóa khách
+**** F5.1.4 Tìm và lọc khách
+*** F5.2 Tra cứu hồ sơ 360 của khách
+**** F5.2.1 Xem lịch sử lưu trú
+**** F5.2.2 Xem lịch sử tương tác
+**** F5.2.3 Xem sổ điểm
+**** F5.2.4 Tính tổng chi tiêu, số lần ở, số dư điểm
+** F6 Quản lý lưu trú
+*** F6.1 Cập nhật danh mục loại phòng và phòng
+**** F6.1.1 Thêm, sửa loại phòng
+**** F6.1.2 Thêm, sửa phòng
+*** F6.2 Đặt phòng, nhận phòng, trả phòng
+**** F6.2.1 Tìm phòng trống
+**** F6.2.2 Đặt phòng
+**** F6.2.3 Nhận phòng
+**** F6.2.4 Trả phòng
+**** F6.2.5 Hủy đặt phòng
+**** F6.2.6 Tìm và lọc đặt phòng
+** F7 Quản lý khách hàng thân thiết
+*** F7.1 Cập nhật danh mục quà tặng
+**** F7.1.1 Thêm, sửa quà
+**** F7.1.2 Ngừng áp dụng quà
+*** F7.2 Theo dõi sổ điểm và đổi quà
+**** F7.2.1 Tra cứu sổ điểm và số dư
+**** F7.2.2 Kiểm tra điều kiện đổi quà
+**** F7.2.3 Ghi nhận đổi quà
+**** F7.2.4 Hủy lượt đổi, hoàn điểm
+*** F7.3 Cộng điểm thiện chí (tự động)
+** F8 Chăm sóc khách hàng theo chương trình
+*** F8.1 Lập và theo dõi chương trình chăm sóc
+**** F8.1.1 Chọn phân khúc khách
+**** F8.1.2 Xem trước danh sách khách
+**** F8.1.3 Lưu chương trình
+**** F8.1.4 Ghi phản hồi của khách
+**** F8.1.5 Tìm và xem chương trình
+*** F8.2 Lập báo cáo khách hàng và dashboard 360
+**** F8.2.1 Lập báo cáo phân khúc khách theo hạng
+**** F8.2.2 Lập báo cáo hiệu quả chương trình
+**** F8.2.3 Xem dashboard khách hàng 360
+**** F8.2.4 Xuất báo cáo ra Excel

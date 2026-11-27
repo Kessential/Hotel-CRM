@@ -29,4 +29,7 @@ CLAUDE.local.md
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+*.nav
+*.snm
+*.vrb
 docs/slides/*.pdf

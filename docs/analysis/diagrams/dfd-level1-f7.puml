@@ -40,6 +40,6 @@ P72 --> D9 : dòng −điểm đổi quà / +điểm hoàn
 
 P60 --> D9 : dòng +điểm lưu trú
 P60 --> D5 : hạng mới
-P30 --> D9 : dòng +điểm thiện chí\n(ticket đã đóng, Q12)
+P30 --> D9 : dòng +điểm thiện chí\n(phiếu yêu cầu đã đóng, Q12)
 P30 --> D5 : hạng mới
 @enduml

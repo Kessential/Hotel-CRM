@@ -1,0 +1,150 @@
+% Hotel CRM - slide L1 (19/11/2026, thiết kế v1). Giữ lại để tham khảo; bản hiện hành là HotelCRM_Slides.tex
+% Biên dịch: xelatex HotelCRM_Slides_L1.tex (chạy 2 lần)
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usetheme[progressbar=frametitle,numbering=fraction,block=fill,sectionpage=progressbar]{metropolis}
+
+\usepackage{fontspec}
+\setsansfont{Segoe UI}[BoldFont={Segoe UI Bold},ItalicFont={Segoe UI Italic},BoldItalicFont={Segoe UI Bold Italic}]
+\setmainfont{Segoe UI}[BoldFont={Segoe UI Bold},ItalicFont={Segoe UI Italic},BoldItalicFont={Segoe UI Bold Italic}]
+\setmonofont{Consolas}[Scale=0.95]
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage[table]{xcolor}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.multipart,shapes.geometric,arrows.meta,calc,fit,backgrounds,shadows}
+\usepackage[edges]{forest}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% ---------- Màu ----------
+\definecolor{navy}{HTML}{1F3A5F}
+\definecolor{tvA}{HTML}{1565C0}   % TV1 - phân hệ Ticket
+\definecolor{tvB}{HTML}{2E7D32}   % TV2 - phân hệ Khách hàng/Lưu trú
+\definecolor{common}{HTML}{6D6D6D}
+\definecolor{warn}{HTML}{C62828}
+\definecolor{okc}{HTML}{2E7D32}
+\definecolor{midc}{HTML}{EF6C00}
+\definecolor{lightbg}{HTML}{F4F6F9}
+\setbeamercolor{frametitle}{bg=navy,fg=white}
+\setbeamercolor{progress bar}{fg=tvA,bg=tvA!20}
+\setbeamercolor{title separator}{fg=tvA}
+\setbeamercolor{block title}{bg=navy!15,fg=navy}
+\setbeamercolor{block body}{bg=lightbg}
+\setbeamercolor{alerted text}{fg=warn}
+\setbeamercolor{normal text}{fg=black!85}
+
+% ---------- Lệnh tiện ích ----------
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\TA}{\textcolor{tvA}{\textbf{[TV1]}}}
+\newcommand{\TB}{\textcolor{tvB}{\textbf{[TV2]}}}
+\newcommand{\TC}{\textcolor{common}{\textbf{[Chung]}}}
+\newcommand{\stOK}{\textcolor{okc}{\textbf{Đạt}}}
+\newcommand{\stNO}{\textcolor{warn}{\textbf{Chưa}}}
+\newcommand{\stPART}{\textcolor{midc}{\textbf{Một phần}}}
+\newcommand{\gr}[1]{\textbf{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\compo}{$\blacklozenge$}
+\newcommand{\aggre}{$\lozenge$}
+% BFD: \bfd{x}{màu}{tiêu đề}{danh sách chức năng lá}
+\newcommand{\bfd}[4]{%
+  \node[draw=#2!70!black, fill=#2!18, rounded corners=1.5pt, text width=1.95cm, minimum height=0.8cm,
+        align=center, font=\tiny\bfseries, inner sep=2pt] (L#1) at (#1*2.2,0) {#3};
+  \draw[black!55] (#1*2.2,1.0) -- (L#1.north);
+  \foreach \itm [count=\k] in {#4}{
+    \node[draw=black!45, fill=white, rounded corners=1pt, text width=1.62cm, anchor=west, align=left,
+          font=\tiny, inner sep=2pt, minimum height=0.46cm] (C#1-\k) at (#1*2.2-0.72,-0.95-0.6*\k+0.6) {\itm};
+    \draw[black!55] (#1*2.2-0.88,-0.4) |- (C#1-\k.west);
+  }}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\renewcommand{\arraystretch}{1.15}
+
+\lstdefinestyle{cs}{
+  language=[Sharp]C, basicstyle=\ttfamily\scriptsize, keywordstyle=\color{tvA}\bfseries,
+  commentstyle=\color{tvB}\itshape, stringstyle=\color{warn!80!black}, showstringspaces=false,
+  backgroundcolor=\color{lightbg}, frame=single, rulecolor=\color{navy!30}, framesep=2pt,
+  xleftmargin=3pt, xrightmargin=3pt, columns=fullflexible, keepspaces=true,
+  morekeywords={var,record,sealed,internal,override,abstract,virtual,is,null,new,init}
+}
+\lstset{style=cs}
+
+% ---------- TikZ: hộp lớp UML ----------
+\tikzset{
+  umlcls/.style={draw=#1!70!black, rectangle split, rectangle split parts=3,
+    rectangle split part fill={#1!18,white,white}, align=left, font=\scriptsize,
+    inner sep=2.2pt, minimum width=2.4cm, rounded corners=1pt},
+  umlcls/.default=navy,
+  inh/.style={-{Triangle[open,length=2.4mm,width=2.4mm]}, thick, draw=black!70},
+  impl/.style={dashed,-{Triangle[open,length=2.4mm,width=2.4mm]}, draw=black!70},
+  dep/.style={dashed,-{Stealth[length=2mm]}, draw=black!70},
+  assoc/.style={-, draw=black!70},
+  nav/.style={-{Stealth[length=2mm]}, draw=black!70},
+  comp/.style={{Diamond[length=3mm,width=2mm]}-, draw=black!70},
+  aggr/.style={{Diamond[open,length=3mm,width=2mm]}-, draw=black!70},
+  mult/.style={font=\tiny, text=black!80, inner sep=1pt},
+  ent/.style={draw=#1!70!black, rectangle split, rectangle split parts=2,
+    rectangle split part fill={#1!22,white}, align=left, font=\scriptsize, inner sep=2.2pt,
+    rounded corners=1pt},
+  ent/.default=navy,
+  obox/.style={draw=navy, fill=#1, rounded corners=3pt, text width=3.15cm, minimum height=3.6cm, align=left, font=\scriptsize, inner sep=5pt},
+  sbox/.style={draw=#1!70!black, fill=#1!12, rounded corners=2pt, font=\scriptsize, minimum width=3.2cm, minimum height=0.62cm, align=center},
+  frm/.style={draw=black!55, fill=#1, rounded corners=1pt},
+  pk/.style={draw=#1!70!black, fill=#1!12, rounded corners=2pt, font=\scriptsize, minimum width=3.4cm, minimum height=0.75cm, align=center},
+  ll/.style={draw=#1!70!black, fill=#1!12, font=\scriptsize, minimum width=2.6cm, minimum height=0.6cm, align=center},
+}
+% \cls[opt]{id}{tên}{thuộc tính}{phương thức}
+\newcommand{\cls}[5][]{\node[umlcls,#1] (#2) {{\centering\textbf{#3}\par}\nodepart{second}#4\nodepart{third}#5};}
+% \enty[opt]{id}{tên}{thuộc tính}
+\newcommand{\enty}[4][]{\node[ent,#1] (#2) {{\centering\textbf{#3}\par}\nodepart{second}#4};}
+
+% ---------- Thông tin chung ----------
+\title{Hotel CRM}
+\subtitle{Hệ thống quản lý chăm sóc khách hàng trong khách sạn}
+\author[Phạm Minh Khánh, Vũ Thị Thanh Hằng]{%
+  \textbf{GVHD:} TS. Trần Ngọc Thăng\\[3mm]
+  \textbf{Thành viên:}\\[1mm]
+  \textcolor{tvA}{\textbf{Phạm Minh Khánh}} -- 202418924 \ (Phân hệ Ticket)\\[1mm]
+  \textcolor{tvB}{\textbf{Vũ Thị Thanh Hằng}} -- 202418892 \ (Phân hệ Khách hàng/Lưu trú)}
+\date{}
+\institute{\small\textbf{GitHub:} \href{https://github.com/Kessential/Hotel-CRM}{\texttt{github.com/Kessential/Hotel-CRM}}}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Nội dung}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\begin{enumerate}
+  \item \textbf{Khảo sát} -- 4 output của bước khảo sát
+  \item \textbf{Phân tích} -- sơ đồ phân rã chức năng (BFD), sơ đồ thực thể liên kết \& biểu đồ lớp
+  \item \textbf{Thiết kế} -- thiết kế giao diện
+  \item \textbf{Cài đặt} -- 02 Design Pattern: \emph{State} (TV1) và \emph{Strategy} (TV2, cầu nối 2 phân hệ)
+  \item \textbf{Kiểm thử} -- checklist kiểm thử
+  \item \textbf{Rà soát checklist \& tự đánh giá lần 1}
+\end{enumerate}
+\column{0.46\textwidth}
+\begin{block}{Hiện trạng dự án (19/11/2026)}
+\small
+\begin{itemize}
+  \item GĐ 1 (khung), GĐ 2 (Ticket -- TV1), GĐ 3 (Khách hàng/Lưu trú -- TV2): \textbf{xong}, đã merge vào \code{develop} (19/11)
+  \item Build 0 lỗi, 0 warning; \textbf{22 test: 20 xanh, 2 đỏ} (UC8 làm ở GĐ 4)
+  \item Còn lại: GĐ 3b (SQLite), GĐ 4 (ghép nối, khảo sát, lịch sử, báo cáo), GĐ 5--6 (UML, báo cáo, đóng gói) -- hạn 29/11
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\input{sec1-khaosat}
+\input{sec2-phantich}
+\input{sec3-thietke}
+\input{sec4-caidat}
+\input{sec5-kiemthu}
+\input{sec6-tudanhgia}
+
+\end{document}

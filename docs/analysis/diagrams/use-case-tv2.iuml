@@ -9,8 +9,8 @@ rectangle "Phân hệ Quan hệ khách hàng & khách hàng thân thiết (TV2)"
   usecase "Trả phòng" as UC08b
   usecase "UC09 Đổi quà" as UC09
   usecase "Quản lý danh mục quà" as UC09a
-  usecase "UC10 Chiến dịch chăm sóc" as UC10
-  usecase "Ghi phản hồi chiến dịch" as UC10a
+  usecase "UC10 Chương trình chăm sóc" as UC10
+  usecase "Ghi phản hồi chương trình" as UC10a
   usecase "UC11 Báo cáo khách hàng và dashboard 360" as UC11
 }
 

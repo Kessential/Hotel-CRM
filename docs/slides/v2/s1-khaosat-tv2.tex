@@ -1,0 +1,99 @@
+% [TV2] Khảo sát: 4W+1H phân hệ, khảo sát cái gì và hệ thống tham khảo, quy trình theo bước.
+% Nguồn: docs/analysis/01-khao-sat.md. Bảng điểm yếu, BM4-BM7, F5-F8 ở phụ lục (a-phuluc-tv2.tex).
+
+\begin{frame}{Khảo sát phân hệ Quan hệ khách hàng \& KH thân thiết \TB}
+\begin{columns}[T]
+\column{0.64\textwidth}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}L{1.25cm}Y@{}}
+\toprule
+\textbf{4W+1H} & \textbf{Kết quả khảo sát} \\
+\midrule
+\textbf{What} & Hồ sơ khách 360, lưu trú, tích điểm \& hạng, đổi quà, chương trình chăm sóc theo phân khúc, báo cáo khách hàng. \\
+\textbf{Who} & \textbf{Lễ tân}: hồ sơ, đặt/nhận/trả phòng, đổi quà. \textbf{Quản lý}: xóa khách, tạo chương trình chăm sóc, báo cáo. \textbf{CSKH}: xem hồ sơ, gọi khách theo chương trình. \textbf{Admin}: mọi việc. \textbf{Khách}: không đăng nhập. \\
+\textbf{Where} & Quầy lễ tân, văn phòng CSKH, văn phòng quản lý; web chạy tại máy, mở bằng trình duyệt; một CSDL chung. \\
+\textbf{When} & Khách đến lần đầu; đặt/nhận/trả phòng; khách đổi quà; phiếu yêu cầu của khách được đóng; đầu mỗi đợt ưu đãi; cuối tháng. \\
+\textbf{How} & \textbf{Hiện tại:} sổ đăng ký + Excel; cộng điểm tay, xét hạng theo quý; danh sách gửi ưu đãi xuất từ Excel, ghi phản hồi trên giấy. \\
+\bottomrule
+\end{tabularx}
+\column{0.33\textwidth}
+\begin{block}{Phạm vi}
+\scriptsize
+F5 Quản lý hồ sơ khách hàng\\
+F6 Quản lý lưu trú (nguồn dữ liệu cho CRM)\\
+F7 Quản lý KH thân thiết\\
+F8 Chăm sóc KH theo chương trình
+\end{block}
+\begin{alertblock}{Ngoài phạm vi}
+\scriptsize
+Hóa đơn, công nợ, doanh thu, công suất phòng: việc của phần mềm quản lý khách sạn, không phải CRM.
+\end{alertblock}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Khảo sát cái gì, tham khảo hệ thống nào \TB}
+\begin{columns}[T]
+\column{0.29\textwidth}
+\begin{block}{Khảo sát cái gì (What)}
+\scriptsize
+1. Quy trình hiện tại ở quầy lễ tân, bộ phận CSKH\\[0.6mm]
+2. Biểu mẫu BM4--BM7\\[0.6mm]
+3. Quy tắc: giá, điểm, hạng, đổi quà, nhận ưu đãi\\[0.6mm]
+4. Báo cáo quản lý cần (R3--R5)\\[0.6mm]
+5. Hệ thống cùng loại: tách phần chung và phần riêng
+\end{block}
+\column{0.68\textwidth}
+\scriptsize
+\begin{tabularx}{\linewidth}{@{}L{2.3cm}YY@{}}
+\toprule
+\textbf{Hệ thống tham khảo} & \textbf{Phần chung $\to$ đưa vào} & \textbf{Phần riêng $\to$ không đưa vào} \\
+\midrule
+Oracle OPERA Cloud\newline(PMS, hồ sơ khách) & hồ sơ khách, lịch sử lưu trú, nhận phòng, giá gắn với từng đặt phòng (F5, F6) & doanh thu, thuế, thanh toán: việc của PMS \\ \addlinespace
+Marriott Bonvoy,\newline Hilton Honors & sổ điểm, hạng thành viên (nhóm xét theo điểm đã tích), đổi quà theo hạng và số dư (F7) & điểm hết hạn, tích điểm qua đối tác, hạng theo số đêm \\ \addlinespace
+HubSpot CRM,\newline Salesforce & phân khúc, danh sách chương trình, phản hồi, tỷ lệ; lịch sử tương tác (F8, R4) & gửi email tiếp thị, báo cáo theo cơ hội bán hàng \\
+\bottomrule
+\end{tabularx}
+\end{columns}
+
+\vspace{3mm}
+\begin{alertblock}{Kết luận}
+\scriptsize Giữ lại: hồ sơ khách và lịch sử lưu trú, lịch sử tương tác, điểm và hạng, phân khúc, phản hồi, báo cáo. Chức năng họ có mà ta chưa có: rà ở slide ``Kịch bản demo''. Nguồn: tài liệu công bố (đọc 28/11) và khóa luận về khách sạn Lạc Long; chưa phỏng vấn trực tiếp.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Quy trình nghiệp vụ theo từng bước \TB}
+\begin{columns}[T]
+\column{0.32\textwidth}
+\begin{block}{Lưu trú (Lễ tân)}
+\scriptsize
+1. Tìm phòng trống \hfill\textcolor{tvB}{6.2.1}\\[0.5mm]
+2. Đặt phòng, \textbf{chốt giá/đêm} \hfill\textcolor{tvB}{6.2.2, Q8}\\[0.5mm]
+3. Nhận phòng đúng ngày \hfill\textcolor{tvB}{6.2.3}\\[0.5mm]
+4. Trả phòng: cộng điểm, xét hạng, ghi tương tác, tạo phiếu khảo sát chờ, \textbf{1 giao dịch} \hfill\textcolor{tvB}{6.2.4, Q9, L3}\\[0.5mm]
+5. Hủy nếu khách không đến \hfill\textcolor{tvB}{6.2.5}
+\end{block}
+\column{0.32\textwidth}
+\begin{block}{Đổi quà (Lễ tân)}
+\scriptsize
+1. Tra cứu sổ điểm, số dư \hfill\textcolor{tvB}{7.2.1}\\[0.5mm]
+2. Kiểm tra: còn áp dụng, còn hàng, đủ hạng, đủ điểm \hfill\textcolor{tvB}{7.2.2, Q10}\\[0.5mm]
+3. Ghi nhận: trừ kho, trừ điểm, \textbf{chốt điểm quy đổi} \hfill\textcolor{tvB}{7.2.3}\\[0.5mm]
+4. Hủy lượt đổi: trả kho, hoàn điểm \hfill\textcolor{tvB}{7.2.4}
+\end{block}
+\column{0.32\textwidth}
+\begin{block}{Chương trình chăm sóc (Quản lý, CSKH)}
+\scriptsize
+1. Chọn phân khúc \hfill\textcolor{tvB}{8.1.1}\\[0.5mm]
+2. Xem trước: bỏ khách không đồng ý, khách đang khiếu nại \hfill\textcolor{tvB}{8.1.2, Q11, L4}\\[0.5mm]
+3. Lưu chương trình ($\geq$1 khách) \hfill\textcolor{tvB}{8.1.3}\\[0.5mm]
+4. CSKH gọi khách, ghi phản hồi \hfill\textcolor{tvB}{8.1.4}\\[0.5mm]
+5. Xem hiệu quả (R4) \hfill\textcolor{tvB}{8.2.2}
+\end{block}
+\end{columns}
+
+\vspace{2mm}
+\begin{alertblock}{Mỗi quy trình sửa điểm yếu nào của cách làm hiện tại (sổ + Excel)}
+\scriptsize
+Cộng điểm tay, xét hạng theo quý $\to$ bước 4 của Lưu trú tự làm. \quad Một cột ``điểm'', đổi quà trừ thẳng nên tụt hạng $\to$ sổ điểm + hạng theo điểm đã tích. \quad Gửi ưu đãi cả cho khách đang khiếu nại $\to$ bước 2 của Chương trình chăm sóc. Bảng đủ 8 điểm yếu: phụ lục.
+\end{alertblock}
+\end{frame}
