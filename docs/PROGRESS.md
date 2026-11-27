@@ -4,31 +4,31 @@ Kế hoạch: `docs/PLAN.md` (v2). Việc chi tiết giai đoạn đang làm: `d
 
 Cách cập nhật: mỗi người sửa dòng/ô của mình trong PR của mình, sau mỗi module (đánh dấu `[x]`, đổi cột trạng thái, thêm một dòng nhật ký). Không sửa dòng của người kia.
 
-Cập nhật lần cuối: 27/11/2026 (PR `tv2/remove-v1-tests`, TV2).
+Cập nhật lần cuối: 27/11/2026 (PR `tv1/web-plan`, TV1: chuyển giao diện sang web).
 
 ## 1. Trạng thái giai đoạn
 | Giai đoạn | Thời gian (plan) | Trạng thái | Mốc kiểm cuối giai đoạn |
 |---|---|---|---|
-| P1 Phân tích thiết kế | 22–29/11, nộp slide 30/11 | **Đang làm**, trễ 3 ngày (M1 xong 25/11) | mọi `.puml` xuất ảnh; bảng 5.10 đạt; slide biên dịch được |
-| P2 Hạ tầng | 1–4/12 | Chưa làm (TV2 đã bắt đầu Domain sớm, PR #2) | đăng nhập 4 vai trò trên SQLite; TV2 có 10 unit test xanh |
-| P3 Phân hệ | 5–10/12 | Chưa làm | đủ 13 Form, R1–R4, seed ≥150 dòng |
+| P1 Phân tích thiết kế | 22–29/11, nộp slide 30/11 | **Đang làm**: phần TV2 xong (PR #3); phần TV1 làm dồn 27–29/11 (chốt 27/11) | mọi `.puml` xuất ảnh; bảng 5.10 đạt; slide biên dịch được |
+| P2 Hạ tầng | 1–4/12 | Chưa làm (TV2 đã bắt đầu Domain sớm, PR #2) | đăng nhập 4 vai trò trên SQLite qua trình duyệt; bản publish chạy trên máy sạch (4/12); TV2 có 10 unit test xanh |
+| P3 Phân hệ | 5–10/12 | Chưa làm | đủ 13 trang, R1–R4, seed ≥150 dòng |
 | P4 Ghép & đóng gói | 11–12/12 | Chưa làm | 28 test xanh; chạy máy sạch ≤3 phút |
 | P5 Vấn đáp | 13/12 → 30/12 | Chưa làm | buổi vấn đáp; nộp cuối 30/12 |
 
 ## 2. Trạng thái module P1
-| Module | Hạn | TV1 | TV2 | Trạng thái (25/11) |
+| Module | Hạn | TV1 | TV2 | Trạng thái (27/11) |
 |---|---|---|---|---|
 | M1 Chuẩn bị | 22/11 | **Xong 25/11** (trễ 3 ngày): `CLAUDE.md`, `docs/PLAN.md` v2, file này, `docs/tasks/v2-p1-analysis.md`, xóa tài liệu v1 khỏi cây thư mục, dọn đồ v1 | PR #1 đã merge (25/11); xác nhận phân công khi approve PR #4 (25/11) | **Xong 25/11**: PR #4 (`tv1/m1-setup` → `v2`) đã được TV2 approve và merge |
-| M2 Khảo sát | 23/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11); ảnh BM4–BM7 thật chưa có | **Quá hạn 2 ngày** |
-| M3 BFD + UC | 24/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | **Quá hạn 1 ngày** |
-| M4 Quy tắc, quyền, DFD | 25/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | **Đến hạn hôm nay, chưa làm** |
-| M5 ERD + CSDL | 26/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
-| M6 Lớp + package + hợp đồng | 27/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11); còn chốt hợp đồng 27/11; code Domain trong PR #2 | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
-| M7 Hành vi | 28/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
-| M8 Giao diện + test | 28/11 | Chưa làm | Đã viết (PR #3, TV1 approve 26/11) | Chưa tới hạn; sẽ trễ theo M2–M4 nếu không dời lịch |
+| M2 Khảo sát | 23/11 | Chưa làm; làm 27/11 | Đã viết (PR #3, TV1 approve 26/11); ảnh BM4–BM7 thật chưa có | Quá hạn; phần TV1 làm 27/11 |
+| M3 BFD + UC | 24/11 | Chưa làm; làm 27/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 27/11 |
+| M4 Quy tắc, quyền, DFD | 25/11 | Chưa làm; làm 28/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 28/11 |
+| M5 ERD + CSDL | 26/11 | Chưa làm; làm 28/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 28/11 |
+| M6 Lớp + package + hợp đồng | 27/11 | Chưa làm; làm 28/11 | Đã viết (PR #3, TV1 approve 26/11); còn chốt hợp đồng 27/11; code Domain trong PR #2 | Phần TV1 làm 28/11 |
+| M7 Hành vi | 28/11 | Chưa làm; làm 29/11 | Đã viết (PR #3, TV1 approve 26/11) | Phần TV1 làm 29/11 |
+| M8 Giao diện + test | 28/11 | Chưa làm; làm 29/11 | Đã viết (PR #3, TV1 approve 26/11); `09-giao-dien.md` mục 1 và tên trang cần sửa theo web | Phần TV1 làm 29/11 |
 | M9 Slide + tự đánh giá L2 | 29/11 | Chưa làm | Chưa làm | Chưa tới hạn; slide nộp **30/11 (không dời)** |
 
-Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
+Lịch: giữ hạn slide 30/11, TV1 làm dồn phần mình của M2–M8 trong 27–29/11 (chốt 27/11, mục 8; lịch từng module ở `docs/tasks/v2-p1-analysis.md` mục 2).
 
 ## 3. Việc của TV1 (sao từ PLAN mục 6.4)
 **Tài liệu & sơ đồ (P1)**
@@ -40,22 +40,25 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 - [ ] Sơ đồ lớp phần chung + TV1; package diagram; khai báo `ICustomerDirectory`, `IStayLookup`, `ITicketObserver`; chốt hợp đồng với TV2 (27/11)
 - [ ] Sơ đồ tuần tự L2 (đóng ticket, có khung alt rollback); máy trạng thái ticket (28/11)
 - [ ] Bảng Form F1–F4; ma trận test TC1-xx; bảng tính tay R2 (28/11)
-- [ ] Slide phần chung + TV1 (29/11)
+- [ ] Slide phần chung + TV1 + 1 slide kiến trúc web (29/11)
+- [x] Đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md`, `docs/PROGRESS.md`, file task P1 (27/11) — PR `tv1/web-plan`, chờ TV2 review
 
 **Nền chung (P2, 1–4/12)**
-- [ ] Đổi tên project thành `HotelCRM.GUI`, `HotelCRM.BLL`, `HotelCRM.DAL`; thêm `Database/`, `Resource/`; bỏ JSON
-- [ ] SQLite: kết nối, `UnitOfWork`, tạo CSDL từ `schema.sql` + nạp `seed.sql`; một repository mẫu để TV2 làm theo
-- [ ] Cây ngoại lệ, `ErrorHandler` tiếng Việt, `appsettings.json` + file mẫu, bỏ Singleton, `IClock`
-- [ ] `Employee` + `Administrator`, `Manager`, `Agent`; đăng nhập (frm000); màn hình chính theo vai trò (frm001)
-- [ ] `schema.sql` 7 bảng TV1; seed tài khoản 4 vai trò; sửa `.claude/rules/*` theo v2
+- [ ] Đổi tên project thành `HotelCRM.GUI` (Razor Pages), `HotelCRM.BLL`, `HotelCRM.DAL` bằng commit chỉ có `git mv`; xoá code v1 không còn dùng (WinForms, JSON, `UserSession`, `UiNotificationObserver`); thêm `Database/`, `Resource/` (1/12)
+- [ ] Khung web: `_Layout` (thanh bên thu gọn, menu theo vai trò, thanh trên, toast), đăng nhập cookie (frm000), trang chủ khung (frm001), trang lỗi chung; đưa lên trước 2/12
+- [ ] SQLite: kết nối, `UnitOfWork` theo từng request, WAL + `busy_timeout`, tạo CSDL từ `schema.sql` + nạp `seed.sql`; một repository mẫu để TV2 làm theo
+- [ ] Cây ngoại lệ, `ErrorHandler` tiếng Việt, `appsettings.json` + file mẫu (có `Urls`), bỏ Singleton, `IClock`
+- [ ] `Employee` + `Administrator`, `Manager`, `Agent`
+- [ ] `schema.sql` 7 bảng TV1; seed tài khoản 4 vai trò; `.editorconfig` (khối `Pages/`), `.gitattributes`; sửa `.claude/rules/*` theo v2 (`winforms.md` → `web.md`)
+- [ ] Publish self-contained và chạy thử trên máy sạch (4/12)
 
 **Phân hệ CSKH (P3, 5–10/12)**
 - [ ] Domain: `SupportTicket` + 3 loại ticket, 4 state (bảng đăng ký thay `switch`), `TicketLog`, `SatisfactionSurvey`, `SurveyAnswer`, `SurveyCriterion`
 - [ ] Repository + truy vấn báo cáo cho 7 bảng TV1
 - [ ] `TicketService` (tạo, phân công, xử lý, nhật ký, phát sự kiện), 3 factory, `SurveyService`
 - [ ] Cài cho TV2 dùng: `TicketQuery`, `SurveyScheduler`, `CustomerCareStats` (8/12)
-- [ ] Form frm101–frm106 (Master-Detail: frm101, frm104, frm105); `ErrorProvider`; tiền/ngày đúng định dạng
-- [ ] R1, R2 (có biểu đồ), xuất Excel
+- [ ] Trang frm101–frm106 (Master-Detail: frm101, frm104, frm105) dùng thành phần chung của TV2; báo lỗi cạnh ô; tiền/ngày đúng định dạng; khối số liệu CSKH trên frm001
+- [ ] R1, R2 (Chart.js), xuất Excel (tải file)
 - [ ] Seed 7 bảng: đủ 3 loại ticket, đủ trạng thái, có ticket quá hạn SLA, nhật ký, phiếu khảo sát chờ/đã làm
 
 **Test (P2–P4)**
@@ -64,17 +67,19 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 - [ ] 4 integration: R2 khớp tính tay; RBAC; L2 luồng đầy đủ; L2 rollback
 
 **Đóng gói (P4, 11–12/12)**
-- [ ] Publish single-file, chạy thử trên máy sạch
-- [ ] README: cài đặt, tài khoản demo, lệnh chạy test
+- [ ] Publish self-contained, chạy thử lại trên máy sạch
+- [ ] README: cài đặt, mở trình duyệt, tài khoản demo, lệnh chạy test
 
 **Vấn đáp (P5)**
 - [ ] Live OCP khi tắt AI: thêm `LostItemTicket` + factory, đăng ký 1 dòng (tập ≥2 lần)
-- [ ] Đặt breakpoint theo sơ đồ L2 (của mình) và L3 (của TV2), đọc Call Stack
+- [ ] Đặt breakpoint theo sơ đồ L2 (của mình) và L3 (của TV2) khi app chạy dạng web, đọc Call Stack
 - [ ] Trả lời câu hỏi chéo phần TV2: Strategy phân khúc, sổ điểm, vì sao hạng không hạ, rollback L3
 - [ ] Nêu ≥2 nhược điểm của State và Factory Method
 - [ ] Demo phần mình trong video; chương báo cáo phân hệ TV1 + chương kiến trúc
 
 ## 4. Việc của TV2 (sao từ PLAN mục 6.5)
+Các dòng dưới chưa sửa theo quyết định chuyển sang web (phần dùng chung mở rộng, "Form" → trang, bỏ `ErrorProvider`); TV2 sửa dòng của mình trong PR của TV2, theo `docs/PLAN.md` mục 6.5.
+
 **Tài liệu & sơ đồ (P1)**
 - [x] Đọc plan, xác nhận phân công; cùng merge PR #1 (22/11) — PR #1 đã merge 25/11; xác nhận phân công khi approve PR #4 (25/11)
 - [x] Hiện trạng phần khách hàng, lưu trú, điểm, chiến dịch; biểu mẫu BM4 Phiếu đăng ký thành viên, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chiến dịch; yêu cầu chức năng F5–F8 (23/11) — PR #3; ảnh biểu mẫu thật chưa có (mục 7)
@@ -123,9 +128,9 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 - [ ] Điền tự đánh giá L2 (29/11)
 - [ ] Review PR của nhau trong 24 giờ; mỗi người ≥2 PR được merge trên GitHub
 - [ ] Cập nhật `docs/PROGRESS.md` trong PR của mình sau mỗi module
-- [ ] Chủ nhật 29/11, 6/12, 13/12: đo tỷ lệ `git blame`, rà tiến độ
+- [ ] Đo tỷ lệ `git blame` ở các mốc 28/11, 4/12, 6/12, 9/12, 13/12, rà tiến độ
 - [ ] Rà bảng 5.10, đồng bộ giao diện hai phân hệ (12/12)
-- [ ] Quay video 3–5 phút; tập vấn đáp chéo (P5)
+- [ ] Quay video 3–5 phút trên trình duyệt; tập vấn đáp chéo (P5)
 - [ ] Ghép báo cáo cuối, nộp (30/12)
 
 ## 6. Việc đang dở
@@ -133,20 +138,23 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 |---|---|---|
 | PR #2 `tv2/domain` → `v2` (Domain P2 đợt 1: hệ số tích điểm, sổ điểm, đổi quà, chiến dịch, 3 phân khúc + test) | TV2 mở 25/11, TV1 review | TV1 approve 26/11, góp ý 5 điểm không chặn merge (sửa ở đợt 2); chờ TV2 merge |
 | PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | đã rebase lên `v2` (`37884a0`) và sửa theo khung của `docs/tasks/v2-p1-analysis.md` (25/11); TV1 approve 26/11, đồng ý 7 điểm hỏi; TV2 đã sửa 3 việc trước khi merge (mục 8, Q13, tiêu đề PR) (26/11); chờ TV2 merge |
-| M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | TV2: phần mình nằm trong PR #3 (M2–M8); TV1: bắt đầu sau khi M1 merge, xem `docs/tasks/v2-p1-analysis.md` |
+| PR `tv1/web-plan` → `v2` (đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md`, `docs/PROGRESS.md`, file task P1) | TV1 mở 27/11, TV2 review | chờ TV2 review |
+| M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | TV2: phần mình nằm trong PR #3 (M2–M8); TV1: làm 27/11, mục 6 phi chức năng viết thẳng bản web |
+| Sửa tài liệu P1 phần TV2 theo web: `09-giao-dien.md` mục 1 (16 lựa chọn giao diện) và tên trang frm201–frm207; `08-hanh-vi.md` mục 3.3 (Call Stack `OnPostCheckOut`); cột Form của BM6, BM7 trong `01-khao-sat.md`; F8 "chiến dịch" → "chương trình chăm sóc"; boundary `frm203_nv_stay` trong `seq-l3-checkout.puml` | TV2 | trước slide 30/11 |
 | Sửa đường dẫn trong slide: `sec1`, `sec3`, `sec5`, `sec6` còn trỏ `docs/PLAN.md` (v1), `docs/PROGRESS.md` (v1), `docs/tasks/stage-*.md` — các file này đã xóa (bản v1 chỉ còn trong lịch sử git, `fd7b7e4`) | TV2 | làm ở M9 |
 
 ## 7. Việc chờ người
 | Việc | Ai | Hạn | Trạng thái |
 |---|---|---|---|
-| **Dời lịch M2–M9 hay giữ** (M1 xong trễ 3 ngày; M2–M3 đã quá hạn; slide vẫn nộp 30/11) | TV1 + TV2 | 26/11 | chưa quyết |
 | Ảnh/bản mẫu biểu mẫu thật BM1–BM3 | TV1 | 23/11 | quá hạn, chưa có |
 | Ảnh/bản mẫu biểu mẫu thật BM4–BM7 | TV2 | 23/11 | quá hạn, chưa có |
-| Đồng ý tải `plantuml.jar` vào `tools/` | TV1 | trước M3 (24/11) | quá hạn, chưa quyết |
-| Cài Java (PlantUML cần Java; máy TV1 chưa có `java`) | TV1 | trước M3 | chưa làm |
-| Đối chiếu HuongdanXDHTTTQL: cây BFD mẫu có 3 nhánh chung (Quản trị hệ thống, Danh mục, Báo cáo thống kê) + nhánh nghiệp vụ; plan chia 8 nhánh theo phân hệ. Giữ hay chỉnh | TV1 + TV2 | M3 | chưa quyết |
-| Đối chiếu HuongdanXDHTTTQL: tên Form mẫu đánh số liên tiếp (`frm001_dm_…`, `frm002_nv_…`); plan đánh số theo người (1xx/2xx). Giữ hay đổi | TV1 + TV2 | M8 (trước P3) | chưa quyết |
-| Đối chiếu HuongdanXDHTTTQL: Solution Folder `Dlllib`, tên solution kèm phiên bản. Có làm theo không | TV1 | P2 | chưa quyết |
+| Tải `plantuml.jar` vào `tools/` / dùng công cụ khác / để TV2 xuất ảnh | TV1 + TV2 | 28/11 (trước khi xuất ảnh M3–M7) | chưa quyết |
+| Cài Java (PlantUML cần Java; máy TV1 chưa có `java`); không cần nếu TV2 xuất ảnh | TV1 | 28/11 | chưa làm |
+| Thầy có tính file `.cshtml` vào `git blame` không | TV1 hỏi thầy | trước 4/12 | chưa hỏi |
+| ~~Dời lịch M2–M9 hay giữ~~ | TV1 + TV2 | 26/11 | xong 27/11: giữ hạn slide 30/11, TV1 làm dồn M2–M8 trong 27–29/11 |
+| ~~Đối chiếu HuongdanXDHTTTQL: cây BFD 3 nhánh chung hay 8 nhánh theo phân hệ~~ | TV1 + TV2 | M3 | xong 27/11: giữ 8 nhánh theo phân hệ, ghi đối chiếu ở `02-bfd.md` mục 3 |
+| ~~Đối chiếu HuongdanXDHTTTQL: tên Form đánh số liên tiếp hay theo người~~ | TV1 + TV2 | M8 | xong 27/11: theo người, tên tiếng Anh (`docs/PLAN.md` mục 5.1) |
+| ~~Đối chiếu HuongdanXDHTTTQL: `Dlllib`, tên solution kèm phiên bản~~ | TV1 | P2 | xong 27/11: không làm |
 | Mẫu báo cáo cuối của thầy (Word/LaTeX) | ai có | 10/12 | chưa có |
 | Ngày vấn đáp cụ thể của nhóm | cả hai | khi có lịch | chưa có |
 | ~~Merge PR #1 vào `develop`~~ | TV1/TV2 | 22/11 | xong 25/11 (`fd7b7e4`) |
@@ -168,6 +176,12 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV2 | File task mục 1.1 ("mỗi người, mỗi module một nhánh"): P1 của TV2 nằm trên một nhánh `tv2/p1-analysis` (PR #3), mỗi module một commit | PR #3 mở trước khi có file task; tách lại thì mất lịch sử review | TV1 + TV2 (PR #3) |
 | 26/11 | TV2 | Q13 (PLAN 5.3): không xóa khách đã có lưu trú, ticket **hoặc đã nằm trong chiến dịch**; `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`. PLAN chỉ ghi "lưu trú hoặc ticket" | khách chưa ở lần nào vẫn có thể nằm trong chiến dịch; xóa khách này thì khóa ngoại `campaign_targets.CustomerId` (RESTRICT) chặn với lỗi khó hiểu, còn `CASCADE` làm mất số liệu R4 (`06-erd.md` mục 3.5) | TV1 + TV2 (PR #3) |
 | 26/11 | TV2 | PLAN 5.2 (`point_transactions.Reason`): bỏ giá trị "Điều chỉnh", chỉ còn `Stay`, `Goodwill`, `Redemption`; hoàn điểm khi hủy lượt đổi dùng chung `Redemption` (dòng dương cùng `RedemptionId`). R3: điểm đã tích = tổng dòng `Stay` + `Goodwill`; điểm đã đổi = −tổng dòng `Redemption` (ròng, lượt đã hủy góp 0) | không UC, Form hay quyền nào cho phép chỉnh điểm tay; thêm giá trị thì thành code chết | TV1 + TV2 (PR #3) |
+| 27/11 | TV1 | Giao diện đổi từ WinForms sang web: ASP.NET Core Razor Pages + Bootstrap 5 + Bootstrap Icons + Chart.js, bỏ `ScottPlot.WinForms`; chạy tại `http://localhost:5080`; đăng nhập cookie; `Program.cs` dựng đối tượng theo từng request (PLAN 3, 5.6, mục mới 3.1) | thầy yêu cầu ngày 26/11; thầy trả lời: chạy localhost là đủ, không bắt buộc công nghệ, tên trang theo HuongdanXDHTTTQL, mục checklist WinForms chấm theo phần tương đương, hạn không đổi | TV1 + TV2 (bản kế hoạch chuyển đổi, 27/11) |
+| 27/11 | TV1 | Tên trang chốt tiếng Anh theo khung slide: `frm000_login` … `frm207_bc_customer_360`; giữ BFD 8 nhánh; bỏ `Dlllib`, tên solution kèm phiên bản, tên bảng viết hoa (PLAN 5.1, 5.6) | slide cho phép tiếng Anh; code đã toàn tiếng Anh | TV1 + TV2 (27/11) |
+| 27/11 | TV1 | Chữ trên giao diện và tài liệu: "Phiếu yêu cầu" (code `SupportTicket`), "Chương trình chăm sóc" (code `Campaign`); đổi tên nút lá BFD và UC theo (PLAN 4.2, 4.3) | khớp menu với BFD/UC (tiêu chí 3.1) | TV1 + TV2 (27/11) |
+| 27/11 | TV1 | TV2 nhận thêm phần dùng chung giao diện và hạ tầng integration test, hạn 7/12 (PLAN 6.2, 6.5) | cân `git blame`; hai phân hệ trông như một | TV1 + TV2 (27/11) |
+| 27/11 | TV1 | Mốc đo `git blame`: 28/11, 4/12, 6/12, 9/12, 13/12 thay cho mỗi Chủ nhật; luật giữ blame (PLAN 3.1, 6.6, 7) | phát hiện lệch sớm hơn | TV1 + TV2 (27/11) |
+| 27/11 | TV1 + TV2 | Tông màu Navy & đồng thau; font Cormorant Garamond + Be Vietnam Pro; không làm chuông báo SLA; giữ hạn P1, TV1 làm dồn M2–M8 trong 27–29/11 (PLAN 3.1, 6.3) | hai người chọn | TV1 + TV2 (27/11) |
 
 ## 9. Nhật ký
 | Ngày | Ai | Việc |
@@ -181,5 +195,8 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV1 | Sửa PR #4 theo review (mục 8, `docs/slide_checklist/` ngoài repo + `.gitignore`), merge PR #4 vào `v2` |
 | 25/11 | TV2 | Rebase PR #3 lên `v2` (`37884a0`; commit "Record the three decisions agreed with TV1" đổi mã từ `284ee92` thành `3ccc924`). Sửa 10 file `docs/analysis/` theo khung của file task (mục của TV1 và mục chung TV1 để dòng chờ); bỏ mã YC tự đặt, dùng mã F; ảnh biểu mẫu vào `docs/analysis/bieu-mau/`; đổi tên `use-case-tv2.iuml`, `dfd-level1-f7.puml`; DFD F7 theo Gane–Sarson với kho D5, D9, D10; mã test TC2-11…TC2-14; thêm loại ngoại lệ + thông báo cho UC08–UC10, Strategy (7.2), Observer phía nhận (7.3), cây `MembershipTier` (8.2), phác thảo bố cục 7 Form, kế hoạch tiêm lỗi |
 | 26/11 | TV2 | Sửa PR #3 theo review approve của TV1 (26/11): mục 8 đổi 2 dòng sang "TV1 + TV2", thêm dòng Q13 mở rộng và dòng bỏ "Điều chỉnh" của `PointReason` (kèm cách R3 tính điểm đã đổi); Q13 mở rộng ở `04`, `06` mục 3.5, `07` mục 4.1/4.3, `class-tv2.iuml`; thêm ca "khách chỉ nằm trong chiến dịch" vào TC2-10; sửa tiêu đề, mô tả PR |
+| 26/11 | TV1 + TV2 | Thầy yêu cầu chuyển giao diện sang web và trả lời 5 câu hỏi (chạy localhost là đủ, không bắt buộc công nghệ, tên trang theo HuongdanXDHTTTQL, mục WinForms chấm theo phần tương đương, hạn không đổi) |
+| 27/11 | TV2 | Duyệt toàn bộ bản kế hoạch chuyển đổi sang web của TV1 (file ngoài repo); hai người chọn tông màu, font, chuông SLA, lịch P1 |
 | 27/11 | TV2 | Đồng ý (miệng, 27/11) toàn bộ bản kế hoạch chuyển giao diện sang web của TV1; cùng chọn tông Navy & đồng thau, font Cormorant Garamond + Be Vietnam Pro, không làm chuông SLA, giữ hạn P1. Góp ý trong review PR #6: đo `git blame` tính cả `.cshtml`, `.js`, `.css` (bỏ `wwwroot/lib`, `*.Designer.cs`); test v1 của TV2 do TV2 tự xóa |
 | 27/11 | TV2 | Xóa 2 file test v1 do TV2 viết: `Assignment/AssignmentStrategyTests.cs` (3 strategy phân công cũ, TV1 xóa phần code ở P2) và `Customers/SurveyServiceTests.cs` (khảo sát nay thuộc TV1, TV1 viết test mới). Build 0 warning, 60 test xanh |
+| 27/11 | TV1 | Mở PR `tv1/web-plan`: đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md` (mục mới 3.1, sửa 0, 3, 4.2, 4.3, 5.1, 5.6, 6, 7, 8, 9), file này, `docs/tasks/v2-p1-analysis.md` |

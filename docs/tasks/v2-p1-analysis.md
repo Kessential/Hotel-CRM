@@ -4,7 +4,9 @@ Giai đoạn P1 của `docs/PLAN.md` (mục 6.3). Kết quả: bộ tài liệu 
 
 File này đủ để mỗi người tự làm phần mình song song. Mã F, UC, BM, Q, R, L, TC lấy đúng như `docs/PLAN.md`; không tự đặt mã mới. Chỗ nào file này không nói thì theo `docs/PLAN.md`; chỗ nào còn phải quyết thì xem "Việc chờ người" trong `docs/PROGRESS.md`, chưa có quyết định thì làm theo plan và ghi chú lại.
 
-Hạn ghi trong file là hạn của plan. M1 xong trễ 3 ngày, việc dời lịch M2–M9 đang chờ quyết. Nếu nhóm dời lịch thì sửa cột hạn ở mục 2 trong PR, còn hạn nộp slide 30/11 giữ nguyên.
+Cột "Hạn (plan)" ở mục 2 là hạn gốc. M1 xong trễ 3 ngày; ngày 27/11 hai người chốt giữ hạn nộp slide 30/11, TV1 làm dồn phần mình của M2–M8 trong 27–29/11 theo cột "Hạn TV1 (27/11)". Phần TV2 của M2–M8 đã xong (PR #3).
+
+Ngày 26/11 thầy yêu cầu đổi giao diện sang web; quyết định chốt 27/11 ở `docs/PLAN.md` mục 3.1. Tài liệu P1 viết theo bản web (mục 1.6).
 
 ## 1. Quy ước chung cho P1
 
@@ -49,17 +51,22 @@ Hạn ghi trong file là hạn của plan. M1 xong trễ 3 ngày, việc dời l
 
 **Mã ca test:** TV1 `TC1-01` … `TC1-14` (01–10 unit, 11–14 integration); TV2 `TC2-01` … `TC2-14` (cùng cách chia).
 
+### 1.6 Viết theo bản web (chốt 27/11)
+- "Form" trong tài liệu là trang web; tên trang theo `docs/PLAN.md` mục 5.1 (`frm000_login`, `frm102_nv_ticket_create`, `frm201_dm_customer`, …). Chỗ nào checklist ghi Form, ErrorProvider, DataGridView, App.config thì ghi phần tương đương trên web: trang Razor, báo lỗi cạnh ô, bảng dùng chung, `appsettings.json`.
+- Chữ trong tài liệu và trên sơ đồ dùng "phiếu yêu cầu" (tên lớp, bảng giữ `SupportTicket`, `tickets`) và "chương trình chăm sóc" (giữ `Campaign`, `campaigns`). Tên nút lá BFD và tên UC theo `docs/PLAN.md` mục 4.2, 4.3. Tiêu đề mục đã có trong file của người kia thì không đổi hộ.
+- Ảnh giao diện trong tài liệu và slide lấy từ bản mẫu web của TV1 (link trong bản kế hoạch chuyển đổi), không dùng ảnh WinForms v1.
+
 ## 2. Bảng việc M2–M9
-| Module | Hạn (plan) | TV1 | TV2 | Phụ thuộc |
-|---|---|---|---|---|
-| M2 Khảo sát | 23/11 | 3.1 [TV1] | 3.1 [TV2] | — |
-| M3 BFD + UC | 24/11 | 3.2 [TV1] | 3.2 [TV2] | quyết định giữ/chỉnh cây BFD theo Huongdan (TV1 tạo khung trước, TV2 thêm lá) |
-| M4 Quy tắc, quyền, DFD | 25/11 | 3.3 [TV1] | 3.3 [TV2] | DFD mức 1 F7 dùng ký hiệu + kho ở 1.5 (không cần chờ mức 0) |
-| M5 ERD + CSDL | 26/11 | 3.4 [TV1] | 3.4 [TV2] | TV1 tạo `erd.puml` khung trước để TV2 `!include` |
-| M6 Lớp + package + hợp đồng | 27/11 | 3.5 [TV1] | 3.5 [TV2] | **họp chốt hợp đồng interface 27/11** |
-| M7 Hành vi | 28/11 | 3.6 [TV1] | 3.6 [TV2] | tên lớp/hàm theo M6 |
-| M8 Giao diện + test | 28/11 | 3.7 [TV1] | 3.7 [TV2] | quy tắc M4, lớp M6 |
-| M9 Slide + tự đánh giá L2 | 29/11 | 3.8 [TV1] | 3.8 [TV2] | ảnh sơ đồ M3–M7 đã xuất |
+| Module | Hạn (plan) | Hạn TV1 (27/11) | TV1 | TV2 | Phụ thuộc |
+|---|---|---|---|---|---|
+| M2 Khảo sát | 23/11 | 27/11 | 3.1 [TV1] | 3.1 [TV2] | — |
+| M3 BFD + UC | 24/11 | 27/11 | 3.2 [TV1] | 3.2 [TV2] | giữ cây BFD 8 nhánh (chốt 27/11; TV1 tạo khung trước, TV2 thêm lá) |
+| M4 Quy tắc, quyền, DFD | 25/11 | 28/11 | 3.3 [TV1] | 3.3 [TV2] | DFD mức 1 F7 dùng ký hiệu + kho ở 1.5 (không cần chờ mức 0) |
+| M5 ERD + CSDL | 26/11 | 28/11 | 3.4 [TV1] | 3.4 [TV2] | TV1 tạo `erd.puml` khung trước để TV2 `!include` |
+| M6 Lớp + package + hợp đồng | 27/11 | 28/11 | 3.5 [TV1] | 3.5 [TV2] | **họp chốt hợp đồng interface 27/11** |
+| M7 Hành vi | 28/11 | 29/11 | 3.6 [TV1] | 3.6 [TV2] | tên lớp/hàm theo M6 |
+| M8 Giao diện + test | 28/11 | 29/11 | 3.7 [TV1] | 3.7 [TV2] | quy tắc M4, lớp M6 |
+| M9 Slide + tự đánh giá L2 | 29/11 | 29/11 | 3.8 [TV1] | 3.8 [TV2] | ảnh sơ đồ M3–M7 đã xuất |
 
 ## 3. Chi tiết từng module
 
@@ -90,7 +97,7 @@ Hạn ghi trong file là hạn của plan. M1 xong trễ 3 ngày, việc dời l
 - Mục 3.1: quy trình tiếp nhận, phân công, xử lý, khảo sát hiện tại; ít nhất 3 nhược điểm, mỗi nhược điểm chỉ ra Q hoặc F nào sẽ giải quyết.
 - Mục 4.1: BM1 Phiếu yêu cầu/khiếu nại, BM2 Phiếu theo dõi xử lý, BM3 Phiếu khảo sát hài lòng. Mỗi BM: ảnh/bản dựng lại, mục đích, ai lập, khi nào, bảng trường → cột CSDL dự kiến (`tickets`, `ticket_logs`, `surveys`, `survey_answers`) → Form (frm102, frm104, frm105).
 - Mục 5.1: bảng F1.1, F1.2, F2.1, F3.1, F3.2, F4.1, F4.2: mã, tên, mô tả, vai trò dùng, Form, UC.
-- Mục 6: phi chức năng: chạy Windows không cài thêm (publish single-file), SQLite một file, đăng nhập + mật khẩu băm PBKDF2, phân quyền ở Service, giao diện tiếng Việt, tiền `#,##0`, ngày `dd/MM/yyyy`, thời gian mở báo cáo, không mất dữ liệu khi lỗi giữa chừng (transaction).
+- Mục 6: phi chức năng: web chạy tại máy, mở bằng trình duyệt ở `http://localhost:5080` (publish self-contained, không cài .NET, không cần chứng chỉ HTTPS, chỉ nghe localhost), chỉ dùng trên máy tính, SQLite một file, đăng nhập + mật khẩu băm PBKDF2, phân quyền ở Service, giao diện tiếng Việt, tiền `#,##0`, ngày `dd/MM/yyyy`, thời gian mở báo cáo, không mất dữ liệu khi lỗi giữa chừng (transaction).
 - Mục 7: trong phạm vi (F1–F8); ngoài phạm vi: các mục "Đã bỏ" ở PLAN mục 3 (đặt nhiều phòng, dịch vụ phát sinh, hóa đơn, công nợ, doanh thu/công suất phòng…).
 - Mã liên quan: F1–F4, BM1–BM3, R1–R2, L1–L2, D1–D4.
 
@@ -134,7 +141,7 @@ Hạn ghi trong file là hạn của plan. M1 xong trễ 3 ngày, việc dời l
 
 **[TV1]**
 - `bfd.puml`: gốc "Hệ thống CRM khách sạn" → 8 nhánh F1–F8; `bfd-tv1.iuml`: lá F1.1, F1.2, F2.1, F3.1, F3.2, F4.1, F4.2 (PLAN 4.2). Mỗi lá ↔ 1 Form (Huongdan: chức năng chương trình, không phải chức năng nghiệp vụ).
-- `02-bfd.md` mục 1, 2.1, 3. Mục 3: Huongdan gợi ý khoảng 5 nhánh, 3 cấp, gồm 3 nhánh chung (Quản trị hệ thống, Quản lý danh mục, Báo cáo thống kê). Plan chia 8 nhánh theo phân hệ, danh mục và báo cáo nằm trong từng nhánh. Ghi lại lập luận giữ cách chia của plan (checklist đòi ≥3 nhánh/TV, chia dọc), hoặc phương án chỉnh nếu nhóm quyết khác.
+- `02-bfd.md` mục 1, 2.1, 3. Mục 3: Huongdan gợi ý khoảng 5 nhánh, 3 cấp, gồm 3 nhánh chung (Quản trị hệ thống, Quản lý danh mục, Báo cáo thống kê). Nhóm chốt 27/11 giữ 8 nhánh theo phân hệ, danh mục và báo cáo nằm trong từng nhánh; ghi lập luận (slide chỉ ghi "thông thường"; checklist đòi ≥3 nhánh/TV; chia dọc dễ chứng minh phần của từng người).
 - `use-case.puml`: khai báo 4 tác nhân + `!include` 2 file; `use-case-tv1.iuml`: UC01–UC06 và quan hệ với tác nhân (PLAN 4.3).
 - `03-use-case.md` mục 1, 2, 3.1, 4 (bảng L1–L6 như PLAN 4.4, thêm cột UC), 5.1, 5.2.
 - UC04: 4 thao tác bắt đầu/giải quyết/đóng/mở lại; Q1, Q2, Q6, Q12; L2 (đóng ticket → observer TV2, 1 transaction). UC05: Q5; phiếu Chờ do L3 tạo.
@@ -286,7 +293,7 @@ Hạn ghi trong file là hạn của plan. M1 xong trễ 3 ngày, việc dời l
 ## 4. Form phân hệ quan hệ khách hàng (frm201–frm207) [TV2]
 ## 5. Đối chiếu tên Form với HuongdanXDHTTTQL        [Chung – TV1]
 ```
-**Mẫu một Form:** tên Form · nút BFD · UC · loại (danh mục / nghiệp vụ / báo cáo; Master-Detail?) · phác thảo bố cục (ASCII hoặc ảnh) · lưới: cột (cột nào ↔ trường biểu mẫu nào) · bộ lọc · nút và vai trò được bấm · kiểm tra ở Form (`ErrorProvider`) · Service/hàm gọi · tổng tính động (nếu Master-Detail).
+**Mẫu một trang:** tên trang (`frm…`, đường dẫn) · nút BFD · UC · loại (danh mục / nghiệp vụ / báo cáo; Master-Detail?) · ảnh bản mẫu web hoặc phác thảo bố cục · bảng: cột (cột nào ↔ trường biểu mẫu nào) · bộ lọc · nút và vai trò được bấm (nút bị khoá ghi lý do) · modal thêm/sửa · kiểm tra ở trang (báo lỗi cạnh ô) · handler (`OnPost…`) → Service/hàm gọi · tổng tính động (nếu Master-Detail).
 
 **Khung `10-kiem-thu.md`:**
 ```
@@ -301,12 +308,12 @@ Hạn ghi trong file là hạn của plan. M1 xong trễ 3 ngày, việc dời l
 **Cột ma trận test:** TC · loại (Unit/Integration) · kỹ thuật (EP, BVA, State, Ngoại lệ, RBAC, Rollback) · Q/UC/R/L liên quan · dữ liệu vào · kết quả mong đợi · Fake dùng · lớp test dự kiến.
 
 **[TV1]**
-- `09-giao-dien.md` mục 2, 3 (frm101–frm106 theo PLAN 5.1; Master-Detail: frm101, frm104, frm105; frm103 đủ 6 bộ lọc + nút xóa lọc; frm106 R1, R2 có biểu đồ, xuất Excel), mục 5 (Huongdan đánh số Form liên tiếp `frm001_dm_…`, `frm002_nv_…`; plan đánh số theo người; ghi phương án nhóm chốt, xem "Việc chờ người").
+- `09-giao-dien.md` mục 2, 3 (frm101–frm106 theo PLAN 5.1; Master-Detail: frm101, frm104, frm105; frm103 đủ 6 bộ lọc + nút xóa lọc; frm106 R1, R2 có biểu đồ, xuất Excel), mục 5 (đối chiếu với Huongdan: slide đánh số liên tiếp `frm001_dm_…`, `frm002_nv_…`; nhóm chốt 27/11 đánh số theo người, tên tiếng Anh, thêm `_bc_` cho trang báo cáo; bảng tên cũ → tên mới theo `docs/PLAN.md` mục 5.1).
 - `10-kiem-thu.md` mục 1, 2 (10 unit + 4 integration ở PLAN 5.8 cột TV1, đủ BVA cho `ReopenDays`, `MaxActiveTickets`, điểm 0/1/5/6), 4 (bộ dữ liệu nhỏ dùng cho integration test, tính tay từng ô của R2: số ticket, số trễ SLA theo loại/tháng/hạng), dòng TV1 ở mục 6.
 - Điền cột "Ca test" cho Q1–Q6 trong `04-quy-tac.md`.
 
 **[TV2]**
-- `09-giao-dien.md` mục 1 (font, màu, bố cục, tiền `#,##0` căn phải, ngày `dd/MM/yyyy`, `ErrorProvider`, nút chung; để hai phân hệ trông như một tác giả), mục 4 (frm201–frm207; Master-Detail: frm201, frm202, frm205, frm206; frm201 lọc từ khóa/hạng/quốc tịch/đồng ý ưu đãi; frm207 R3 có biểu đồ, R4, R5).
+- `09-giao-dien.md` mục 1 (quy ước giao diện web theo `docs/PLAN.md` mục 5.1: bố cục, tông màu, font, modal "Thực hiện"/"Hủy bỏ", bảng dùng chung, báo lỗi cạnh ô, toast, tiền `#,##0` căn phải, ngày `dd/MM/yyyy`; để hai phân hệ trông như một tác giả), mục 4 (frm201–frm207; Master-Detail: frm201, frm202, frm205, frm206; frm201 lọc từ khóa/hạng/quốc tịch/đồng ý ưu đãi; frm207 R3 có biểu đồ, R4, R5).
 - `10-kiem-thu.md` mục 3 (10 unit + 4 integration ở PLAN 5.8 cột TV2, đủ BVA độ dài SĐT/CCCD, ngày nối tiếp, ngưỡng hạng), mục 5 (bộ dữ liệu nhỏ, tính tay R5 theo khách: số lần ở, chi tiêu, số khiếu nại, điểm hài lòng TB; không tính booking đã hủy), dòng TV2 ở mục 6.
 - Điền cột "Ca test" cho Q7–Q13 trong `04-quy-tac.md`.
 
@@ -331,7 +338,7 @@ Hạn ghi trong file là hạn của plan. M1 xong trễ 3 ngày, việc dời l
 - Mục 3 của `11-tu-danh-gia-l2.md`; tạo file `.xlsx` L2 từ bản L1, điền cột Minh chứng với tiền tố `[TV1]`/`[TV2]` theo mục 2–3 của file `.md`. Biên dịch PDF cả bộ.
 
 **[TV1]**
-- Slide phần chung + TV1: 4W+1H, BFD tổng, UC tổng, DFD, ma trận quyền, kiến trúc/package, BM1–BM3, Q1–Q6, ERD 7 bảng, lớp chung + TV1, State + Factory Method, Observer, L2, trạng thái ticket, Form F1–F4, ma trận TC1.
+- Slide phần chung + TV1: 4W+1H, BFD tổng, UC tổng, DFD, ma trận quyền, kiến trúc/package, 1 slide kiến trúc web (trình duyệt → Razor Pages → BLL → Domain ← DAL → SQLite), BM1–BM3, Q1–Q6, ERD 7 bảng, lớp chung + TV1, State + Factory Method, Observer, L2, trạng thái ticket, Form F1–F4, ma trận TC1.
 - Mục 1, 2 của `11-tu-danh-gia-l2.md` (đối chiếu từng hạng mục PLAN 5.10).
 
 **Điều kiện xong:** slide biên dịch PDF không lỗi trên máy TV2; mỗi slide có nhãn [TV1]/[TV2]; mọi ảnh sơ đồ lấy từ `docs/analysis/diagrams/*.png`; `.xlsx` L2 điền đủ cột Minh chứng; PR merge; PROGRESS cập nhật; nộp 30/11.
