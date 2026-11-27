@@ -19,7 +19,7 @@ Cập nhật lần cuối: 28/11/2026 (PR #5 `tv2/domain-2`, TV2).
 | Module | Hạn | TV1 | TV2 | Trạng thái (27/11) |
 |---|---|---|---|---|
 | M1 Chuẩn bị | 22/11 | **Xong 25/11** (trễ 3 ngày): `CLAUDE.md`, `docs/PLAN.md` v2, file này, `docs/tasks/v2-p1-analysis.md`, xóa tài liệu v1 khỏi cây thư mục, dọn đồ v1 | PR #1 đã merge (25/11); xác nhận phân công khi approve PR #4 (25/11) | **Xong 25/11**: PR #4 (`tv1/m1-setup` → `v2`) đã được TV2 approve và merge |
-| M2 Khảo sát | 23/11 | Chưa làm; làm 27/11 | Đã viết (PR #3, TV1 approve 26/11); ảnh BM4–BM7 thật chưa có | Quá hạn; phần TV1 làm 27/11 |
+| M2 Khảo sát | 23/11 | Đã viết 27/11 (PR `tv1/m2-khao-sat`, chờ TV2 review); BM1–BM3 là mẫu dựng lại, chưa có bản thật; nguồn khảo sát mục 3.1 chưa điền | Đã viết (PR #3, TV1 approve 26/11); ảnh BM4–BM7 thật chưa có | **Quá hạn 2 ngày** |
 | M3 BFD + UC | 24/11 | Chưa làm; làm 27/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 27/11 |
 | M4 Quy tắc, quyền, DFD | 25/11 | Chưa làm; làm 28/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 28/11 |
 | M5 ERD + CSDL | 26/11 | Chưa làm; làm 28/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 28/11 |
@@ -33,7 +33,7 @@ Lịch: giữ hạn slide 30/11, TV1 làm dồn phần mình của M2–M8 trong
 ## 3. Việc của TV1 (sao từ PLAN mục 6.4)
 **Tài liệu & sơ đồ (P1)**
 - [x] M1: `CLAUDE.md`, `docs/PLAN.md` v2, `docs/PROGRESS.md` v2, file task P1, nhánh `v2` (22/11) — xong 25/11
-- [ ] 4W+1H toàn hệ thống; yêu cầu phi chức năng; biểu mẫu BM1 Phiếu yêu cầu/khiếu nại, BM2 Phiếu theo dõi xử lý, BM3 Phiếu khảo sát (23/11)
+- [x] 4W+1H toàn hệ thống; yêu cầu phi chức năng; biểu mẫu BM1 Phiếu yêu cầu/khiếu nại, BM2 Phiếu theo dõi xử lý, BM3 Phiếu khảo sát (23/11) — PR `tv1/m2-khao-sat` (27/11); ảnh biểu mẫu thật chưa có (mục 7)
 - [ ] Cây BFD 8 nhánh, lá F1–F4; sơ đồ Use Case tổng; đặc tả UC04, UC05 (24/11)
 - [ ] Q1–Q6 với tiền/hậu điều kiện và ngoại lệ; ma trận quyền; DFD ngữ cảnh, mức 0, mức 1 của F3 (25/11)
 - [ ] Khung `erd.puml` + 7 bảng TV1; giải thích 3NF (26/11)
@@ -209,6 +209,7 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 27/11 | TV2 | Đồng ý (miệng, 27/11) toàn bộ bản kế hoạch chuyển giao diện sang web của TV1; cùng chọn tông Navy & đồng thau, font Cormorant Garamond + Be Vietnam Pro, không làm chuông SLA, giữ hạn P1. Góp ý trong review PR #6: đo `git blame` tính cả `.cshtml`, `.js`, `.css` (bỏ `wwwroot/lib`, `*.Designer.cs`); test v1 của TV2 do TV2 tự xóa |
 | 27/11 | TV2 | Xóa 2 file test v1 do TV2 viết: `Assignment/AssignmentStrategyTests.cs` (3 strategy phân công cũ, TV1 xóa phần code ở P2) và `Customers/SurveyServiceTests.cs` (khảo sát nay thuộc TV1, TV1 viết test mới). Build 0 warning, 60 test xanh |
 | 27/11 | TV1 | Mở PR `tv1/web-plan`: đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md` (mục mới 3.1, sửa 0, 3, 4.2, 4.3, 5.1, 5.6, 6, 7, 8, 9), file này, `docs/tasks/v2-p1-analysis.md` |
+| 27/11 | TV1 | **M2** trên nhánh `tv1/m2-khao-sat` (từ `v2`): điền phần TV1 của `docs/analysis/01-khao-sat.md`, chỉ thay 7 dòng chờ, không sửa phần TV2: mục 1 (đặt vấn đề, ý nghĩa, đối chiếu khung "Khảo sát" của HuongdanXDHTTTQL slide 4–7), mục 2 (4W+1H toàn hệ thống + bảng đầu ra BM1–BM7, R1–R5, D1–D11, L1–L6), mục 3.1 (hiện trạng, 9 nhược điểm → Q/F), mục 4.1 (BM1–BM3 dựng lại, ô → cột → trang), mục 5.1 (F1.1–F4.2 + số liệu nghiệp vụ), mục 6 (21 yêu cầu phi chức năng theo bản web), mục 7 (phạm vi). Góp ý phần TV2 ghi trong PR |
 | 28/11 | TV1 | Sửa PR #6 theo review TV2 (27/11): phạm vi đo `git blame` (`.cs`, `.cshtml`, `.js`, `.css`, bỏ `wwwroot/lib`) ở `CLAUDE.md` và PLAN 3.1; file v1 ai viết người đó xoá (PLAN 3.1 việc 2); bỏ dòng nhật ký 27/11 của TV2; thêm "3 strategy phân công cũ" vào danh sách xoá (PLAN 6.4, mục 3), dòng `DatabaseInitializer` ở PLAN 6.7, ContentRoot = `AppContext.BaseDirectory` (PLAN 3.1 việc 8). Theo PR #10: khung web (`HotelCRM.GUI`, `_Layout`, menu, toast, khung `Program.cs`) chuyển sang TV2; lọc menu theo vai trò giữ ở TV1 (theo đề xuất của TV2 ngày 28/11) (`CLAUDE.md` Phân công, PLAN 3.1, 5.6, 6.2–6.5, 6.7, 9). Theo PR #8: "chiến dịch", "Ticket" → "chương trình chăm sóc", "phiếu yêu cầu" ở tên BM7 (PLAN 5.1, 6.5) và danh mục chung (file task mục 1.5) |
 | 28/11 | TV2 | Dựng khung web trên nhánh `tv2/web-shell`: project `HotelCRM.GUI` (Razor Pages, `net10.0`) trong `HotelCRM.sln`; font và Bootstrap Icons để trong `wwwroot/lib` để chạy không cần mạng; mở PR vào `v2` |
 | 28/11 | TV2 | Sửa PR #10 theo review TV1: bỏ jQuery, jquery-validation, jquery-validation-unobtrusive và `_ValidationScriptsPartial` (ngoài danh sách thư viện đã chốt); thẻ nền trắng, chữ phụ dùng màu của tông (tương phản 6,53:1 trên thẻ); content root đặt là thư mục chứa file chạy, đã thử `dotnet run`, DLL và bản publish chạy từ thư mục khác. Thêm việc khung web vào mục 4 |
