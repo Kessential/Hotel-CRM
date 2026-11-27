@@ -107,11 +107,19 @@ Theo HuongdanXDHTTTQL (slide 5), khảo sát cho ra bốn thứ làm đầu vào
 ### 3.1 Chăm sóc & hỗ trợ khách hàng [TV1]
 
 #### Nguồn khảo sát
-> Cần điền trước khi nộp (giống mục 3.2): nguồn đã khảo sát cho phần chăm sóc khách hàng, người được hỏi (vai trò), ngày, cách thu thập. Nếu không khảo sát được một khách sạn thật thì ghi rõ quy trình dưới đây là kịch bản do nhóm dựng và nêu tên tài liệu tham khảo.
+Phần này khảo sát qua tài liệu đã công bố (nghiên cứu tài liệu), chưa phỏng vấn trực tiếp nhân viên khách sạn. Quy trình ở "Cách làm hiện tại" dựa trên các nguồn dưới đây; chi tiết nguồn không nói tới (mẫu phiếu, số liệu) do nhóm bổ sung, và BM1–BM3 là mẫu dựng lại (mục 4.1).
 
 | Nguồn | Người cung cấp / vai trò | Ngày | Cách thu thập |
 |---|---|---|---|
-| … | … | …/…/2026 | … |
+| Chu Thúy Quỳnh, *Tìm hiểu hoạt động quản trị nhân lực bộ phận lễ tân tại khách sạn Lạc Long – Hải Phòng*, khóa luận tốt nghiệp, Trường ĐH Quản lý và Công nghệ Hải Phòng, 2020 ([lib.hpu.edu.vn](https://lib.hpu.edu.vn/jspui/bitstream/123456789/33955/1/Chu-Thuy-Quynh-DL2001.pdf)) | tác giả khảo sát khách sạn Lạc Long (Hải Phòng); GVHD ThS. Đào Thị Thanh Mai | đọc 27/11/2026 | nghiên cứu tài liệu: mô tả hiện trạng bộ phận lễ tân của một khách sạn thật |
+| Oracle, *OPERA Property Management System 5.6 – Rooms Management > Maintenance* ([docs.oracle.com](https://docs.oracle.com/cd/E98457_01/opera_5_6_core_help/maintenance.htm)) | tài liệu hướng dẫn của phần mềm quản lý khách sạn | đọc 27/11/2026 | nghiên cứu tài liệu: các trường của một yêu cầu sửa chữa trong PMS |
+| Oxmaint, *Guest-Reported Issue Routing: Front Desk to Engineering CMMS*, 03/07/2026 ([oxmaint.com](https://oxmaint.com/industries/hospitality/guest-reported-issue-routing-front-desk-engineering-cmms)) | bài viết của hãng phần mềm bảo trì (có tính quảng cáo; số liệu không dùng) | đọc 27/11/2026 | nghiên cứu tài liệu: cách chuyển yêu cầu sửa chữa bằng giấy, điện thoại, nhóm chat và nhược điểm |
+
+Điểm lấy từ nguồn:
+- Lễ tân là nơi tiếp nhận mọi phàn nàn của khách, chuyển thông tin tới các bộ phận khác; phàn nàn về kỹ thuật thì bộ phận kỹ thuật xử lý; phàn nàn vượt quyền thì báo cấp trên (giám sát, trưởng bộ phận) – khóa luận, mục 1.1.5, 2.2, 3.1.6.
+- Giám sát lễ tân kiểm tra việc ghi chép sổ giao ca hằng ngày; khách sạn dùng phiếu nhận xét để biết mức hài lòng của khách – khóa luận, mục 2.2. Khi giải quyết phàn nàn cần ghi tên khách, số buồng, vấn đề – khóa luận, mục 3.1.6 (đề xuất của tác giả).
+- Yêu cầu sửa chữa ghi trên mẩu giấy hoặc nhắn nhóm chat, không có giờ ghi, không xác nhận lại với khách, không ai thấy trạng thái – bài Oxmaint (nhược điểm 1, 3, 4 ở dưới).
+- Yêu cầu sửa chữa trong PMS có phòng, lý do, ghi chú, người lập, đã xử lý hay chưa, người xử lý – OPERA 5.6 (đối chiếu với các ô của BM1, BM2).
 
 #### Phạm vi phân hệ
 Phân hệ theo dõi mọi yêu cầu của khách từ lúc tiếp nhận tới lúc đóng (F2, F3), đo mức hài lòng sau mỗi lần ở (F4.1) và báo cáo chất lượng chăm sóc (F4.2). TV1 viết luôn phần nền chung: phòng ban, nhân viên, tài khoản, đăng nhập, phân quyền (F1). Phân hệ không giữ hồ sơ khách, lưu trú hay điểm: cần thông tin đó thì hỏi phân hệ TV2 qua interface (L1); ngược lại phân hệ TV2 hỏi phân hệ này về phiếu yêu cầu và khảo sát (L3–L6).

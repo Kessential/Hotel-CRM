@@ -19,7 +19,7 @@ Cập nhật lần cuối: 28/11/2026 (PR #5 `tv2/domain-2`, TV2).
 | Module | Hạn | TV1 | TV2 | Trạng thái (27/11) |
 |---|---|---|---|---|
 | M1 Chuẩn bị | 22/11 | **Xong 25/11** (trễ 3 ngày): `CLAUDE.md`, `docs/PLAN.md` v2, file này, `docs/tasks/v2-p1-analysis.md`, xóa tài liệu v1 khỏi cây thư mục, dọn đồ v1 | PR #1 đã merge (25/11); xác nhận phân công khi approve PR #4 (25/11) | **Xong 25/11**: PR #4 (`tv1/m1-setup` → `v2`) đã được TV2 approve và merge |
-| M2 Khảo sát | 23/11 | Đã viết 27/11 (PR `tv1/m2-khao-sat`, chờ TV2 review); BM1–BM3 là mẫu dựng lại, chưa có bản thật; nguồn khảo sát mục 3.1 chưa điền | Đã viết (PR #3, TV1 approve 26/11); ảnh BM4–BM7 thật chưa có | **Quá hạn 2 ngày** |
+| M2 Khảo sát | 23/11 | Đã viết 27/11 (PR `tv1/m2-khao-sat`, chờ TV2 review); BM1–BM3 là mẫu dựng lại, chưa có bản thật; nguồn khảo sát mục 3.1 là tài liệu đã công bố (khóa luận về khách sạn Lạc Long – Hải Phòng, OPERA 5.6, Oxmaint), chưa phỏng vấn trực tiếp | Đã viết (PR #3, TV1 approve 26/11); ảnh BM4–BM7 thật chưa có | **Quá hạn 2 ngày** |
 | M3 BFD + UC | 24/11 | Chưa làm; làm 27/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 27/11 |
 | M4 Quy tắc, quyền, DFD | 25/11 | Chưa làm; làm 28/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 28/11 |
 | M5 ERD + CSDL | 26/11 | Chưa làm; làm 28/11 | Đã viết (PR #3, TV1 approve 26/11) | Quá hạn; phần TV1 làm 28/11 |
