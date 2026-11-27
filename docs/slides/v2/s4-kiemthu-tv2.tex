@@ -17,18 +17,18 @@ TC2-06 & Q9--10 & Gold 5.100 đổi quà 600 $\to$ số dư 4.500, vẫn Gold & 
 TC2-07 & Q10 & số dư = giá: được; thiếu 1 điểm, thiếu hạng, hết quà: lỗi & \code{<} $\to$ \code{<=} & \stOK \\
 TC2-08 & Q11 & 180 ngày: có, 179: không; sinh 01/12, 31/12: có, 30/11: không & \code{>=} $\to$ \code{>} & \stOK \\
 TC2-09 & Q11 & 1 không đồng ý, 1 đang khiếu nại $\to$ còn 2; rỗng: không lưu & bỏ lời gọi \code{ITicketQuery} & \stPART\ (P3) \\
-TC2-10 & Q13 & booking đã hủy / ticket đã đóng / \textbf{chỉ nằm trong chiến dịch}: chặn & chỉ xét ticket chưa đóng & \stPART\ (P3) \\
+TC2-10 & Q13 & booking đã hủy / phiếu yêu cầu đã đóng / \textbf{chỉ nằm trong chương trình}: chặn & chỉ xét phiếu chưa đóng & \stPART\ (P3) \\
 \bottomrule
 \end{tabularx}
 
 \vspace{1.5mm}
 \begin{block}{Kết quả chạy (nhánh PR \#5)}
-\scriptsize \code{CustomerTests} 31 · \code{BookingTests} 9 · \code{RoomTests} 4 · \code{InteractionTests} 4 · \code{MembershipTierTests} 16 · \code{RewardTests} 6 · \code{PointTransactionTests} 4 · \code{CampaignTests} 10 · \code{SegmentStrategyTests} 11 $=$ \textbf{95 ca của TV2, xanh 100\%}. \code{dotnet build}: 0 lỗi, 0 warning; \code{dotnet test}: 107/109, 2 đỏ là \code{SurveyServiceTests} của TV1 (có từ trước).\\[0.5mm]
+\scriptsize \code{CustomerTests} 31 · \code{BookingTests} 9 · \code{RoomTests} 4 · \code{InteractionTests} 4 · \code{MembershipTierTests} 16 · \code{RewardTests} 6 · \code{PointTransactionTests} 4 · \code{CampaignTests} 10 · \code{SegmentStrategyTests} 11 $=$ \textbf{95 ca của TV2, xanh 100\%}. \code{dotnet build}: 0 lỗi, 0 warning; \code{dotnet test}: 107/109, 2 đỏ là \code{SurveyServiceTests} v1 (đã xóa ở PR \#7; khảo sát v2 thuộc TV1).\\[0.5mm]
 Kỹ thuật: BVA, EP, chuyển trạng thái; kỳ vọng lấy từ bảng tính tay, không chép công thức của code; Fake chéo \code{FakeTicketQuery} (TC2-09, 10). Integration TC2-11..14 và bảng tính tay R5: phụ lục.
 \end{block}
 \end{frame}
 
-\begin{frame}{Kịch bản demo phân hệ TV2 ($\approx$4 phút) và chức năng còn thiếu \TB}
+\begin{frame}{Demo TV2 trên trình duyệt ($\approx$4 phút) và chức năng còn thiếu \TB}
 \begin{columns}[T]
 \column{0.62\textwidth}
 \scriptsize
@@ -36,14 +36,14 @@ Kỹ thuật: BVA, EP, chuyển trạng thái; kỳ vọng lấy từ bảng tí
 \toprule
 \textbf{\#} & \textbf{Ai} & \textbf{Thao tác $\to$ phải thấy} & \textbf{CN, QT} \\
 \midrule
-1 & Lễ tân & thêm khách Việt Nam, CCCD 11 số $\to$ báo lỗi; sửa 12 số $\to$ lưu, hạng Standard & 5.1.1, Q7 \\
+1 & Lễ tân & thêm khách Việt Nam, CCCD 11 số $\to$ báo lỗi cạnh ô; sửa 12 số $\to$ lưu, hạng Standard & 5.1.1, Q7 \\
 2 & Lễ tân & đặt phòng 305 ngày 10--14/12, giá chốt 1.250.000đ; đặt chồng 11--13/12 $\to$ bị chặn & 6.2.2, Q8 \\
 3 & Lễ tân & nhận phòng 10/12, trả 14/12: 4 đêm = 5.000.000đ $\to$ +500 điểm, 900 $\to$ 1.400, \textbf{lên Silver}; bên TV1 có phiếu khảo sát Chờ & 6.2.4, Q9, L3 \\
 4 & Lễ tân & đổi quà 2.000 điểm $\to$ bị chặn; đổi Voucher spa 800 $\to$ số dư 600; hủy $\to$ 1.400, vẫn Silver & 7.2, Q10 \\
-5 & Quản lý & tạo chiến dịch ``Sinh nhật tháng 12'', xem trước $\to$ khách đang khiếu nại bị loại & 8.1, Q11, L4 \\
+5 & Quản lý & tạo chương trình ``Sinh nhật tháng 12'', xem trước $\to$ khách đang khiếu nại bị loại & 8.1, Q11, L4 \\
 6 & CSKH & ghi phản hồi ``Đã đặt phòng'' $\to$ tỷ lệ phản hồi tăng ngay & 8.1.4 \\
-7 & Quản lý & báo cáo R4, dashboard R5, xuất Excel & 8.2 \\
-8 & Lễ tân & thử tạo chiến dịch $\to$ ``Bạn không có quyền\ldots'' & Q6 \\
+7 & Quản lý & báo cáo R4, dashboard R5, tải file Excel & 8.2 \\
+8 & Lễ tân & thử tạo chương trình: nút khóa; gửi thẳng request $\to$ service chặn ``Bạn không có quyền\ldots'' & Q6 \\
 \bottomrule
 \end{tabularx}
 \column{0.35\textwidth}

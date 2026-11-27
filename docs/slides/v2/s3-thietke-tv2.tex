@@ -1,5 +1,5 @@
 % [TV2] Thiết kế: lớp TV2, Strategy phân khúc, tuần tự L3.
-% Nguồn: docs/analysis/07..09, code nhánh v2 và PR #5. Hợp đồng, máy trạng thái, Form ở phụ lục.
+% Nguồn: docs/analysis/07..09, code nhánh v2 và PR #5. Hợp đồng, máy trạng thái, giao diện ở phụ lục.
 
 \begin{frame}{Biểu đồ lớp TV2 (Domain + Strategy) \TB}
 \centering
@@ -37,7 +37,7 @@
 {\tiny Đã có code: PR \#2 (\code{MembershipTier} + 4 hạng, \code{Reward}, \code{RewardRedemption}, \code{PointTransaction}, \code{Campaign}, \code{CampaignTarget}, \code{ISegmentStrategy} + 3 phân khúc) và PR \#5 (\code{Customer}, \code{Interaction}, \code{Booking}, \code{Room}). Còn \code{Receptionist : Employee}, chờ \code{Employee} v2 của TV1. Giữa các aggregate chỉ giữ Id.\par}
 \end{frame}
 
-\begin{frame}[fragile]{Mẫu Strategy (TV2): chọn khách cho chiến dịch \TB}
+\begin{frame}[fragile]{Mẫu Strategy (TV2): chọn khách cho chương trình chăm sóc \TB}
 \begin{columns}[T]
 \column{0.5\textwidth}
 \begin{lstlisting}
@@ -63,7 +63,7 @@ public sealed class LapsedGuestSegment : ISegmentStrategy
 \column{0.47\textwidth}
 \scriptsize
 \begin{block}{Vai trò}
-\tiny \textbf{Strategy}: \code{ISegmentStrategy}. \textbf{ConcreteStrategy}: \code{VipSegment}, \code{LapsedGuestSegment}, \code{BirthdayMonthSegment}. \textbf{Context}: \code{CampaignService} (nhận danh sách strategy qua constructor, tìm theo \code{Code} quản lý chọn trên Form). Đầu vào \code{SegmentCandidate}: service gom dữ liệu 1 lần $\Rightarrow$ strategy không đọc CSDL, không N+1, test không cần CSDL.
+\tiny \textbf{Strategy}: \code{ISegmentStrategy}. \textbf{ConcreteStrategy}: \code{VipSegment}, \code{LapsedGuestSegment}, \code{BirthdayMonthSegment}. \textbf{Context}: \code{CampaignService} (nhận danh sách strategy qua constructor, tìm theo \code{Code} quản lý chọn trên trang frm206). Đầu vào \code{SegmentCandidate}: service gom dữ liệu 1 lần $\Rightarrow$ strategy không đọc CSDL, không N+1, test không cần CSDL.
 \end{block}
 \begin{block}{Live OCP: \code{FrequentGuestSegment} (ở $\geq$ 3 lần/năm)}
 \tiny 1 lớp mới đếm \code{StayCheckOutDates} trong 365 ngày trước \code{referenceDate} + 1 dòng đăng ký ở \code{Program.cs}. Không sửa service, record hay truy vấn.
@@ -81,10 +81,10 @@ public sealed class LapsedGuestSegment : ISegmentStrategy
   msg/.style={-{Stealth[length=1.8mm]}, draw=black!80},
   ret/.style={dashed, -{Stealth[length=1.8mm]}, draw=black!60},
   ml/.style={font=\tiny, above, inner sep=1pt}]
-\foreach \x/\n/\t/\c in {0/lt/Lễ tân/common, 2.6/fm/frm203/tvB, 5.2/sv/StayService/tvB, 7.8/uw/IUnitOfWork/common, 10.4/bk/Booking/tvB, 13.0/mt/MembershipTier/tvB, 15.6/cu/Customer/tvB, 18.2/ss/ISurveyScheduler/tvA}{
+\foreach \x/\n/\t/\c in {0/lt/Lễ tân/common, 2.6/fm/frm203\_nv\_stay/tvB, 5.2/sv/StayService/tvB, 7.8/uw/IUnitOfWork/common, 10.4/bk/Booking/tvB, 13.0/mt/MembershipTier/tvB, 15.6/cu/Customer/tvB, 18.2/ss/ISurveyScheduler/tvA}{
   \node[ll=\c, minimum width=2.1cm, minimum height=0.55cm] (\n) at (\x,0) {\t};
   \draw[black!35, dashed] (\n.south) -- (\x,-8.6);}
-\draw[msg] (0,-0.9) -- node[ml] {bấm Trả phòng} (2.6,-0.9);
+\draw[msg] (0,-0.9) -- node[ml] {bấm Trả phòng (POST)} (2.6,-0.9);
 \draw[msg] (2.6,-1.4) -- node[ml] {ErrorHandler.Run $\to$ CheckOut(actor, id)} (5.2,-1.4);
 \node[font=\tiny, right] at (5.25,-1.9) {actor.EnsureCan\ldots() -- kiểm quyền (Q6)};
 \draw[msg] (5.2,-2.4) -- node[ml] {Execute(work): BEGIN} (7.8,-2.4);
@@ -100,9 +100,9 @@ public sealed class LapsedGuestSegment : ISegmentStrategy
 \node[font=\tiny\bfseries, anchor=north west, fill=warn!15] at (1.9,-6.8) {alt};
 \draw[ret] (7.8,-7.25) -- node[ml] {[thành công] COMMIT $\to$ CheckOutResult(points, tier, upgraded)} (2.6,-7.25);
 \draw[black!40] (1.9,-7.55) -- (19.4,-7.55);
-\draw[ret, draw=warn] (7.8,-8.05) -- node[ml, text=warn] {[ngoại lệ ở bất kỳ bước nào] ROLLBACK, ném lại $\to$ thông báo tiếng Việt} (2.6,-8.05);
+\draw[ret, draw=warn] (7.8,-8.05) -- node[ml, text=warn] {[ngoại lệ ở bất kỳ bước nào] ROLLBACK, ném lại $\to$ toast lỗi tiếng Việt} (2.6,-8.05);
 \end{tikzpicture}}
 
 \vspace{1mm}
-{\tiny Rollback: booking vẫn Đang ở, không có dòng sổ điểm, hạng và tương tác không đổi, không có phiếu khảo sát $\Rightarrow$ lễ tân thử lại được. Breakpoint ở \code{SurveyScheduler.ScheduleFor}: Call Stack \code{btnCheckOut_Click} $\to$ \code{ErrorHandler.Run} $\to$ \code{StayService.CheckOut} $\to$ \code{UnitOfWork.Execute} $\to$ lambda $\to$ \code{ScheduleFor}.\par}
+{\tiny Rollback: booking vẫn Đang ở, không có dòng sổ điểm, hạng và tương tác không đổi, không có phiếu khảo sát $\Rightarrow$ lễ tân thử lại được. Breakpoint ở \code{SurveyScheduler.ScheduleFor}: Call Stack (app chạy dạng web) \code{OnPostCheckOut} (PageModel) $\to$ \code{ErrorHandler.Run} $\to$ \code{StayService.CheckOut} $\to$ \code{UnitOfWork.Execute} $\to$ lambda $\to$ \code{ScheduleFor}.\par}
 \end{frame}

@@ -12,17 +12,17 @@ Cộng điểm tay, xét hạng theo quý & quên cộng, lên hạng chậm & t
 Một cột ``điểm'', đổi quà trừ thẳng & không biết điểm từ đâu; đổi quà làm tụt hạng & \textbf{sổ điểm} từng giao dịch; hạng theo điểm đã tích & Q9, Q10 \\
 Đổi quà không xét hạng, kho & khách thường đổi quà VIP, hứa quà đã hết & kiểm tra số dư, hạng tối thiểu, số lượng & Q10 \\
 Gửi ưu đãi cho cả khách từ chối và khách đang khiếu nại & khách phàn nàn & chỉ khách đồng ý; bỏ khách có khiếu nại chưa đóng (hỏi TV1) & Q11 \\
-Không ghi phản hồi chiến dịch & không đo được hiệu quả & ghi phản hồi, tỷ lệ phản hồi/đặt phòng & Q11, R4 \\
-Ticket xử lý xong không được ghi nhận & mất cơ hội giữ chân khách & đóng ticket $\to$ điểm thiện chí + tương tác & Q12 \\
+Không ghi phản hồi chương trình ưu đãi & không đo được hiệu quả & ghi phản hồi, tỷ lệ phản hồi/đặt phòng & Q11, R4 \\
+Phiếu yêu cầu xử lý xong không được ghi nhận & mất cơ hội giữ chân khách & đóng phiếu yêu cầu $\to$ điểm thiện chí + tương tác & Q12 \\
 \bottomrule
 \end{tabularx}
 \end{frame}
 
-\begin{frame}{Phụ lục: Biểu mẫu BM4--BM7 $\to$ bảng $\to$ Form \TB}
+\begin{frame}{Phụ lục: Biểu mẫu BM4--BM7 $\to$ bảng $\to$ trang \TB}
 \scriptsize
 \begin{tabularx}{\textwidth}{@{}L{3.0cm}YL{2.4cm}@{}}
 \toprule
-\textbf{Biểu mẫu} & \textbf{Ô chính (Nhập / Tính / \textbf{Chốt} / Tự ghi)} & \textbf{Bảng $\to$ Form} \\
+\textbf{Biểu mẫu} & \textbf{Ô chính (Nhập / Tính / \textbf{Chốt} / Tự ghi)} & \textbf{Bảng $\to$ trang} \\
 \midrule
 \textcolor{tvB}{\textbf{BM4}} Đăng ký thành viên & họ tên, SĐT, email, CCCD/hộ chiếu, quốc tịch, ngày sinh, đồng ý ưu đãi (Nhập); hạng (Tính) & \code{customers} $\to$ frm201 \\
 \textcolor{tvB}{\textbf{BM5}} Đặt / nhận--trả phòng & khách, phòng, ngày nhận, ngày trả (Nhập); \textbf{đơn giá/đêm (Chốt)}; số đêm, thành tiền (Tính); điểm được cộng (Tự ghi) & \code{bookings} $\to$ frm203 \\
@@ -32,7 +32,7 @@ Ticket xử lý xong không được ghi nhận & mất cơ hội giữ chân kh
 \end{tabularx}
 
 \vspace{2mm}
-\begin{block}{Truy vết ngược (Form $\to$ biểu mẫu): cột ``Giá/đêm'' trên lưới frm203}
+\begin{block}{Truy vết ngược (trang $\to$ biểu mẫu): cột ``Giá/đêm'' trên bảng frm203}
 \scriptsize
 Lấy từ ô ``đơn giá/đêm'' của BM5, lưu ở \code{bookings.RatePerNight}, \textbf{không} đọc \code{room_types.PricePerNight}: giá phòng đổi theo mùa, đọc giá hiện tại thì thành tiền, điểm đã cộng và báo cáo chi tiêu của các lần ở cũ đều sai. Tương tự: ``Điểm đã đổi'' trên frm205 $\leftarrow$ ô ``điểm quy đổi'' của BM6 $\leftarrow$ \code{RewardRedemption.PointsSpent}.
 \end{block}
@@ -42,7 +42,7 @@ Lấy từ ô ``đơn giá/đêm'' của BM5, lưu ở \code{bookings.RatePerNig
 \scriptsize
 \begin{tabularx}{\textwidth}{@{}L{1.1cm}YL{2.6cm}L{1.0cm}L{1.0cm}L{1.6cm}@{}}
 \toprule
-\textbf{Mã} & \textbf{Yêu cầu} & \textbf{Tác nhân} & \textbf{UC} & \textbf{Form} & \textbf{Quy tắc} \\
+\textbf{Mã} & \textbf{Yêu cầu} & \textbf{Tác nhân} & \textbf{UC} & \textbf{Trang} & \textbf{Quy tắc} \\
 \midrule
 F5.1 & Thêm/sửa/xóa/tìm khách; lọc từ khóa, hạng, quốc tịch, đồng ý ưu đãi & Lễ tân, QL (xóa: QL); CSKH xem & UC07 & frm201 & Q7, Q13 \\
 F5.2 & Hồ sơ 360: lưu trú, tương tác, sổ điểm; tổng chi tiêu, số lần ở, số dư & mọi vai trò & UC07 & frm201 & -- \\
@@ -50,9 +50,9 @@ F6.1 & Danh mục loại phòng và phòng & Admin & UC08 & frm202 & -- \\
 F6.2 & Đặt, nhận, trả, hủy; trả phòng: điểm, hạng, tương tác, phiếu khảo sát chờ (1 giao dịch) & Lễ tân, QL & UC08 & frm203 & Q8, Q9, \textbf{L3} \\
 F7.1 & Danh mục quà & Admin & UC09 & frm204 & -- \\
 F7.2 & Sổ điểm, đổi quà, hủy lượt đổi (hoàn điểm) & Lễ tân, QL & UC09 & frm205 & Q10 \\
-F8.1 & Chiến dịch: chọn phân khúc, lập danh sách, ghi phản hồi & tạo: QL; phản hồi: mọi vai trò & UC10 & frm206 & Q11, \textbf{L4} \\
-F8.2 & Báo cáo R3, R4, dashboard R5; xuất Excel & QL & UC11 & frm207 & \textbf{L6} \\
-F7.3 & Ticket Đã đóng $\to$ điểm thiện chí + tương tác, cùng giao dịch & tự động (từ TV1) & UC04 & -- & Q12, \textbf{L2} \\
+F8.1 & Chương trình chăm sóc: chọn phân khúc, lập danh sách, ghi phản hồi & tạo: QL; phản hồi: mọi vai trò & UC10 & frm206 & Q11, \textbf{L4} \\
+F8.2 & Báo cáo R3, R4, dashboard R5; tải file Excel & QL & UC11 & frm207 & \textbf{L6} \\
+F7.3 & Phiếu yêu cầu Đã đóng $\to$ điểm thiện chí + tương tác, cùng giao dịch & tự động (từ TV1) & UC04 & -- & Q12, \textbf{L2} \\
 \bottomrule
 \end{tabularx}
 {\tiny Admin làm được mọi việc. L2--L6: luồng liên phân hệ. Chưa có: nguồn khảo sát thật và ảnh biểu mẫu thật BM4--BM7 (bổ sung trước buổi vấn đáp).\par}
@@ -99,7 +99,7 @@ Hãy lập sơ đồ phân rã tương tự cho phân hệ "Quan hệ khách hà
 \node[store] (d3) at (9.5,3) {D3 \quad Quà tặng};
 \node[store] (d4) at (9.5,-0.6) {D4 \quad Lượt đổi quà};
 \node[ext, fill=tvB!8] (f62) at (14.5,2.4) {F6.2 Trả phòng};
-\node[ext, fill=tvA!8] (f32) at (14.5,-0.6) {F3.2 Xử lý ticket \TA};
+\node[ext, fill=tvA!8] (f32) at (14.5,-0.6) {F3.2 Xử lý phiếu yêu cầu \TA};
 \draw[fl] (adm) -- node[lb, above] {thông tin quà} (p71);
 \draw[fl] (p71) -- node[lb, above] {quà mới / đã sửa} (d3);
 \draw[fl] (kh.15) -- node[lb, above] {yêu cầu đổi quà, hủy} (p72.165);
@@ -134,7 +134,7 @@ Hãy lập sơ đồ phân rã tương tự cho phân hệ "Quan hệ khách hà
 \column{0.42\textwidth}
 \begin{block}{Không lưu (tính khi cần)}
 \scriptsize
-số đêm, thành tiền; số dư điểm, điểm đã tích (tổng \code{point_transactions}); tỷ lệ phản hồi chiến dịch.
+số đêm, thành tiền; số dư điểm, điểm đã tích (tổng \code{point_transactions}); tỷ lệ phản hồi chương trình chăm sóc.
 \end{block}
 \begin{block}{Dẫn xuất lưu có chủ đích: \code{customers.Tier}}
 \scriptsize
@@ -205,30 +205,30 @@ số đêm, thành tiền; số dư điểm, điểm đã tích (tổng \code{po
 \tiny Cancel khi Đang ở, CheckOut khi Đã đặt, CheckIn lần hai\ldots\ $\to$ \code{BusinessRuleException}, trạng thái giữ nguyên. Chỉ Đã đặt và Đang ở giữ phòng (\code{BlocksRoom}).
 \end{block}
 \begin{block}{Vì sao không dùng mẫu State?}
-\tiny Chỉ 3 chuyển, không vòng lặp, mỗi chuyển 1 điều kiện: State thêm 4 lớp mà không bớt \code{if} đáng kể. Khi có trạng thái có hành vi riêng (``Không đến'', ``Gia hạn'') mới chuyển sang State -- chỉ \code{Booking} đổi, service và Form không đổi.
+\tiny Chỉ 3 chuyển, không vòng lặp, mỗi chuyển 1 điều kiện: State thêm 4 lớp mà không bớt \code{if} đáng kể. Khi có trạng thái có hành vi riêng (``Không đến'', ``Gia hạn'') mới chuyển sang State -- chỉ \code{Booking} đổi, service và trang không đổi.
 \end{block}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Phụ lục: Giao diện F5--F8: 7 Form, 4 Master-Detail \TB}
+\begin{frame}{Phụ lục: Giao diện web F5--F8: 7 trang, 4 Master-Detail \TB}
 \scriptsize
-\begin{tabularx}{\textwidth}{@{}L{3.0cm}L{0.7cm}YL{2.9cm}@{}}
+\begin{tabularx}{\textwidth}{@{}L{3.3cm}L{0.7cm}YL{2.9cm}@{}}
 \toprule
-\textbf{Form} & \textbf{BM} & \textbf{Master $\to$ Detail (tổng tính động) / nội dung} & \textbf{Quyền} \\
+\textbf{Trang (Razor Pages)} & \textbf{BM} & \textbf{Danh sách $\to$ trang chi tiết có tab (tổng tính khi tải) / nội dung} & \textbf{Quyền} \\
 \midrule
-frm201\_dm\_khach\_hang & BM4 & khách $\to$ lưu trú, tương tác, sổ điểm (số lần ở, tổng chi tiêu, số dư) & sửa: LT, QL; xóa: QL; CSKH xem \\
-frm202\_dm\_phong & -- & loại phòng $\to$ phòng (số phòng) & sửa: Admin \\
-frm203\_nv\_luu\_tru & BM5 & đặt, nhận, trả, hủy; lọc ngày, trạng thái, khách & LT, QL \\
-frm204\_dm\_qua\_tang & -- & danh mục quà & sửa: Admin \\
-frm205\_nv\_doi\_qua & BM6 & khách $\to$ sổ điểm (số dư lũy kế), lượt đổi & LT, QL \\
-frm206\_nv\_chien\_dich & BM7 & chiến dịch $\to$ khách nhận (số khách, số phản hồi, tỷ lệ) & tạo: QL; phản hồi: mọi vai trò \\
-frm207\_bc\_khach\_hang & -- & R3 (biểu đồ cột theo hạng), R4, R5; xuất Excel & QL \\
+frm201\_dm\_customer & BM4 & khách $\to$ lưu trú, tương tác, sổ điểm, phiếu yêu cầu (số lần ở, tổng chi tiêu, số dư) & sửa: LT, QL; xóa: QL; CSKH xem \\
+frm202\_dm\_room & -- & loại phòng $\to$ phòng (số phòng) & sửa: Admin \\
+frm203\_nv\_stay & BM5 & đặt, nhận, trả, hủy; lọc ngày, trạng thái, khách & LT, QL \\
+frm204\_dm\_reward & -- & danh mục quà & sửa: Admin \\
+frm205\_nv\_loyalty & BM6 & khách $\to$ sổ điểm (số dư lũy kế), lượt đổi & LT, QL \\
+frm206\_nv\_campaign & BM7 & chương trình $\to$ khách nhận (số khách, số phản hồi, tỷ lệ) & tạo: QL; phản hồi: mọi vai trò \\
+frm207\_bc\_customer\_360 & -- & R3 (biểu đồ Chart.js theo hạng), R4, R5; tải file Excel & QL \\
 \bottomrule
 \end{tabularx}
 
 \vspace{2mm}
-\begin{block}{Quy ước dùng chung (TV2 phụ trách)}
-\tiny Chữ trên Form tiếng Việt, tên control tiếng Anh (\code{txt}, \code{cbo}, \code{dgv}\ldots). Tiền \texttt{\#,\#\#0} căn phải; ngày \texttt{dd/MM/yyyy}. Kiểm tra 2 lớp: \code{ErrorProvider} trên Form, Domain quyết định. Ẩn nút theo vai trò chỉ là lớp chặn thứ 2. Mọi Form lọc có ``Xóa lọc''. Admin làm được mọi việc.
+\begin{block}{Thành phần giao diện dùng chung (TV2 phụ trách, xong 7/12, cả 13 trang dùng)}
+\tiny Tên trang theo khung slide 24--25 của thầy, bằng tiếng Anh; chữ trên menu, tiêu đề, thông báo tiếng Việt. Bảng dùng chung: phân trang và sắp xếp ở server (cột sắp xếp lấy từ danh sách cho phép, không ghép chuỗi SQL), chọn cột, tiêu đề cố định; thanh lọc có ``Xóa lọc''. Thêm/sửa bằng modal ``Thực hiện''/``Hủy bỏ''; kiểm tra 2 lớp: báo lỗi cạnh ô trên trang, Domain quyết định. Tiền \texttt{\#,\#\#0} căn phải; ngày \texttt{dd/MM/yyyy}; tông Navy \& đồng thau trong \code{site.css}. Khóa nút theo vai trò (có dòng nêu lý do) chỉ là lớp chặn thứ 2, service vẫn kiểm quyền.
 \end{block}
 \end{frame}
 
@@ -243,7 +243,7 @@ frm207\_bc\_khach\_hang & -- & R3 (biểu đồ cột theo hạng), R4, R5; xu�
 TC2-I1 & L3 đầy đủ: Standard 900 điểm, trả 2 đêm × 2,5 tr $\to$ +500, Silver, 1 tương tác, 1 phiếu Chờ \\
 TC2-I2 & L3 rollback: \code{FakeSurveyScheduler} ném lỗi $\to$ CSDL không đổi \\
 TC2-I3 & R5 khớp bảng bên phải \\
-TC2-I4 & RBAC: CSKH đổi quà, Lễ tân tạo chiến dịch $\to$ bị chặn; Admin được \\
+TC2-I4 & RBAC: CSKH đổi quà, Lễ tân tạo chương trình $\to$ bị chặn; Admin được \\
 \bottomrule
 \end{tabularx}
 \column{0.55\textwidth}

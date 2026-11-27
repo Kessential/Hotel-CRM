@@ -40,20 +40,20 @@
 \end{forest}
 \column{0.245\textwidth}
 \begin{forest} dq
-[F8 Chăm sóc KH qua chiến dịch, b2
-  [{8.1 Lập, theo dõi chiến dịch}, b3
-    [Chọn phân khúc khách] [Xem trước danh sách] [Lưu chiến dịch]
-    [Ghi phản hồi của khách] [Tìm và xem chiến dịch]]
+[F8 Chương trình chăm sóc KH, b2
+  [{8.1 Lập, theo dõi chương trình}, b3
+    [Chọn phân khúc khách] [Xem trước danh sách] [Lưu chương trình]
+    [Ghi phản hồi của khách] [Tìm và xem chương trình]]
   [8.2 Lập báo cáo khách hàng, dm
-    [{Lập BC khách theo hạng (R3)}] [{Lập BC hiệu quả chiến dịch (R4)}]
+    [{Lập BC khách theo hạng (R3)}] [{Lập BC hiệu quả (R4)}]
     [{Xem dashboard 360 (R5)}] [Xuất báo cáo ra Excel]]]
 \end{forest}
 \end{columns}
 
 \vspace{1mm}
-\begin{block}{Xếp vào cây tổng theo chuẩn 3 nhánh chung (đề xuất, TV1 chốt cây tổng)}
+\begin{block}{Đối chiếu HuongdanXDHTTTQL: nhóm chốt 27/11 giữ 8 nhánh theo phân hệ}
 \scriptsize
-\colorbox{common!20}{\textbf{Nền xám}} $\to$ nhánh chung: \textbf{Quản lý danh mục} $\leftarrow$ 6.1, 7.1; \ \textbf{Báo cáo thống kê} $\leftarrow$ 8.2 (R3, R4, R5); \ \textbf{Quản trị hệ thống}: TV1. Còn lại là nghiệp vụ riêng của TV2. Chỉ có chức năng, không ghi dữ liệu (dữ liệu ở ERD). Mẫu phân rã + prompt cho AI: phụ lục.
+\colorbox{common!20}{\textbf{Nền xám}} $\to$ chức năng danh mục (6.1, 7.1) và báo cáo thống kê (8.2: R3, R4, R5), slide 11 gom thành nhánh chung; nhóm để trong nhánh của từng phân hệ vì checklist đòi $\geq$3 nhánh mỗi người. Mỗi chức năng cấp 3 $\leftrightarrow$ 1 trang web (frm201--frm207). Chỉ có chức năng, không ghi dữ liệu (dữ liệu ở ERD). Mẫu phân rã + prompt cho AI: phụ lục.
 \end{block}
 \end{frame}
 
@@ -68,7 +68,7 @@
 UC07 & Quản lý hồ sơ khách 360 & & L5 \\
 UC08 & Đặt phòng và lưu trú & \checkmark & L3 \\
 UC09 & Đổi quà & \checkmark & \\
-UC10 & Chiến dịch chăm sóc & \checkmark & L4 \\
+UC10 & Chương trình chăm sóc & \checkmark & L4 \\
 UC11 & Báo cáo KH, dashboard 360 & & L6 \\
 \bottomrule
 \end{tabularx}
@@ -102,8 +102,8 @@ Q8 & ngày trả > ngày nhận; không trùng lịch; giá chốt; nhận phòn
 Q9 & điểm theo hạng trước khi trả phòng; hạng theo điểm đã tích, nhiều bậc, không hạ & \code{MembershipTier.PointsFor}, \code{Customer.EarnPoints} & \stOK \\
 Q10 & đổi quà: còn áp dụng, còn hàng, đủ hạng, đủ điểm; điểm chốt; số dư $\geq 0$ & \code{Reward.EnsureCanRedeem}, \code{Redeem} & \stOK \\
 Q11 & phân khúc $\cap$ đồng ý $-$ đang khiếu nại; mỗi khách 1 lần; $\geq 1$ khách; phản hồi tới hết ngày kết thúc & \code{Campaign.AddTarget}, \code{EnsureHasTargets} & \stOK \\
-Q12 & ticket Đã đóng $\to$ +50 (khiếu nại) / +10, cùng giao dịch & \code{GoodwillPointsObserver}, \code{PointTransaction.ForGoodwill} & một phần \\
-Q13 & không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch & \code{Customer.EnsureCanBeDeleted} & \stOK \\
+Q12 & phiếu yêu cầu Đã đóng $\to$ +50 (khiếu nại) / +10, cùng giao dịch & \code{GoodwillPointsObserver}, \code{PointTransaction.ForGoodwill} & một phần \\
+Q13 & không xóa khách đã có lưu trú, phiếu yêu cầu hoặc đã nằm trong chương trình chăm sóc & \code{Customer.EnsureCanBeDeleted} & \stOK \\
 \bottomrule
 \end{tabularx}
 
