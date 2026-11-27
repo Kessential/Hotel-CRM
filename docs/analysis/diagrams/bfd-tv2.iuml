@@ -1,6 +1,6 @@
 ' [TV2] BFD branches F5-F8 (level 2), their functions (level 3) and sub-functions (level 4).
 ' Included by bfd.puml (TV1) inside @startwbs, right after the root node "* Hệ thống CRM khách sạn".
-' Every name is a verb phrase; no data and no Form names (02-bfd.md, sections 2.3-2.4).
+' Every name is a verb phrase; no data and no page names (02-bfd.md, sections 2.3-2.4).
 ' On the shared tree F6.1 and F7.1 may move under "Quản lý danh mục" and F8.2 under "Báo cáo thống kê" (TV1 decides).
 ** F5 Quản lý hồ sơ khách hàng
 *** F5.1 Cập nhật hồ sơ khách
@@ -14,10 +14,10 @@
 **** F5.2.3 Xem sổ điểm
 **** F5.2.4 Tính tổng chi tiêu, số lần ở, số dư điểm
 ** F6 Quản lý lưu trú
-*** F6.1 Cập nhật danh mục phòng
+*** F6.1 Cập nhật danh mục loại phòng và phòng
 **** F6.1.1 Thêm, sửa loại phòng
 **** F6.1.2 Thêm, sửa phòng
-*** F6.2 Đặt, nhận, trả phòng
+*** F6.2 Đặt phòng, nhận phòng, trả phòng
 **** F6.2.1 Tìm phòng trống
 **** F6.2.2 Đặt phòng
 **** F6.2.3 Nhận phòng
@@ -34,15 +34,15 @@
 **** F7.2.3 Ghi nhận đổi quà
 **** F7.2.4 Hủy lượt đổi, hoàn điểm
 *** F7.3 Cộng điểm thiện chí (tự động)
-** F8 Chăm sóc khách hàng theo chiến dịch
-*** F8.1 Lập và theo dõi chiến dịch
+** F8 Chăm sóc khách hàng theo chương trình
+*** F8.1 Lập và theo dõi chương trình chăm sóc
 **** F8.1.1 Chọn phân khúc khách
 **** F8.1.2 Xem trước danh sách khách
-**** F8.1.3 Lưu chiến dịch
+**** F8.1.3 Lưu chương trình
 **** F8.1.4 Ghi phản hồi của khách
-**** F8.1.5 Tìm và xem chiến dịch
-*** F8.2 Lập báo cáo khách hàng
+**** F8.1.5 Tìm và xem chương trình
+*** F8.2 Lập báo cáo khách hàng và dashboard 360
 **** F8.2.1 Lập báo cáo phân khúc khách theo hạng
-**** F8.2.2 Lập báo cáo hiệu quả chiến dịch
+**** F8.2.2 Lập báo cáo hiệu quả chương trình
 **** F8.2.3 Xem dashboard khách hàng 360
 **** F8.2.4 Xuất báo cáo ra Excel

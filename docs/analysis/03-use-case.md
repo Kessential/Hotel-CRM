@@ -16,13 +16,13 @@ _[TV1] chưa điền._
 ### 3.2 UC07–UC11 [TV2]
 Phần TV2 của sơ đồ: `diagrams/use-case-tv2.iuml`. Sơ đồ dùng alias tác nhân `ADM`, `QL`, `LT`, `CSKH` do `use-case.puml` khai báo; Admin tổng quát hóa ba vai trò còn lại nên làm được mọi Use Case và không ghi lại ở từng dòng.
 
-| UC | Tên | Tác nhân | Form | Phức hợp | Liên phân hệ |
+| UC | Tên | Tác nhân | Trang | Phức hợp | Liên phân hệ |
 |---|---|---|---|---|---|
-| UC07 | Quản lý hồ sơ khách 360 | Lễ tân, Quản lý; CSKH chỉ xem | frm201 | | L5: hỏi `ITicketQuery` trước khi xóa |
-| UC08 | Đặt phòng & lưu trú (mở rộng: danh mục phòng; bao gồm: trả phòng) | Lễ tân, Quản lý | frm202, frm203 | ✓ | L3: trả phòng gọi `ISurveyScheduler` |
-| UC09 | Đổi quà (mở rộng: danh mục quà) | Lễ tân, Quản lý | frm204, frm205 | ✓ | |
-| UC10 | Chiến dịch chăm sóc (mở rộng: ghi phản hồi) | tạo: Quản lý; ghi phản hồi: Lễ tân, CSKH, Quản lý | frm206 | ✓ | L4: hỏi `ITicketQuery` khiếu nại chưa đóng |
-| UC11 | Báo cáo khách hàng & dashboard 360 | Quản lý | frm207 | | L6: hỏi `ICustomerCareStats` |
+| UC07 | Quản lý hồ sơ khách 360 | Lễ tân, Quản lý; CSKH chỉ xem | `frm201_dm_customer` | | L5: hỏi `ITicketQuery` trước khi xóa |
+| UC08 | Đặt phòng & lưu trú (mở rộng: danh mục phòng; bao gồm: trả phòng) | Lễ tân, Quản lý | `frm202_dm_room`, `frm203_nv_stay` | ✓ | L3: trả phòng gọi `ISurveyScheduler` |
+| UC09 | Đổi quà (mở rộng: danh mục quà) | Lễ tân, Quản lý | `frm204_dm_reward`, `frm205_nv_loyalty` | ✓ | |
+| UC10 | Chương trình chăm sóc (mở rộng: ghi phản hồi) | tạo: Quản lý; ghi phản hồi: Lễ tân, CSKH, Quản lý | `frm206_nv_campaign` | ✓ | L4: hỏi `ITicketQuery` khiếu nại chưa đóng |
+| UC11 | Báo cáo khách hàng & dashboard 360 | Quản lý | `frm207_bc_customer_360` | | L6: hỏi `ICustomerCareStats` |
 
 ## 4. Luồng liên phân hệ L1–L6 [Chung – TV1]
 _[Chung – TV1] chưa điền._
@@ -46,7 +46,7 @@ _[TV1] chưa điền._
 | Hậu điều kiện | Đặt phòng: có booking "Đã đặt" với giá/đêm đã chốt. Nhận phòng: booking "Đang ở". Trả phòng: booking "Đã trả phòng", sổ điểm có thêm một dòng Lưu trú, hạng khách đã xét lại, có một tương tác và một phiếu khảo sát "Chờ". Hủy: booking "Đã hủy" |
 | Quy tắc | Q6 (quyền), Q8 (ngày, trùng lịch, giá chốt, trạng thái), Q9 (tích điểm, nâng hạng) |
 | Bảng dữ liệu | đọc `customers`, `rooms`, `room_types`; ghi `bookings`, `point_transactions`, `customers.Tier`, `interactions`; qua TV1: `surveys` |
-| Form | frm203_nv_luu_tru (mở rộng: frm202_dm_phong) |
+| Trang | `frm203_nv_stay` (mở rộng: `frm202_dm_room`) |
 | Biểu mẫu | BM5 Phiếu đặt phòng / nhận–trả phòng |
 | Liên phân hệ | L3: `ISurveyScheduler.ScheduleFor` (TV1 cài), chạy trong giao dịch của `StayService.CheckOut` |
 | Service | `StayService` |
@@ -56,7 +56,7 @@ _[TV1] chưa điền._
 2. Hệ thống kiểm tra ngày trả > ngày nhận (Q8), rồi hiện các phòng còn trống trong khoảng đó, kèm loại phòng và giá/đêm hiện tại.
 3. Lễ tân chọn phòng và bấm Đặt phòng.
 4. Hệ thống kiểm tra quyền (Q6), kiểm tra lại phòng còn trống (Q8; người khác có thể vừa đặt), tạo booking "Đã đặt", chốt `RatePerNight` bằng giá/đêm hiện tại của loại phòng, ghi người lập và thời điểm.
-5. Hệ thống hiện booking mới trên lưới: số đêm, giá/đêm, thành tiền.
+5. Hệ thống hiện booking mới trên bảng: số đêm, giá/đêm, thành tiền.
 
 **Luồng chính B – Nhận phòng**
 1. Lễ tân lọc booking theo ngày hoặc khách, chọn booking "Đã đặt", bấm Nhận phòng.
@@ -101,7 +101,7 @@ _[TV1] chưa điền._
 | Hậu điều kiện | Có một lượt đổi "Đã đổi" với điểm quy đổi đã chốt; sổ điểm có một dòng âm bằng đúng số điểm đó; kho quà giảm 1; hạng khách không đổi |
 | Quy tắc | Q6, Q10 |
 | Bảng dữ liệu | đọc `customers`, `point_transactions`, `rewards`; ghi `reward_redemptions`, `point_transactions`, `rewards.Quantity` |
-| Form | frm205_nv_doi_qua (mở rộng: frm204_dm_qua_tang) |
+| Trang | `frm205_nv_loyalty` (mở rộng: `frm204_dm_reward`) |
 | Biểu mẫu | BM6 Phiếu đổi quà |
 | Liên phân hệ | không |
 | Service | `LoyaltyService` |
@@ -109,11 +109,11 @@ _[TV1] chưa điền._
 Số dư điểm = tổng mọi dòng sổ điểm của khách. Điểm đã tích (dùng xét hạng) = tổng các dòng Lưu trú và Thiện chí. Vì vậy đổi quà làm giảm số dư nhưng không làm giảm điểm đã tích, nên không làm tụt hạng.
 
 **Luồng chính**
-1. Lễ tân chọn khách. Hệ thống hiện hạng, số dư và sổ điểm (từng dòng: ngày, lý do, +/− điểm), tính số dư ngay trên Form.
+1. Lễ tân chọn khách. Hệ thống hiện hạng, số dư và sổ điểm (từng dòng: ngày, lý do, +/− điểm), tính số dư ngay trên trang.
 2. Hệ thống hiện danh sách quà đang áp dụng: điểm quy đổi, hạng tối thiểu, số lượng còn; đánh dấu quà khách chưa đổi được (thiếu điểm hoặc chưa đủ hạng).
 3. Lễ tân chọn quà, bấm Đổi quà; hệ thống hiện số dư sau khi đổi để xác nhận.
 4. Hệ thống mở một giao dịch: kiểm tra quyền (Q6); đọc lại số dư, hạng và số lượng quà; kiểm tra quà còn áp dụng, còn hàng, hạng khách ≥ hạng tối thiểu, số dư ≥ điểm quy đổi (Q10, `Reward.Redeem`); tạo lượt đổi, chốt `PointsSpent`; giảm số lượng quà; ghi dòng sổ điểm âm (`PointTransaction.ForRedemption`); commit.
-5. Hệ thống cập nhật số dư và lưới lượt đổi.
+5. Hệ thống cập nhật số dư và bảng lượt đổi.
 
 **Luồng phụ**
 - A. Hủy lượt đổi: lễ tân chọn lượt đổi "Đã đổi", bấm Hủy. Trong một giao dịch: lượt đổi chuyển "Đã hủy", quà trả về kho (`Reward.CancelRedemption`), ghi một dòng sổ điểm dương bằng đúng điểm đã đổi (`PointTransaction.ForRefund`). Dòng âm cũ được giữ lại: sổ điểm chỉ ghi thêm, không sửa hay xóa.
@@ -131,39 +131,39 @@ Số dư điểm = tổng mọi dòng sổ điểm của khách. Điểm đã t�
 | E6 | CSKH đổi quà (Q6) | `AuthorizationException` | "Bạn không có quyền đổi quà." |
 | E7 | Danh mục quà nhập sai (luồng B) | `ValidationException` | "Điểm quy đổi phải lớn hơn 0." / "Số lượng quà không được âm." |
 
-### 5.5 UC10 Chiến dịch chăm sóc [TV2]
+### 5.5 UC10 Chương trình chăm sóc [TV2]
 
 | Mục | Nội dung |
 |---|---|
-| Mã, tên | UC10 – Chiến dịch chăm sóc |
-| Tác nhân | Quản lý (tạo chiến dịch); Lễ tân, CSKH, Quản lý (ghi phản hồi); Admin làm được cả hai |
+| Mã, tên | UC10 – Chương trình chăm sóc |
+| Tác nhân | Quản lý (tạo chương trình); Lễ tân, CSKH, Quản lý (ghi phản hồi); Admin làm được cả hai |
 | Mô tả ngắn | Gửi một ưu đãi tới đúng nhóm khách (phân khúc chọn lúc chạy), không làm phiền khách không đồng ý hoặc đang khiếu nại, và đo được phản hồi |
-| Tiền điều kiện | Đăng nhập; tạo chiến dịch cần vai trò Quản lý hoặc Admin |
-| Hậu điều kiện | Có một chiến dịch và danh sách khách nhận (ít nhất một khách), mỗi khách một dòng, đã ghi kênh và ngày gửi |
+| Tiền điều kiện | Đăng nhập; tạo chương trình cần vai trò Quản lý hoặc Admin |
+| Hậu điều kiện | Có một chương trình và danh sách khách nhận (ít nhất một khách), mỗi khách một dòng, đã ghi kênh và ngày gửi |
 | Quy tắc | Q6, Q11 |
-| Bảng dữ liệu | đọc `customers`, `bookings`; qua TV1: ticket khiếu nại chưa đóng; ghi `campaigns`, `campaign_targets` |
-| Form | frm206_nv_chien_dich (Master: chiến dịch; Detail: khách nhận) |
-| Biểu mẫu | BM7 Danh sách chăm sóc theo chiến dịch |
+| Bảng dữ liệu | đọc `customers`, `bookings`; qua TV1: phiếu khiếu nại chưa đóng; ghi `campaigns`, `campaign_targets` |
+| Trang | `frm206_nv_campaign` (Master: chương trình; Detail: khách nhận) |
+| Biểu mẫu | BM7 Danh sách chăm sóc theo chương trình |
 | Liên phân hệ | L4: `ITicketQuery.GetCustomersWithOpenComplaints` (TV1 cài), hỏi một lần cho cả danh sách |
 | Service | `CampaignService` (Context của Strategy `ISegmentStrategy`) |
 
-**Luồng chính A – Tạo chiến dịch**
+**Luồng chính A – Tạo chương trình**
 1. Quản lý nhập tên, nội dung ưu đãi, ngày bắt đầu, ngày kết thúc, chọn kênh gửi và phân khúc trong danh sách (VIP, Lâu chưa quay lại, Sinh nhật trong tháng). Danh sách phân khúc lấy từ các Strategy đã đăng ký.
 2. Quản lý bấm Xem trước. Hệ thống:
    1. đọc dữ liệu tất cả khách trong một truy vấn (hạng, ngày sinh, các ngày trả phòng) thành `SegmentCandidate`;
-   2. giữ khách mà Strategy đã chọn trả lời "thuộc phân khúc" theo ngày bắt đầu chiến dịch;
+   2. giữ khách mà Strategy đã chọn trả lời "thuộc phân khúc" theo ngày bắt đầu chương trình;
    3. bỏ khách không đồng ý nhận ưu đãi;
    4. hỏi phân hệ TV1 qua `ITicketQuery` một lần cho cả danh sách: bỏ khách đang có khiếu nại chưa đóng (luồng L4).
 3. Hệ thống hiện danh sách và số khách bị loại ở từng bước (không đồng ý, đang khiếu nại).
-4. Quản lý bấm Lưu. Trong một giao dịch: kiểm tra quyền (Q6), tạo chiến dịch, thêm từng khách vào danh sách (`Campaign.AddTarget`: kiểm tra lại đồng ý, khiếu nại, không trùng khách), kiểm tra danh sách không rỗng (`Campaign.EnsureHasTargets`), commit.
+4. Quản lý bấm Lưu. Trong một giao dịch: kiểm tra quyền (Q6), tạo chương trình, thêm từng khách vào danh sách (`Campaign.AddTarget`: kiểm tra lại đồng ý, khiếu nại, không trùng khách), kiểm tra danh sách không rỗng (`Campaign.EnsureHasTargets`), commit.
 
 **Luồng chính B – Ghi phản hồi (mở rộng)**
-1. Nhân viên mở chiến dịch, chọn một khách trong danh sách, chọn phản hồi: Quan tâm, Đã đặt phòng, Từ chối.
-2. Hệ thống kiểm tra chiến dịch chưa kết thúc (Q11; ghi được tới hết ngày kết thúc), ghi phản hồi, thời điểm và người ghi. Ghi lại lần sau thì thay phản hồi cũ (ví dụ Quan tâm → Đã đặt phòng).
+1. Nhân viên mở chương trình, chọn một khách trong danh sách, chọn phản hồi: Quan tâm, Đã đặt phòng, Từ chối.
+2. Hệ thống kiểm tra chương trình chưa kết thúc (Q11; ghi được tới hết ngày kết thúc), ghi phản hồi, thời điểm và người ghi. Ghi lại lần sau thì thay phản hồi cũ (ví dụ Quan tâm → Đã đặt phòng).
 3. Hệ thống cập nhật ngay số phản hồi và tỷ lệ phản hồi ở cuối danh sách.
 
 **Luồng phụ**
-- A3a. Danh sách rỗng: hệ thống báo không có khách phù hợp và không cho lưu (Q11: chiến dịch phải có ít nhất một khách; quyết định ở `docs/PROGRESS.md` mục 8); quản lý đổi phân khúc hoặc ngày.
+- A3a. Danh sách rỗng: hệ thống báo không có khách phù hợp và không cho lưu (Q11: chương trình phải có ít nhất một khách; quyết định ở `docs/PROGRESS.md` mục 8); quản lý đổi phân khúc hoặc ngày.
 - A3b. Quản lý đổi phân khúc rồi Xem trước lại: danh sách được tính lại từ đầu.
 - A4a. Giữa lúc xem trước và lúc lưu, có khách vừa mở khiếu nại hoặc vừa rút đồng ý nhận ưu đãi: bước A4 kiểm tra lại, loại khách đó, vẫn lưu các khách còn lại và báo rõ khách nào bị loại, vì sao. Nếu loại xong danh sách rỗng thì áp dụng A3a.
 
@@ -171,14 +171,16 @@ Số dư điểm = tổng mọi dòng sổ điểm của khách. Điểm đã t�
 
 | Mã | Tình huống | Ngoại lệ | Thông báo |
 |---|---|---|---|
-| E1 | Lễ tân hoặc CSKH tạo chiến dịch (Q6) | `AuthorizationException` | "Bạn không có quyền tạo chiến dịch." |
+| E1 | Lễ tân hoặc CSKH tạo chương trình (Q6) | `AuthorizationException` | "Bạn không có quyền tạo chương trình chăm sóc." |
 | E2 | Thiếu tên, ưu đãi hoặc phân khúc | `ValidationException` | "Tên chiến dịch không được để trống." / "Nội dung ưu đãi không được để trống." / "Phải chọn phân khúc khách hàng." |
 | E3 | Ngày kết thúc trước ngày bắt đầu | `ValidationException` | "Ngày kết thúc phải bằng hoặc sau ngày bắt đầu." |
 | E4 | Danh sách rỗng khi lưu (A3a) | `BusinessRuleException` | "Chiến dịch "Tri ân cuối năm" chưa có khách nào phù hợp; hãy đổi phân khúc hoặc khoảng ngày." |
 | E5 | Ghi phản hồi sau ngày kết thúc | `BusinessRuleException` | "Chiến dịch "Tri ân cuối năm" đã kết thúc ngày 31/12/2026." |
 | E6 | Ghi phản hồi cho khách không có trong danh sách | `BusinessRuleException` | "Khách 12 không có trong danh sách của chiến dịch này." |
 
-Trong A4a, `CampaignService` không để `Campaign.AddTarget` ném lỗi cho khách bị loại mà hỏi `Campaign.IsEligible` trước, gom các khách bị loại vào kết quả trả về để Form báo lại.
+Các thông báo ở E2, E4–E6 chép nguyên từ `Campaign` nên còn chữ "chiến dịch"; khi code đổi sang "chương trình" thì sửa bảng này theo.
+
+Trong A4a, `CampaignService` không để `Campaign.AddTarget` ném lỗi cho khách bị loại mà hỏi `Campaign.IsEligible` trước, gom các khách bị loại vào kết quả trả về để trang báo lại.
 
 ## 6. Kịch bản demo và rà soát chức năng phân hệ TV2 [TV2]
 Theo góp ý của thầy: có kịch bản demo nêu người dùng mong muốn gì, đi qua quy trình theo từng bước, và chỉ ra quy trình còn thiếu chức năng gì. Kịch bản được dựng với sự hỗ trợ của AI (Claude) từ prompt ở `02-bfd.md` mục 2.5; TV2 đối chiếu từng bước với BFD và quyết định.
@@ -190,7 +192,7 @@ Theo góp ý của thầy: có kịch bản demo nêu người dùng mong muốn
 | Lễ tân | Trả phòng xong không phải tự cộng điểm, tự xét hạng | F6.2.4 (Q9, L3) |
 | Lễ tân | Đổi quà thì hệ thống tự chặn khi thiếu điểm, thiếu hạng, hết quà | F7.2.2 (Q10) |
 | Quản lý | Gửi ưu đãi đúng nhóm khách, không làm phiền khách đang khiếu nại, đo được hiệu quả | F8.1 (Q11, L4), F8.2.2 (R4) |
-| Quản lý | Xem toàn cảnh một khách: chi tiêu, số ticket, mức hài lòng | F8.2.3 (R5, L6) |
+| Quản lý | Xem toàn cảnh một khách: chi tiêu, số phiếu yêu cầu, mức hài lòng | F8.2.3 (R5, L6) |
 
 ### 6.2 Kịch bản demo (khoảng 4 phút)
 Dữ liệu chuẩn bị: khách Nguyễn Văn An hạng Standard, 900 điểm đã tích; phòng 305 loại Deluxe đôi 1.250.000đ/đêm; quà "Voucher spa" 800 điểm và quà "Đêm phòng miễn phí" 2.000 điểm, cả hai hạng tối thiểu Standard.
@@ -201,15 +203,15 @@ Dữ liệu chuẩn bị: khách Nguyễn Văn An hạng Standard, 900 điểm �
 | 2 | Lễ tân | Đặt phòng 305 cho khách An từ 10/12 đến 14/12, sau đó đặt thử 11/12–13/12 cho khách khác | Booking Đã đặt, giá/đêm 1.250.000đ được chốt; lần đặt thứ hai bị chặn, thông báo nêu ngày đang bị giữ | F6.2.2, Q8 |
 | 3 | Lễ tân | Nhận phòng ngày 10/12, trả phòng ngày 14/12 | 4 đêm × 1.250.000 = 5.000.000đ → +500 điểm → 1.400 điểm, lên Silver; bên TV1 có phiếu khảo sát Chờ | F6.2.3, F6.2.4, Q9, L3 |
 | 4 | Lễ tân | Đổi "Đêm phòng miễn phí" (2.000 điểm, thiếu điểm), rồi đổi Voucher spa, rồi hủy lượt đổi | Lần đầu bị chặn; lần hai số dư 600; hủy thì số dư về 1.400, hạng vẫn Silver | F7.2.2–F7.2.4, Q10 |
-| 5 | Quản lý | Tạo chiến dịch "Sinh nhật tháng 12", Xem trước | Danh sách bỏ khách không đồng ý và khách đang có khiếu nại chưa đóng (hỏi phân hệ TV1) | F8.1.1–F8.1.3, Q11, L4 |
+| 5 | Quản lý | Tạo chương trình "Sinh nhật tháng 12", Xem trước | Danh sách bỏ khách không đồng ý và khách đang có khiếu nại chưa đóng (hỏi phân hệ TV1) | F8.1.1–F8.1.3, Q11, L4 |
 | 6 | CSKH | Ghi phản hồi "Đã đặt phòng" cho một khách | Tỷ lệ phản hồi ở cuối danh sách tăng ngay | F8.1.4 |
-| 7 | Quản lý | Mở báo cáo hiệu quả chiến dịch, dashboard 360, xuất Excel | Số liệu khớp các bước trên; file .xlsx mở được | F8.2.2–F8.2.4 |
-| 8 | Lễ tân | Thử tạo chiến dịch | Bị chặn: "Bạn không có quyền tạo chiến dịch." | Q6 |
+| 7 | Quản lý | Mở báo cáo hiệu quả chương trình, dashboard 360, xuất Excel | Số liệu khớp các bước trên; file .xlsx mở được | F8.2.2–F8.2.4 |
+| 8 | Lễ tân | Thử tạo chương trình chăm sóc | Bị chặn: "Bạn không có quyền tạo chương trình chăm sóc." | Q6 |
 
 ### 6.3 Quy trình còn thiếu chức năng gì (so với hệ thống tham khảo)
 | Chức năng hệ thống tham khảo có | Có ở | Phân hệ hiện tại | Quyết định |
 |---|---|---|---|
-| Ghi tương tác thủ công (khách gọi điện, gửi email) | HubSpot, OPERA | hồ sơ 360 chỉ có tương tác do hệ thống ghi (trả phòng, ticket đóng) | **đề xuất thêm** F5.2.5 "Ghi tương tác" trên frm201 (`Interaction` đã hỗ trợ kênh có nhân viên); chờ chốt |
+| Ghi tương tác thủ công (khách gọi điện, gửi email) | HubSpot, OPERA | hồ sơ 360 chỉ có tương tác do hệ thống ghi (trả phòng, đóng phiếu yêu cầu) | **đề xuất thêm** F5.2.5 "Ghi tương tác" trên frm201 (`Interaction` đã hỗ trợ kênh có nhân viên); chờ chốt |
 | Gộp hai hồ sơ trùng của một khách | OPERA | Q7 chặn trùng SĐT, email, giấy tờ ngay lúc nhập | không làm: chặn từ đầu thay cho gộp về sau |
 | Điểm hết hạn khi không hoạt động | Marriott Bonvoy, Hilton Honors | điểm không hết hạn | ngoài phạm vi; ghi ở hướng phát triển |
 | Gửi email/SMS tự động | HubSpot | hệ thống lập danh sách; CSKH gửi tay, ghi kênh và phản hồi | ngoài phạm vi (cần dịch vụ gửi tin bên ngoài) |
