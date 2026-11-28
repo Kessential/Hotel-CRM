@@ -12,19 +12,19 @@ _[Chung – TV1] chưa điền._
 _[TV1] chưa điền._
 
 ## 4. Quy tắc phân hệ quan hệ khách hàng Q7–Q13 [TV2]
-Thông báo lỗi của `Reward`, `Campaign`, `MembershipTier` lấy đúng từ code PR #2; của `Customer`, `Booking`, `Room` là bản tiếng Việt đề xuất, vì code v1 còn thông báo tiếng Anh và sẽ dịch ở đợt 2.
+Thông báo lỗi lấy đúng từ code: `Reward`, `Campaign`, `MembershipTier` (PR #2); `Customer`, `Interaction`, `Booking`, `Room` (đợt 2, nhánh `tv2/domain-2`).
 
-Cách cài: service tra cứu dữ liệu và kiểm quyền; lớp Domain quyết định và ném ngoại lệ. Quy tắc cần dữ liệu của nhiều đối tượng được viết thành hàm Domain nhận kết quả tra cứu làm tham số (ví dụ `Reward.EnsureCanRedeem(tier, balance)`). Mã ca test TC2-xx khớp ma trận ở `10-kiem-thu.md` mục 3. Cột "Code" cho biết lớp/hàm đã có trong PR #2 hay sẽ viết ở đợt 2 (P2) hoặc P3.
+Cách cài: service tra cứu dữ liệu và kiểm quyền; lớp Domain quyết định và ném ngoại lệ. Quy tắc cần dữ liệu của nhiều đối tượng được viết thành hàm Domain nhận kết quả tra cứu làm tham số (ví dụ `Reward.EnsureCanRedeem(tier, balance)`). Mã ca test TC2-xx khớp ma trận ở `10-kiem-thu.md` mục 3. Cột "Code" cho biết lớp/hàm Domain đã có (PR #2 hoặc đợt 2) hay sẽ viết ở P3.
 
 | Mã | Quy tắc | Liên phân hệ | Lớp quyết định | Code | Ca test |
 |---|---|---|---|---|---|
-| Q7 | Hồ sơ khách hợp lệ và không trùng | | `Person`, `Customer` | đợt 2 | TC2-01, TC2-02 |
-| Q8 | Đặt phòng, nhận, trả, hủy đúng ngày và trạng thái | | `Booking`, `Room` | có (v1), sửa ở đợt 2 | TC2-03, TC2-04 |
-| Q9 | Tích điểm theo hạng, nâng hạng không bao giờ hạ | (L2 qua Q12) | `MembershipTier`, `Customer` | `PointsFor` có; `Customer.EarnPoints` đợt 2 | TC2-05, TC2-06, TC2-11 |
+| Q7 | Hồ sơ khách hợp lệ và không trùng | | `Person`, `Customer` | có | TC2-01, TC2-02 |
+| Q8 | Đặt phòng, nhận, trả, hủy đúng ngày và trạng thái | | `Booking`, `Room` | có | TC2-03, TC2-04 |
+| Q9 | Tích điểm theo hạng, nâng hạng không bao giờ hạ | (L2 qua Q12) | `MembershipTier`, `Customer` | có | TC2-05, TC2-06, TC2-11 |
 | Q10 | Đổi quà đúng điều kiện, điểm chốt lúc đổi | | `Reward`, `RewardRedemption`, `PointTransaction` | có | TC2-06, TC2-07, TC2-14 |
 | Q11 | Chọn khách cho chiến dịch, ghi phản hồi đúng hạn | ✓ L4 (`ITicketQuery`) | `Campaign`, `ISegmentStrategy` | có | TC2-08, TC2-09, TC2-14 |
 | Q12 | Đóng ticket → điểm thiện chí, cùng giao dịch | ✓ L2 (`ITicketObserver`) | `GoodwillPointsObserver`, `PointTransaction` | `ForGoodwill` có; observer P3 | integration L2 của TV1 |
-| Q13 | Không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch | ✓ L5 (`ITicketQuery`) | `Customer` | đợt 2 | TC2-10 |
+| Q13 | Không xóa khách đã có lưu trú, ticket hoặc đã nằm trong chiến dịch | ✓ L5 (`ITicketQuery`) | `Customer` | có | TC2-10 |
 
 ### Q7 – Hồ sơ khách hợp lệ và không trùng
 - **Phát biểu:**
@@ -77,7 +77,7 @@ Cách cài: service tra cứu dữ liệu và kiểm quyền; lớp Domain quy�
 - **Vi phạm:** số tiền âm → `ValidationException` ("Số tiền tính điểm không được âm."). Điểm tính ra bằng 0 thì không ghi dòng sổ điểm (dòng sổ điểm phải khác 0); không coi là lỗi.
 - **Lớp/hàm:**
   - `MembershipTier.PointsFor(amountVnd)` (đã có), `EarnRate` của 4 lớp hạng (đã có).
-  - `Customer.EarnPoints(points)`: cộng điểm đã tích, xét hạng bằng `Next()` (đợt 2).
+  - `Customer.EarnPoints(points)`: cộng điểm đã tích, xét hạng bằng `Next()`, trả `true` nếu lên hạng (đã có).
   - `PointTransaction.ForStay` (đã có).
 - **Liên phân hệ:** không trực tiếp; điểm thiện chí từ L2 đi qua Q12 rồi dùng chung `Customer.EarnPoints`.
 - **Ca test:** `MembershipTierTests` (đã có, 11 trường hợp); TC2-05, TC2-06, TC2-11.
@@ -104,6 +104,8 @@ Cách cài: service tra cứu dữ liệu và kiểm quyền; lớp Domain quy�
   - Mỗi khách xuất hiện một lần trong một chiến dịch. Chiến dịch phải có ít nhất một khách.
   - Ngày kết thúc ≥ ngày bắt đầu.
   - Phản hồi ghi được tới hết ngày kết thúc; ghi lại thì thay phản hồi cũ.
+  - Phản hồi ghi được cả trước ngày bắt đầu: ưu đãi được gửi ngay khi lưu chiến dịch, nên khách nhận được là trả lời được (TV1 góp ý ở PR #2, TV2 giữ có chủ ý).
+  - "Tỷ lệ phản hồi" cuối BM7/frm206 (`Campaign.ResponseRate`) đếm mọi phản hồi, kể cả Từ chối. Tỷ lệ quan tâm và tỷ lệ đặt phòng của R4 do truy vấn báo cáo đếm từ `campaign_targets`.
   - Lúc lưu, khách nào vừa trở nên không đủ điều kiện thì bị loại, các khách còn lại vẫn được lưu và hệ thống báo khách bị loại.
   - Hai điểm "ít nhất một khách" và "loại khách lúc lưu" là quyết định ở `docs/PROGRESS.md` mục 8.
 - **Tiền điều kiện:** tạo chiến dịch cần Quản lý hoặc Admin; ghi phản hồi thì mọi vai trò làm được (Q6).
@@ -130,6 +132,7 @@ Cách cài: service tra cứu dữ liệu và kiểm quyền; lớp Domain quy�
   - TV2: `GoodwillPointsObserver`, `InteractionLogger` (P3), `PointTransaction.ForGoodwill` (đã có).
   - TV1: `SupportTicket.GoodwillPoints` (số điểm theo loại ticket).
   - Observer chỉ làm việc khi trạng thái mới là Đã đóng.
+  - Tương tác do observer ghi có kênh Hệ thống (`System`) và không gắn nhân viên. `Interaction` bắt buộc: kênh `System` ⇔ không có `EmployeeId`; tương tác ghi tay (Lễ tân, Điện thoại, Email) phải có nhân viên ghi nhận (`ValidationException`).
 - **Liên phân hệ (L2):** nhận sự kiện qua `ITicketObserver` (TV1 khai báo, TV2 cài).
 - **Ca test:** integration của TV1 cho luồng L2 (đầy đủ và rollback).
 - **Giá trị biên:** không có.
@@ -142,10 +145,10 @@ Cách cài: service tra cứu dữ liệu và kiểm quyền; lớp Domain quy�
 - **Tiền điều kiện:** người thao tác là Quản lý hoặc Admin (Q6).
 - **Hậu điều kiện:** khách bị xóa, hoặc không có gì thay đổi.
 - **Vi phạm:** còn booking, ticket hoặc chiến dịch → `BusinessRuleException` nêu lý do, ví dụ "Không xóa được khách đã có lần đặt phòng, ticket hoặc đã nằm trong chiến dịch chăm sóc."; thiếu quyền → `AuthorizationException`. Khóa ngoại `ON DELETE RESTRICT` là lớp chặn thứ hai ở CSDL.
-- **Lớp/hàm:** `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)` (đợt 2; bản v1 chỉ xét ticket chưa đóng). `CustomerService` tra cứu ba giá trị rồi gọi hàm này; `hasStays` và `inCampaigns` đọc từ bảng của TV2 (`bookings`, `campaign_targets`).
+- **Lớp/hàm:** `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)` (đã có; bản v1 chỉ xét ticket chưa đóng). `CustomerService` tra cứu ba giá trị rồi gọi hàm này; `hasStays` và `inCampaigns` đọc từ bảng của TV2 (`bookings`, `campaign_targets`).
 - **Liên phân hệ (L5):** "khách có ticket không" hỏi phân hệ TV1 qua `ITicketQuery.HasAnyTicket`.
 - **Ca test:** TC2-10.
 - **Giá trị biên:** không có booking, ticket, chiến dịch (xóa được) / 1 booking Đã hủy (lỗi) / 1 ticket Đã đóng (lỗi) / chỉ nằm trong 1 chiến dịch, chưa phản hồi (lỗi).
 
 ### Việc phát sinh cho code [TV2]
-- Đợt 2 (`Customer`, `Booking`): cài Q7 theo quốc tịch, Q9 `EarnPoints`, Q13 theo `hasStays`/`hasTickets`/`inCampaigns`, `Booking.CheckOut(now)`.
+- ~~Đợt 2 (`Customer`, `Booking`): cài Q7 theo quốc tịch, Q9 `EarnPoints`, Q13 theo `hasStays`/`hasTickets`/`inCampaigns`, `Booking.CheckOut(now)`.~~ Xong 26/11 (nhánh `tv2/domain-2`); còn `Receptionist`, chờ TV1 viết lại `Employee`.

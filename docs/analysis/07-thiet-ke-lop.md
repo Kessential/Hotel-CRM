@@ -12,16 +12,16 @@ _[Chung – TV1] chưa điền._
 _[TV1] chưa điền._
 
 ## 4. Lớp phân hệ quan hệ khách hàng [TV2]
-Sơ đồ: `diagrams/class-tv2.iuml`. Cột "Trạng thái": «đã có» là lớp đã có code (PR #2); các lớp còn lại là thiết kế cho đợt 2 (P2) và P3.
+Sơ đồ: `diagrams/class-tv2.iuml`. Cột "Trạng thái": «đã có» là lớp đã có code (PR #2 hoặc đợt 2, nhánh `tv2/domain-2`); các lớp còn lại là thiết kế cho P2–P3.
 
 ### 4.1 Lớp Domain
 | Lớp | Vai trò | Hành vi chính (quyết định quy tắc) | Trạng thái |
 |---|---|---|---|
-| `Customer` : `Person` | hồ sơ khách | `UpdateProfile`, `EnsureUnique` (Q7), `EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)` (Q13), `EarnPoints` (Q9: cộng điểm đã tích, nâng hạng bằng `Next()`, trả `true` nếu lên hạng) | đợt 2 |
-| `MembershipTier` (abstract) + `StandardTier`, `SilverTier`, `GoldTier`, `VipTier` | hạng, mỗi hạng tự trả số liệu của mình | `PointsFor`, `IsAtLeast`, `Next` | đã có |
-| `Interaction` | một lần liên hệ với khách | kiểm tra nội dung không rỗng | đợt 2 |
-| `RoomType`, `Room` | danh mục phòng (kết tập ◇) | `Room.EnsureAvailable` (Q8) | có (v1), sửa đợt 2 |
-| `Booking` | một lần đặt/ở | constructor chốt `RatePerNight` (Q8); `CheckIn(now)`, `CheckOut(now)`, `Cancel()`; `Nights`, `TotalAmount` | sửa đợt 2 |
+| `Customer` : `Person` | hồ sơ khách | `UpdateProfile`, `EnsureUnique` (Q7), `EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)` (Q13), `EarnPoints` (Q9: cộng điểm đã tích, nâng hạng bằng `Next()`, trả `true` nếu lên hạng) | đã có |
+| `MembershipTier` (abstract) + `StandardTier`, `SilverTier`, `GoldTier`, `VipTier` | hạng, mỗi hạng tự trả số liệu của mình | `PointsFor`, `IsAtLeast`, `Next`; `FromName` đi dọc chuỗi `Next()` nên thêm hạng không phải sửa nó | đã có |
+| `Interaction` | một lần liên hệ với khách | nội dung không rỗng; kênh `System` ⇔ không có nhân viên | đã có |
+| `RoomType`, `Room` | danh mục phòng (kết tập ◇) | `Room.EnsureAvailable` (Q8, nêu ngày của booking đang giữ phòng) | đã có |
+| `Booking` | một lần đặt/ở | constructor chốt `RatePerNight` (Q8); `CheckIn(now)`, `CheckOut(now)`, `Cancel()`; `Nights`, `TotalAmount` | đã có |
 | `PointTransaction` | một dòng sổ điểm | 4 hàm `For…` bảo đảm đúng liên kết theo lý do | đã có |
 | `Reward`, `RewardRedemption` | quà, lượt đổi | `EnsureCanRedeem`, `Redeem`, `CancelRedemption` (Q10) | đã có |
 | `Campaign`, `CampaignTarget` (hợp thành ◆) | chiến dịch, khách nhận | `IsEligible`, `AddTarget`, `EnsureHasTargets`, `RecordResponse` (Q11) | đã có |

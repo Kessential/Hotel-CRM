@@ -8,7 +8,7 @@ namespace HotelCRM.Business.Observers;
 /// <summary>
 /// Observer that rewards the customer when one of their tickets is closed (rule 8): when the new
 /// state's <see cref="TicketState.IsClosed"/> is true it adds <see cref="SupportTicket.GoodwillPoints"/>
-/// with <see cref="Customer.AddPoints"/> and saves the customer through the repository itself.
+/// with <see cref="Customer.EarnPoints"/> and saves the customer through the repository itself.
 /// Other state changes are ignored.
 /// </summary>
 public sealed class LoyaltyObserver : ITicketObserver

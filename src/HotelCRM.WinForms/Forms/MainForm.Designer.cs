@@ -34,12 +34,7 @@ partial class MainForm
         mnuNewTicket = new ToolStripMenuItem();
         mnuTicketDetails = new ToolStripMenuItem();
         mnuCustomers = new ToolStripMenuItem();
-        mnuCustomerList = new ToolStripMenuItem();
-        mnuNewCustomer = new ToolStripMenuItem();
-        mnuCustomerHistory = new ToolStripMenuItem();
         mnuRecordSurvey = new ToolStripMenuItem();
-        mnuBookings = new ToolStripMenuItem();
-        mnuManageBookings = new ToolStripMenuItem();
         mnuReports = new ToolStripMenuItem();
         mnuViewReports = new ToolStripMenuItem();
         mnuAccount = new ToolStripMenuItem();
@@ -56,7 +51,7 @@ partial class MainForm
         //
         // mnuMain
         //
-        mnuMain.Items.AddRange(new ToolStripItem[] { mnuTickets, mnuCustomers, mnuBookings, mnuReports, mnuAccount });
+        mnuMain.Items.AddRange(new ToolStripItem[] { mnuTickets, mnuCustomers, mnuReports, mnuAccount });
         mnuMain.Location = new Point(0, 0);
         mnuMain.Name = "mnuMain";
         mnuMain.Size = new Size(784, 24);
@@ -93,31 +88,10 @@ partial class MainForm
         //
         // mnuCustomers
         //
-        mnuCustomers.DropDownItems.AddRange(new ToolStripItem[] { mnuCustomerList, mnuNewCustomer, mnuCustomerHistory, mnuRecordSurvey });
+        mnuCustomers.DropDownItems.AddRange(new ToolStripItem[] { mnuRecordSurvey });
         mnuCustomers.Name = "mnuCustomers";
         mnuCustomers.Size = new Size(76, 20);
         mnuCustomers.Text = "&Customers";
-        //
-        // mnuCustomerList
-        //
-        mnuCustomerList.Name = "mnuCustomerList";
-        mnuCustomerList.Size = new Size(180, 22);
-        mnuCustomerList.Text = "Customer &List";
-        mnuCustomerList.Click += mnuCustomerList_Click;
-        //
-        // mnuNewCustomer
-        //
-        mnuNewCustomer.Name = "mnuNewCustomer";
-        mnuNewCustomer.Size = new Size(180, 22);
-        mnuNewCustomer.Text = "&New Customer";
-        mnuNewCustomer.Click += mnuNewCustomer_Click;
-        //
-        // mnuCustomerHistory
-        //
-        mnuCustomerHistory.Name = "mnuCustomerHistory";
-        mnuCustomerHistory.Size = new Size(180, 22);
-        mnuCustomerHistory.Text = "Interaction &History";
-        mnuCustomerHistory.Click += mnuCustomerHistory_Click;
         //
         // mnuRecordSurvey
         //
@@ -125,20 +99,6 @@ partial class MainForm
         mnuRecordSurvey.Size = new Size(180, 22);
         mnuRecordSurvey.Text = "Record &Survey";
         mnuRecordSurvey.Click += mnuRecordSurvey_Click;
-        //
-        // mnuBookings
-        //
-        mnuBookings.DropDownItems.AddRange(new ToolStripItem[] { mnuManageBookings });
-        mnuBookings.Name = "mnuBookings";
-        mnuBookings.Size = new Size(68, 20);
-        mnuBookings.Text = "&Bookings";
-        //
-        // mnuManageBookings
-        //
-        mnuManageBookings.Name = "mnuManageBookings";
-        mnuManageBookings.Size = new Size(180, 22);
-        mnuManageBookings.Text = "&Manage Bookings";
-        mnuManageBookings.Click += mnuManageBookings_Click;
         //
         // mnuReports
         //
@@ -248,12 +208,7 @@ partial class MainForm
     private ToolStripMenuItem mnuNewTicket;
     private ToolStripMenuItem mnuTicketDetails;
     private ToolStripMenuItem mnuCustomers;
-    private ToolStripMenuItem mnuCustomerList;
-    private ToolStripMenuItem mnuNewCustomer;
-    private ToolStripMenuItem mnuCustomerHistory;
     private ToolStripMenuItem mnuRecordSurvey;
-    private ToolStripMenuItem mnuBookings;
-    private ToolStripMenuItem mnuManageBookings;
     private ToolStripMenuItem mnuReports;
     private ToolStripMenuItem mnuViewReports;
     private ToolStripMenuItem mnuAccount;

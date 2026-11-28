@@ -30,8 +30,8 @@ Unit test không cần CSDL, dùng Fake cho interface của phân hệ TV1 và `
 
 **Trạng thái so với code:**
 - Đã có test trong PR #2: TC2-05 (phần `MembershipTierTests`, 11 trường hợp), TC2-07 (`RewardTests` 6, `PointTransactionTests` 3), TC2-08 (`SegmentStrategyTests` 11), phần Domain của TC2-09 (`CampaignTests` 10).
-- Có từ v1, sửa ở đợt 2: TC2-01, TC2-02 (`Register_DuplicatePhone_ThrowsBusinessRule`), TC2-03 (`Book_OverlappingDates_ThrowsBusinessRule`), TC2-10 (`Delete_CustomerWithOpenTicket_ThrowsBusinessRule`, đổi theo Q13 mới).
-- Chưa có: TC2-04, TC2-06, phần service của TC2-09 (P3), TC2-11…TC2-14 (P3–P4).
+- Đợt 2 (nhánh `tv2/domain-2`, viết lại thay test v1): TC2-01 và TC2-02 (`CustomerTests`), phần `CustomerTests` của TC2-05, TC2-03 (`RoomTests`), TC2-04 (`BookingTests`), phần Domain của TC2-10 (`CustomerTests`, có ca "chỉ nằm trong chiến dịch"). Thêm `InteractionTests`.
+- Chưa có: TC2-06, phần service của TC2-09 và TC2-10 (P3), TC2-11…TC2-14 (P3–P4).
 - Ngoài 14 mã trên, PR #2 có thêm test hỗ trợ (`PointTransactionTests`, phần `CampaignTests` về ngày kết thúc và tỷ lệ phản hồi). Đếm theo định mức thì tính 14 mã TC2.
 - Ca dùng Fake interface của TV1: TC2-09, TC2-10 (`FakeTicketQuery`), TC2-12 (`FakeSurveyScheduler`), TC2-13 (`FakeCustomerCareStats`).
 

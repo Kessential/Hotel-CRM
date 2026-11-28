@@ -62,7 +62,7 @@ Sơ đồ: `diagrams/erd-tv2.iuml`.
 | OccurredAt | TEXT | NOT NULL |
 | Channel | TEXT | NOT NULL, `CHECK (Channel IN ('FrontDesk', 'Phone', 'Email', 'System'))` |
 | Summary | TEXT | NOT NULL |
-| EmployeeId | INTEGER | NULL, FK → `employees` RESTRICT; NULL = hệ thống tự ghi (observer) |
+| EmployeeId | INTEGER | NULL, FK → `employees` RESTRICT; NULL = hệ thống tự ghi (observer); `CHECK ((Channel = 'System') = (EmployeeId IS NULL))`, khớp constructor `Interaction` |
 | TicketId | INTEGER | NULL, FK → `tickets` RESTRICT; có khi tương tác do đóng ticket (Q12) |
 
 **`room_types`**: Id PK; Name TEXT NOT NULL UNIQUE; PricePerNight INTEGER NOT NULL `CHECK (> 0)`; Capacity INTEGER NOT NULL `CHECK (> 0)`.
