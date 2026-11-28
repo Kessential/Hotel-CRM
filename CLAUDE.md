@@ -27,7 +27,7 @@ dotnet publish src/HotelCRM.WinForms -c Release -r win-x64 --self-contained -p:P
 dotnet run tools/HashPassword.cs -- <mật khẩu>
 java -jar tools/plantuml.jar -tpng docs/analysis/diagrams/*.puml
 ```
-- Tên project giữ như hiện tại tới P2. Ở P2 (1/12) đổi `HotelCRM.WinForms` → `HotelCRM.GUI` (ASP.NET Core Razor Pages, `net10.0`), `HotelCRM.Business` → `HotelCRM.BLL`, `HotelCRM.Data` → `HotelCRM.DAL`, bằng một commit chỉ có `git mv` và sửa `.sln`/`.csproj`. Từ đó lệnh chạy là `dotnet run --project src/HotelCRM.GUI` rồi mở `http://localhost:5080` (cổng trong `appsettings.json`, chỉ nghe localhost, HTTP); đóng gói `dotnet publish src/HotelCRM.GUI -c Release -r win-x64 --self-contained` (thêm `-r linux-x64` khi cần).
+- Giao diện web là project mới `HotelCRM.GUI` (ASP.NET Core Razor Pages, `net10.0`; TV2 tạo 28/11, PR #10); project `HotelCRM.WinForms` bị xoá ở P2 (1/12). Cũng ở P2 đổi `HotelCRM.Business` → `HotelCRM.BLL`, `HotelCRM.Data` → `HotelCRM.DAL`, bằng một commit chỉ có `git mv` và sửa `.sln`/`.csproj`. Lệnh chạy bản web là `dotnet run --project src/HotelCRM.GUI` rồi mở `http://localhost:5080` (cổng trong `appsettings.json`, chỉ nghe localhost, HTTP); đóng gói `dotnet publish src/HotelCRM.GUI -c Release -r win-x64 --self-contained` (thêm `-r linux-x64` khi cần).
 - `HashPassword` sinh `PasswordHash` và `Salt` (PBKDF2): hiện cho `employees.json`, từ P2 cho `Database/seed.sql`. Tài khoản mẫu ghi trong `README.md`.
 - `tools/plantuml.jar` chưa có trong repo; tải khi người dùng đồng ý (xem "Việc chờ người" trong `docs/PROGRESS.md`).
 
@@ -83,7 +83,7 @@ Chữ ký chốt ở M6 (27/11). Bên dùng viết file khai báo, bên kia cài
   - BLL: `AuthService`, `EmployeeService`, `TicketService`, `SurveyService`, `CustomerCareReportService`, `Factories/**`, `TicketQuery`, `SurveyScheduler`, `CustomerCareStats`.
   - DAL: `Sqlite/**` (kết nối, UnitOfWork, tạo CSDL, nạp seed); repository và truy vấn báo cáo cho 7 bảng `departments`, `employees`, `tickets`, `ticket_logs`, `survey_criteria`, `surveys`, `survey_answers`.
   - Database: khung `schema.sql`/`seed.sql` + 7 bảng trên.
-  - GUI: `Program.cs` (khung), `_Layout` (thanh bên thu gọn, menu theo vai trò, thanh trên, toast), đăng nhập cookie, `ErrorHandler`, trang lỗi chung, frm000, frm001, frm101–frm106.
+  - GUI: dòng đăng ký của mình trong `Program.cs` (đăng nhập cookie, `UnitOfWork` theo request, service TV1), đăng nhập cookie, `ErrorHandler` (đẩy thông báo lỗi ra toast, trang lỗi chung), frm000, nội dung trang chủ frm001, frm101–frm106.
   - Tests: 10 unit + 4 integration của TV1; `FakeCustomerDirectory`, `FakeStayLookup`.
   - Tài liệu và slide: phần chung (4W+1H, cây BFD, sơ đồ UC tổng, DFD ngữ cảnh + mức 0, ma trận quyền, kiến trúc/package) + phân hệ TV1.
 - **TV2** (`munn8726`), Quan hệ khách hàng & khách hàng thân thiết:
@@ -92,7 +92,7 @@ Chữ ký chốt ở M6 (27/11). Bên dùng viết file khai báo, bên kia cài
   - BLL: `CustomerService`, `StayService`, `LoyaltyService`, `CampaignService`, `CustomerReportService`, `DashboardService`, `CustomerDirectory`, `StayLookup`, `Observers/**`, `Segments/**`, `ExcelReportExporter`.
   - DAL: repository và truy vấn báo cáo cho 10 bảng `customers`, `interactions`, `room_types`, `rooms`, `bookings`, `point_transactions`, `rewards`, `reward_redemptions`, `campaigns`, `campaign_targets`.
   - Database: 10 bảng trên trong `schema.sql`/`seed.sql`.
-  - GUI: frm201–frm207; thành phần giao diện dùng chung (bảng có phân trang, sắp xếp, chọn cột, tiêu đề cố định; thanh lọc có "Xóa lọc"; khung modal; báo lỗi cạnh ô; nhãn trạng thái; ô số liệu; `site.css`); hàm định dạng tiền/ngày; hàm vẽ Chart.js dùng chung. Hạn 7/12.
+  - GUI: khung web (project `HotelCRM.GUI`, khung `Program.cs`, `_Layout` gồm thanh bên thu gọn và thanh trên, menu `Navigation/AppMenu.cs` và lọc menu theo vai trò, toast, `site.js`; chuyển từ TV1 sang ngày 28/11); frm201–frm207; thành phần giao diện dùng chung (bảng có phân trang, sắp xếp, chọn cột, tiêu đề cố định; thanh lọc có "Xóa lọc"; khung modal; báo lỗi cạnh ô; nhãn trạng thái; ô số liệu; `site.css`); hàm định dạng tiền/ngày; hàm vẽ Chart.js dùng chung. Hạn 7/12.
   - Tests: 10 unit + 4 integration của TV2; `FakeTicketQuery`, `FakeSurveyScheduler`, `FakeCustomerCareStats`; hạ tầng integration test dùng chung (CSDL SQLite tạm từ `schema.sql` + `seed.sql`, `FixedClock`).
   - Tài liệu và slide: phân hệ TV2; biên dịch slide (máy có TeX).
 - **Dùng chung:** `Program.cs` mỗi người thêm dòng đăng ký của mình. Sơ đồ chung (ERD, lớp) tách `-tv1.iuml`, `-tv2.iuml` rồi `!include` vào một file `.puml`. `CLAUDE.md`, `.claude/rules/**`, `docs/PLAN.md` sửa qua PR có cả hai duyệt. `docs/PROGRESS.md` mỗi người cập nhật dòng của mình trong PR của mình.
@@ -101,7 +101,7 @@ Chữ ký chốt ở M6 (27/11). Bên dùng viết file khai báo, bên kia cài
 - Nhánh tích hợp `v2`. Nhánh việc `tv1/<việc>`, `tv2/<việc>` tạo từ `v2`, mở PR vào `v2`. Người kia đọc, chạy thử, comment rồi mới merge, trong 24 giờ. Mỗi người ≥ 2 PR được merge. Không force-push `v2`. Cuối cùng merge `v2` → `main`.
 - Ai viết code thì người đó commit bằng tài khoản mình, trên máy mình. Không làm hộ, không chuyển code của người này sang cho người kia commit.
 - Mỗi module một commit, message tiếng Anh. Commit message không kèm dòng `Co-Authored-By` hay dòng quảng cáo công cụ nào; việc dùng Claude được nêu trong README và báo cáo.
-- Đo `git blame` (bỏ `*.Designer.cs` và tài liệu) vào các mốc 28/11, 4/12, 6/12, 9/12, 13/12: mỗi người phải viết 40–60% code logic. Giữ blame: đổi tên project bằng commit chỉ có `git mv`; không chạy định dạng hay refactor hàng loạt lên file của người kia; ai mở PR thì tự rebase và giải xung đột trong file của mình.
+- Đo `git blame` trên các file `.cs`, `.cshtml`, `.js`, `.css` (bỏ `wwwroot/lib`, `*.Designer.cs` và tài liệu) vào các mốc 28/11, 4/12, 6/12, 9/12, 13/12: mỗi người phải viết 40–60% code logic. Giữ blame: đổi tên project bằng commit chỉ có `git mv`; không chạy định dạng hay refactor hàng loạt lên file của người kia; ai mở PR thì tự rebase và giải xung đột trong file của mình.
 
 ## Luật làm việc
 - **Không tự commit, không tự push, không tự merge PR.** Đến điểm dừng thì đề xuất danh sách commit (message tiếng Anh); chỉ làm khi người dùng đồng ý.

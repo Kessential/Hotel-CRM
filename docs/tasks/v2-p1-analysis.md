@@ -32,13 +32,13 @@ Ngày 26/11 thầy yêu cầu đổi giao diện sang web; quyết định chố
 ### 1.5 Danh mục dùng chung để hai người vẽ khớp nhau
 **Tác nhân (Use Case, DFD):** Quản trị hệ thống (Admin), Quản lý, Lễ tân, Nhân viên CSKH; tác nhân ngoài cho DFD: Khách hàng.
 
-**Tiến trình DFD mức 0** (trùng 8 nhánh BFD): 1.0 Hệ thống & nhân sự · 2.0 Tiếp nhận yêu cầu · 3.0 Điều phối & xử lý · 4.0 Đánh giá hài lòng · 5.0 Hồ sơ khách hàng 360 · 6.0 Lưu trú · 7.0 Khách hàng thân thiết · 8.0 Chiến dịch & báo cáo khách hàng.
+**Tiến trình DFD mức 0** (trùng 8 nhánh BFD): 1.0 Hệ thống & nhân sự · 2.0 Tiếp nhận yêu cầu · 3.0 Điều phối & xử lý · 4.0 Đánh giá hài lòng · 5.0 Hồ sơ khách hàng 360 · 6.0 Lưu trú · 7.0 Khách hàng thân thiết · 8.0 Chương trình chăm sóc & báo cáo khách hàng.
 
 **Kho dữ liệu DFD** (khớp bảng ở PLAN 5.2):
 | Mã | Kho | Bảng | Chủ |
 |---|---|---|---|
 | D1 | Nhân viên & phòng ban | `departments`, `employees` | TV1 |
-| D2 | Ticket | `tickets` | TV1 |
+| D2 | Phiếu yêu cầu | `tickets` | TV1 |
 | D3 | Nhật ký xử lý | `ticket_logs` | TV1 |
 | D4 | Khảo sát | `survey_criteria`, `surveys`, `survey_answers` | TV1 |
 | D5 | Khách hàng | `customers` | TV2 |
@@ -47,7 +47,7 @@ Ngày 26/11 thầy yêu cầu đổi giao diện sang web; quyết định chố
 | D8 | Lưu trú | `bookings` | TV2 |
 | D9 | Sổ điểm | `point_transactions` | TV2 |
 | D10 | Quà tặng & lượt đổi | `rewards`, `reward_redemptions` | TV2 |
-| D11 | Chiến dịch | `campaigns`, `campaign_targets` | TV2 |
+| D11 | Chương trình chăm sóc | `campaigns`, `campaign_targets` | TV2 |
 
 **Mã ca test:** TV1 `TC1-01` … `TC1-14` (01–10 unit, 11–14 integration); TV2 `TC2-01` … `TC2-14` (cùng cách chia).
 

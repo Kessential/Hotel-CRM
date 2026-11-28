@@ -44,8 +44,8 @@ Lịch: giữ hạn slide 30/11, TV1 làm dồn phần mình của M2–M8 trong
 - [x] Đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md`, `docs/PROGRESS.md`, file task P1 (27/11) — PR `tv1/web-plan`, chờ TV2 review
 
 **Nền chung (P2, 1–4/12)**
-- [ ] Đổi tên project thành `HotelCRM.GUI` (Razor Pages), `HotelCRM.BLL`, `HotelCRM.DAL` bằng commit chỉ có `git mv`; xoá code v1 không còn dùng (WinForms, JSON, `UserSession`, `UiNotificationObserver`); thêm `Database/`, `Resource/` (1/12)
-- [ ] Khung web: `_Layout` (thanh bên thu gọn, menu theo vai trò, thanh trên, toast), đăng nhập cookie (frm000), trang chủ khung (frm001), trang lỗi chung; đưa lên trước 2/12
+- [ ] Đổi tên project thành `HotelCRM.BLL`, `HotelCRM.DAL` bằng commit chỉ có `git mv`; xoá code v1 không còn dùng của TV1 (WinForms, JSON, 3 strategy phân công cũ, `UserSession`, `UiNotificationObserver`); thêm `Database/`, `Resource/` (1/12)
+- [ ] Trên khung web của TV2: đăng nhập cookie (frm000), nội dung trang chủ (frm001), trang lỗi chung; đưa lên trước 2/12
 - [ ] SQLite: kết nối, `UnitOfWork` theo từng request, WAL + `busy_timeout`, tạo CSDL từ `schema.sql` + nạp `seed.sql`; một repository mẫu để TV2 làm theo
 - [ ] Cây ngoại lệ, `ErrorHandler` tiếng Việt, `appsettings.json` + file mẫu (có `Urls`), bỏ Singleton, `IClock`
 - [ ] `Employee` + `Administrator`, `Manager`, `Agent`
@@ -138,7 +138,7 @@ Các dòng dưới chưa sửa theo quyết định chuyển sang web (phần d�
 |---|---|---|
 | PR #2 `tv2/domain` → `v2` (Domain P2 đợt 1: hệ số tích điểm, sổ điểm, đổi quà, chiến dịch, 3 phân khúc + test) | TV2 mở 25/11, TV1 review | TV1 approve 26/11, góp ý 5 điểm không chặn merge (sửa ở đợt 2); chờ TV2 merge |
 | PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | đã rebase lên `v2` (`37884a0`) và sửa theo khung của `docs/tasks/v2-p1-analysis.md` (25/11); TV1 approve 26/11, đồng ý 7 điểm hỏi; TV2 đã sửa 3 việc trước khi merge (mục 8, Q13, tiêu đề PR) (26/11); chờ TV2 merge |
-| PR `tv1/web-plan` → `v2` (đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md`, `docs/PROGRESS.md`, file task P1) | TV1 mở 27/11, TV2 review | chờ TV2 review |
+| PR `tv1/web-plan` → `v2` (đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md`, `docs/PROGRESS.md`, file task P1) | TV1 mở 27/11, TV2 review | TV2 yêu cầu sửa 3 việc + 3 góp ý nhỏ (27/11); TV1 đã sửa (28/11), chờ TV2 duyệt lại |
 | M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | TV2: phần mình nằm trong PR #3 (M2–M8); TV1: làm 27/11, mục 6 phi chức năng viết thẳng bản web |
 | Sửa tài liệu P1 phần TV2 theo web: `09-giao-dien.md` mục 1 (16 lựa chọn giao diện) và tên trang frm201–frm207; `08-hanh-vi.md` mục 3.3 (Call Stack `OnPostCheckOut`); cột Form của BM6, BM7 trong `01-khao-sat.md`; F8 "chiến dịch" → "chương trình chăm sóc"; boundary `frm203_nv_stay` trong `seq-l3-checkout.puml` | TV2 | trước slide 30/11 |
 | Sửa đường dẫn trong slide: `sec1`, `sec3`, `sec5`, `sec6` còn trỏ `docs/PLAN.md` (v1), `docs/PROGRESS.md` (v1), `docs/tasks/stage-*.md` — các file này đã xóa (bản v1 chỉ còn trong lịch sử git, `fd7b7e4`) | TV2 | làm ở M9 |
@@ -150,7 +150,7 @@ Các dòng dưới chưa sửa theo quyết định chuyển sang web (phần d�
 | Ảnh/bản mẫu biểu mẫu thật BM4–BM7 | TV2 | 23/11 | quá hạn, chưa có |
 | Tải `plantuml.jar` vào `tools/` / dùng công cụ khác / để TV2 xuất ảnh | TV1 + TV2 | 28/11 (trước khi xuất ảnh M3–M7) | chưa quyết |
 | Cài Java (PlantUML cần Java; máy TV1 chưa có `java`); không cần nếu TV2 xuất ảnh | TV1 | 28/11 | chưa làm |
-| Thầy có tính file `.cshtml` vào `git blame` không | TV1 hỏi thầy | trước 4/12 | chưa hỏi |
+| Thầy có tính file `.cshtml` vào `git blame` không | TV1 hỏi thầy | trước 4/12 | chưa hỏi; trong lúc chờ, nhóm tự đo cả `.cshtml`, `.js`, `.css` (PLAN 3.1) |
 | ~~Dời lịch M2–M9 hay giữ~~ | TV1 + TV2 | 26/11 | xong 27/11: giữ hạn slide 30/11, TV1 làm dồn M2–M8 trong 27–29/11 |
 | ~~Đối chiếu HuongdanXDHTTTQL: cây BFD 3 nhánh chung hay 8 nhánh theo phân hệ~~ | TV1 + TV2 | M3 | xong 27/11: giữ 8 nhánh theo phân hệ, ghi đối chiếu ở `02-bfd.md` mục 3 |
 | ~~Đối chiếu HuongdanXDHTTTQL: tên Form đánh số liên tiếp hay theo người~~ | TV1 + TV2 | M8 | xong 27/11: theo người, tên tiếng Anh (`docs/PLAN.md` mục 5.1) |
@@ -180,7 +180,7 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 27/11 | TV1 | Tên trang chốt tiếng Anh theo khung slide: `frm000_login` … `frm207_bc_customer_360`; giữ BFD 8 nhánh; bỏ `Dlllib`, tên solution kèm phiên bản, tên bảng viết hoa (PLAN 5.1, 5.6) | slide cho phép tiếng Anh; code đã toàn tiếng Anh | TV1 + TV2 (27/11) |
 | 27/11 | TV1 | Chữ trên giao diện và tài liệu: "Phiếu yêu cầu" (code `SupportTicket`), "Chương trình chăm sóc" (code `Campaign`); đổi tên nút lá BFD và UC theo (PLAN 4.2, 4.3) | khớp menu với BFD/UC (tiêu chí 3.1) | TV1 + TV2 (27/11) |
 | 27/11 | TV1 | TV2 nhận thêm phần dùng chung giao diện và hạ tầng integration test, hạn 7/12 (PLAN 6.2, 6.5) | cân `git blame`; hai phân hệ trông như một | TV1 + TV2 (27/11) |
-| 27/11 | TV1 | Mốc đo `git blame`: 28/11, 4/12, 6/12, 9/12, 13/12 thay cho mỗi Chủ nhật; luật giữ blame (PLAN 3.1, 6.6, 7) | phát hiện lệch sớm hơn | TV1 + TV2 (27/11) |
+| 27/11 | TV1 | Mốc đo `git blame`: 28/11, 4/12, 6/12, 9/12, 13/12 thay cho mỗi Chủ nhật; đo trên `.cs`, `.cshtml`, `.js`, `.css`, bỏ `wwwroot/lib`, `*.Designer.cs` và tài liệu; luật giữ blame (PLAN 3.1, 6.6, 7) | phát hiện lệch sớm hơn; phần dùng chung của TV2 phần lớn là `.cshtml`/`.css`/`.js` (TV2 đề nghị ở review PR #6) | TV1 + TV2 (27/11) |
 | 27/11 | TV1 + TV2 | Tông màu Navy & đồng thau; font Cormorant Garamond + Be Vietnam Pro; không làm chuông báo SLA; giữ hạn P1, TV1 làm dồn M2–M8 trong 27–29/11 (PLAN 3.1, 6.3) | hai người chọn | TV1 + TV2 (27/11) |
 
 ## 9. Nhật ký
@@ -196,7 +196,7 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV2 | Rebase PR #3 lên `v2` (`37884a0`; commit "Record the three decisions agreed with TV1" đổi mã từ `284ee92` thành `3ccc924`). Sửa 10 file `docs/analysis/` theo khung của file task (mục của TV1 và mục chung TV1 để dòng chờ); bỏ mã YC tự đặt, dùng mã F; ảnh biểu mẫu vào `docs/analysis/bieu-mau/`; đổi tên `use-case-tv2.iuml`, `dfd-level1-f7.puml`; DFD F7 theo Gane–Sarson với kho D5, D9, D10; mã test TC2-11…TC2-14; thêm loại ngoại lệ + thông báo cho UC08–UC10, Strategy (7.2), Observer phía nhận (7.3), cây `MembershipTier` (8.2), phác thảo bố cục 7 Form, kế hoạch tiêm lỗi |
 | 26/11 | TV2 | Sửa PR #3 theo review approve của TV1 (26/11): mục 8 đổi 2 dòng sang "TV1 + TV2", thêm dòng Q13 mở rộng và dòng bỏ "Điều chỉnh" của `PointReason` (kèm cách R3 tính điểm đã đổi); Q13 mở rộng ở `04`, `06` mục 3.5, `07` mục 4.1/4.3, `class-tv2.iuml`; thêm ca "khách chỉ nằm trong chiến dịch" vào TC2-10; sửa tiêu đề, mô tả PR |
 | 26/11 | TV1 + TV2 | Thầy yêu cầu chuyển giao diện sang web và trả lời 5 câu hỏi (chạy localhost là đủ, không bắt buộc công nghệ, tên trang theo HuongdanXDHTTTQL, mục WinForms chấm theo phần tương đương, hạn không đổi) |
-| 27/11 | TV2 | Duyệt toàn bộ bản kế hoạch chuyển đổi sang web của TV1 (file ngoài repo); hai người chọn tông màu, font, chuông SLA, lịch P1 |
 | 27/11 | TV2 | Đồng ý (miệng, 27/11) toàn bộ bản kế hoạch chuyển giao diện sang web của TV1; cùng chọn tông Navy & đồng thau, font Cormorant Garamond + Be Vietnam Pro, không làm chuông SLA, giữ hạn P1. Góp ý trong review PR #6: đo `git blame` tính cả `.cshtml`, `.js`, `.css` (bỏ `wwwroot/lib`, `*.Designer.cs`); test v1 của TV2 do TV2 tự xóa |
 | 27/11 | TV2 | Xóa 2 file test v1 do TV2 viết: `Assignment/AssignmentStrategyTests.cs` (3 strategy phân công cũ, TV1 xóa phần code ở P2) và `Customers/SurveyServiceTests.cs` (khảo sát nay thuộc TV1, TV1 viết test mới). Build 0 warning, 60 test xanh |
 | 27/11 | TV1 | Mở PR `tv1/web-plan`: đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md` (mục mới 3.1, sửa 0, 3, 4.2, 4.3, 5.1, 5.6, 6, 7, 8, 9), file này, `docs/tasks/v2-p1-analysis.md` |
+| 28/11 | TV1 | Sửa PR #6 theo review TV2 (27/11): phạm vi đo `git blame` (`.cs`, `.cshtml`, `.js`, `.css`, bỏ `wwwroot/lib`) ở `CLAUDE.md` và PLAN 3.1; file v1 ai viết người đó xoá (PLAN 3.1 việc 2); bỏ dòng nhật ký 27/11 của TV2; thêm "3 strategy phân công cũ" vào danh sách xoá (PLAN 6.4, mục 3), dòng `DatabaseInitializer` ở PLAN 6.7, ContentRoot = `AppContext.BaseDirectory` (PLAN 3.1 việc 8). Theo PR #10: khung web (`HotelCRM.GUI`, `_Layout`, menu và lọc menu theo vai trò, toast, khung `Program.cs`) chuyển sang TV2 (`CLAUDE.md` Phân công, PLAN 3.1, 5.6, 6.2–6.5, 6.7, 9). Theo PR #8: "chiến dịch", "Ticket" → "chương trình chăm sóc", "phiếu yêu cầu" ở tên BM7 (PLAN 5.1, 6.5) và danh mục chung (file task mục 1.5) |

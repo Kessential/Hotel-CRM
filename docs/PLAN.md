@@ -64,14 +64,14 @@ Ngày 26/11 thầy yêu cầu đổi giao diện từ WinForms sang web. TV1 so�
 | Font Cormorant Garamond (tiêu đề trang, tên khách, đăng nhập) + Be Vietnam Pro (chữ thường) | Phong cách khách sạn; file font để trong `wwwroot/lib` để máy không có mạng vẫn hiện đúng |
 
 **Kỹ thuật khi lên web**
-1. Đổi tên project (`WinForms` → `GUI`, `Business` → `BLL`, `Data` → `DAL`) bằng một commit chỉ có `git mv` + sửa `.sln`/`.csproj`; mỗi người tự sửa `namespace`/`using` trong file của mình (giữ `git blame`). TV1, 1/12.
-2. Xoá code v1 không còn dùng: project WinForms, phần lưu JSON, 3 strategy phân công cũ, `UserSession`, `UiNotificationObserver`. TV1, 1/12.
+1. `HotelCRM.GUI` là project Razor Pages mới (TV2 tạo 28/11, PR #10), không đổi tên từ `WinForms`. Đổi tên `Business` → `BLL`, `Data` → `DAL` bằng một commit chỉ có `git mv` + sửa `.sln`/`.csproj`; mỗi người tự sửa `namespace`/`using` trong file của mình (giữ `git blame`). TV1, 1/12.
+2. Xoá code v1 không còn dùng: project WinForms, phần lưu JSON, 3 strategy phân công cũ, `UserSession`, `UiNotificationObserver`. File v1 do ai viết thì người đó tự xoá: TV1 xoá phần của mình (1/12); TV2 xoá test của 3 strategy phân công cũ và `SurveyService` v1 (PR #7), phần lưu JSON của TV2 (PR #5), và viết lại phần của mình trong `CustomerDirectory`, `StayLookup` v1 ở P3.
 3. `Program.cs` vẫn là Composition Root và tự `new` từng đối tượng, nhưng dựng theo từng request: mỗi request một `UnitOfWork` (vì `UnitOfWork` giữ transaction đang mở). Container có sẵn của ASP.NET Core chỉ giao các đối tượng đã tạo cho trang. Live OCP vẫn là thêm 1 lớp + 1 dòng ở đây.
 4. Đăng nhập bằng cookie thay `UserSession` tĩnh: đọc mã nhân viên từ cookie, nạp `Employee`, truyền làm `actor`.
 5. Bỏ Singleton `AppConfig`; đọc `appsettings.json` một lần; thêm khoá `Urls` (cổng chạy).
 6. `ErrorHandler`: báo lỗi tiếng Việt bằng toast và một trang lỗi chung; vẫn ghi `logs/error.log`, không lộ stack trace.
 7. SQLite bật `journal_mode=WAL` và `busy_timeout`.
-8. Chạy HTTP tại `http://localhost:5080`, chỉ nghe localhost; publish self-contained (`win-x64`, thêm `linux-x64` khi cần). Thử trên máy sạch ngày **4/12** và lại ở P4.
+8. Chạy HTTP tại `http://localhost:5080`, chỉ nghe localhost; ContentRoot đặt là thư mục chứa file chạy (`AppContext.BaseDirectory`), để chạy bản publish từ thư mục khác vẫn tìm thấy `wwwroot`, `Database/`, `Resource/`; publish self-contained (`win-x64`, thêm `linux-x64` khi cần). Thử trên máy sạch ngày **4/12** và lại ở P4.
 9. Ô nhập gắn vào lớp InputModel ở GUI, không gắn thẳng vào Entity (giữ bất biến, tiêu chí 4.4).
 10. Phân trang và sắp xếp ở server (`?page=&sort=`, `LIMIT/OFFSET`); cột sắp xếp lấy từ danh sách cho phép, không ghép chuỗi SQL.
 11. Bảo mật: giữ antiforgery mặc định; không dùng `Html.Raw` với dữ liệu nhập; `[Authorize]` trên trang chỉ là lớp chặn thứ hai, service vẫn gọi `actor.EnsureCan…()`.
@@ -81,9 +81,11 @@ Ngày 26/11 thầy yêu cầu đổi giao diện từ WinForms sang web. TV1 so�
 
 **Phân công và `git blame`**
 - Giữ chia theo phân hệ. TV2 nhận thêm **phần dùng chung** (khoảng 350–450 dòng, hạn 7/12): thành phần bảng, thanh lọc có "Xóa lọc", khung modal, báo lỗi cạnh ô, nhãn trạng thái, ô số liệu, định dạng tiền/ngày, `site.css`, hàm vẽ Chart.js, `ExcelReportExporter`, hạ tầng integration test (CSDL SQLite tạm từ `schema.sql` + `seed.sql`, `FixedClock`; làm sau khi TV1 có `DatabaseInitializer`).
-- TV1 giữ `_Layout` + menu theo vai trò, đăng nhập, `ErrorHandler`, cookie, khung `Program.cs`, nền SQLite; đưa khung web, `IUnitOfWork` và một repository mẫu lên **trước 2/12**.
+- Khung web (project `HotelCRM.GUI`, khung `Program.cs`, `_Layout` gồm thanh bên và thanh trên, menu `Navigation/AppMenu.cs` và lọc menu theo vai trò, toast, `site.js`) chuyển từ TV1 sang TV2 (đổi 28/11, PR #10), vì TV2 cần trang chạy thật cho slide 30/11.
+- TV1 giữ đăng nhập cookie, `ErrorHandler` (đẩy thông báo lỗi ra toast của TV2, trang lỗi chung), nền SQLite, nội dung trang chủ; đưa đăng nhập, `IUnitOfWork` và một repository mẫu lên **trước 2/12**.
 - frm001 chỉ ghép các khối; mỗi người viết khối số liệu phân hệ mình.
 - Luật giữ blame: không chạy định dạng/refactor hàng loạt lên file của người kia; ai mở PR thì tự rebase và giải xung đột trong file của mình; không sửa vặt để lấy dòng. TV2 mở PR nhỏ mỗi 1–2 ngày.
+- Phạm vi đo: nhóm tự đo trên các file `.cs`, `.cshtml`, `.js`, `.css`; bỏ `wwwroot/lib` (thư viện chép vào), `*.Designer.cs` và tài liệu. Phần dùng chung giao cho TV2 phần lớn là `.cshtml`/`.css`/`.js`, chỉ đo `.cs` thì việc giao thêm không cân được tỷ lệ.
 - Mốc đo blame: 28/11, 4/12, 6/12, 9/12, 13/12. Ngày 4/12 lệch về TV1 (khoảng 60/40) là bình thường. Nếu 6/12 TV2 dưới 43%: TV1 dừng thêm tiện ích phụ; TV2 bổ sung việc có ích trong phân hệ mình (biểu đồ R4, lọc nhiều điều kiện ở frm203/frm206, test biên Q7–Q11).
 
 **Hai người cùng chọn (27/11)**
@@ -215,7 +217,7 @@ Tên trang chốt 27/11 theo khung slide 24–25 của HuongdanXDHTTTQL, viết 
 - Tương phản đạt WCAG 2.1 AA: chữ ≥ 4,5:1, viền ô nhập và vòng focus ≥ 3:1; trang có `lang="vi"`.
 - Nhãn trạng thái màu cho phiếu yêu cầu, hạn SLA, lưu trú, hạng thành viên; nhãn đọc được bằng chữ, không chỉ dựa vào màu.
 
-Biểu mẫu thật cần thu thập ở M2: BM1 Phiếu yêu cầu/khiếu nại, BM2 Phiếu theo dõi xử lý, BM3 Phiếu khảo sát hài lòng (TV1); BM4 Phiếu đăng ký thành viên/hồ sơ khách, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chiến dịch (TV2).
+Biểu mẫu thật cần thu thập ở M2: BM1 Phiếu yêu cầu/khiếu nại, BM2 Phiếu theo dõi xử lý, BM3 Phiếu khảo sát hài lòng (TV1); BM4 Phiếu đăng ký thành viên/hồ sơ khách, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chương trình (TV2).
 
 ### 5.2 CSDL SQLite (17 bảng; 4 n–n có thuộc tính; 5 khóa ngoại nối hai phân hệ; 4 danh mục = 24%)
 | Bảng | TV | Loại | Cột chính | Ghi chú |
@@ -292,7 +294,7 @@ src/HotelCRM.DAL     Sqlite (kết nối, UnitOfWork, tạo CSDL), Repositories,
 tests/HotelCRM.Tests Unit/, Integration/, Fakes/
 ```
 - Chiều phụ thuộc: GUI → BLL → Domain ← DAL; Domain không tham chiếu project nào; trang (PageModel) không chứa SQL hay quy tắc; BLL không dùng `HttpContext`.
-- Đổi tên project: `WinForms → GUI` (Razor Pages, `net10.0`), `Business → BLL`, `Data → DAL` (cách làm ở mục 3.1).
+- Project: `GUI` là project Razor Pages mới (`net10.0`), project WinForms bị xoá; đổi tên `Business → BLL`, `Data → DAL` (cách làm ở mục 3.1).
 - Không làm Solution Folder `Dlllib` và tên solution kèm phiên bản của HuongdanXDHTTTQL (chốt 27/11, mục 3.1).
 - Repository đọc CSDL khi cần (bỏ nạp hết vào bộ nhớ) để rollback không làm lệch bộ nhớ. Tham chiếu giữa các aggregate bằng Id. Lưới và báo cáo dùng truy vấn JOIN, không N+1.
 - `IUnitOfWork.Execute(...)`: một connection + một transaction dùng chung; lời gọi lồng nhau tham gia transaction ngoài. L2 và L3 chạy trọn trong một transaction.
@@ -361,7 +363,7 @@ Mỗi người tự thử tiêm lỗi vào phần mình (đổi `>=` thành `>`,
 | BLL | `AuthService`, `EmployeeService`, `TicketService`, `SurveyService`, `CustomerCareReportService`, `Factories/**`, `TicketQuery`, `SurveyScheduler`, `CustomerCareStats` | `CustomerService`, `StayService`, `LoyaltyService`, `CampaignService`, `CustomerReportService`, `DashboardService`, `CustomerDirectory`, `StayLookup`, `Observers/**`, `Segments/**`, `ExcelReportExporter` |
 | DAL | `Sqlite/**` (kết nối, UnitOfWork, tạo CSDL, nạp seed); repository + truy vấn báo cáo 7 bảng TV1 | repository + truy vấn báo cáo 10 bảng TV2 |
 | Database | `schema.sql`/`seed.sql`: khung file + 7 bảng TV1 | 10 bảng TV2 |
-| GUI | `Program.cs` (khung; mỗi người thêm dòng đăng ký của mình), `_Layout` (thanh bên, menu theo vai trò, toast), đăng nhập cookie, `ErrorHandler`, frm000, frm001, frm101–frm106 | frm201–frm207; thành phần dùng chung (bảng, thanh lọc, modal, báo lỗi cạnh ô, nhãn trạng thái, ô số liệu, `site.css`), hàm định dạng tiền/ngày, hàm vẽ Chart.js |
+| GUI | dòng đăng ký của mình trong `Program.cs`; đăng nhập cookie, `ErrorHandler` (đẩy lỗi ra toast, trang lỗi chung), frm000, nội dung frm001, frm101–frm106 | khung web: project `HotelCRM.GUI`, khung `Program.cs` (mỗi người thêm dòng đăng ký của mình), `_Layout` (thanh bên, thanh trên), menu `AppMenu.cs` và lọc menu theo vai trò, toast, `site.js` (từ 28/11); frm201–frm207; thành phần dùng chung (bảng, thanh lọc, modal, báo lỗi cạnh ô, nhãn trạng thái, ô số liệu, `site.css`), hàm định dạng tiền/ngày, hàm vẽ Chart.js |
 | Tests | 10 unit + 4 integration TV1; Fake cho interface của TV2 | 10 unit + 4 integration TV2; Fake cho interface của TV1; hạ tầng integration test dùng chung |
 | Tài liệu | phần chung (4W+1H tổng, cây BFD, sơ đồ UC tổng, DFD ngữ cảnh + mức 0, ma trận quyền, kiến trúc/package) + phân hệ TV1 | phân hệ TV2 |
 | Slide | phần chung + TV1 + 1 slide kiến trúc web | phần TV2; biên dịch (máy có TeX) |
@@ -384,7 +386,7 @@ Mỗi người tự thử tiêm lỗi vào phần mình (đổi `>=` thành `>`,
 **P2–P5**
 | Giai đoạn | Thời gian | Mục tiêu | Mốc kiểm cuối giai đoạn |
 |---|---|---|---|
-| P2 Hạ tầng | 1–4/12 | TV1 dựng khung web (đưa lên trước 2/12), nền SQLite và phân quyền; TV2 làm Domain mới và phần dùng chung song song | đăng nhập được 4 vai trò trên SQLite qua trình duyệt; bản publish chạy trên máy sạch (4/12); TV2 có 10 unit test xanh |
+| P2 Hạ tầng | 1–4/12 | TV1 làm đăng nhập cookie (đưa lên trước 2/12), nền SQLite và phân quyền trên khung web của TV2 (28/11); TV2 làm Domain mới và phần dùng chung song song | đăng nhập được 4 vai trò trên SQLite qua trình duyệt; bản publish chạy trên máy sạch (4/12); TV2 có 10 unit test xanh |
 | P3 Phân hệ | 5–10/12 | mỗi người làm repository, service, trang, báo cáo, seed của mình; phần dùng chung của TV2 xong 7/12 | đủ 13 trang, R1–R4, seed ≥150 dòng |
 | P4 Ghép & đóng gói | 11–12/12 | luồng L2/L3, dashboard R5, publish | 28 test xanh; chạy trên máy sạch ≤3 phút theo README (có bước mở trình duyệt); video quay trên trình duyệt |
 | P5 Vấn đáp | 13/12 → 30/12 | ôn, Live OCP, video, báo cáo; tập đặt breakpoint khi app chạy dạng web | buổi vấn đáp; nộp cuối 30/12 |
@@ -407,8 +409,8 @@ Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/
 - Đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md`, `docs/PROGRESS.md`, file task P1 (27/11)
 
 **Nền chung (P2, 1–4/12)**
-- Đổi tên project thành `HotelCRM.GUI` (Razor Pages), `HotelCRM.BLL`, `HotelCRM.DAL` bằng commit chỉ có `git mv`; xoá code v1 không còn dùng (WinForms, JSON, `UserSession`, `UiNotificationObserver`); thêm `Database/`, `Resource/` (1/12)
-- Khung web: `_Layout` (thanh bên thu gọn, menu theo vai trò, thanh trên, toast), đăng nhập cookie (frm000), trang chủ khung (frm001), trang lỗi chung; đưa lên trước 2/12
+- Đổi tên project thành `HotelCRM.BLL`, `HotelCRM.DAL` bằng commit chỉ có `git mv`; xoá code v1 không còn dùng của TV1 (WinForms, JSON, 3 strategy phân công cũ, `UserSession`, `UiNotificationObserver`); thêm `Database/`, `Resource/` (1/12)
+- Trên khung web của TV2: đăng nhập cookie (frm000), nội dung trang chủ (frm001), trang lỗi chung; đưa lên trước 2/12
 - SQLite: kết nối, `UnitOfWork` theo từng request, WAL + `busy_timeout`, tạo CSDL từ `schema.sql` + nạp `seed.sql`; một repository mẫu để TV2 làm theo
 - Cây ngoại lệ, `ErrorHandler` tiếng Việt, `appsettings.json` + file mẫu (có `Urls`), bỏ Singleton, `IClock`
 - `Employee` + `Administrator`, `Manager`, `Agent`
@@ -447,7 +449,7 @@ Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/
 
 **Tài liệu & sơ đồ (P1)**
 - Đọc plan, xác nhận phân công; cùng merge PR #1 (22/11)
-- Hiện trạng phần khách hàng, lưu trú, điểm, chiến dịch; biểu mẫu BM4 Phiếu đăng ký thành viên, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chiến dịch; yêu cầu chức năng F5–F8 (23/11)
+- Hiện trạng phần khách hàng, lưu trú, điểm, chương trình chăm sóc; biểu mẫu BM4 Phiếu đăng ký thành viên, BM5 Phiếu đặt phòng/nhận–trả phòng, BM6 Phiếu đổi quà, BM7 Danh sách chăm sóc theo chương trình; yêu cầu chức năng F5–F8 (23/11)
 - Lá BFD F5–F8; đặc tả UC08, UC09, UC10 (24/11)
 - Q7–Q13 với tiền/hậu điều kiện và ngoại lệ; DFD mức 1 của F7 (25/11)
 - Phần ERD 10 bảng TV2; giải thích thuộc tính lịch sử (giá/đêm chốt, điểm quy đổi chốt) (26/11)
@@ -455,6 +457,10 @@ Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/
 - Sơ đồ tuần tự L3 (trả phòng, có khung alt rollback); máy trạng thái booking (28/11)
 - Bảng Form F5–F8; ma trận test TC2-xx; bảng tính tay R5 (28/11)
 - Slide phần TV2; biên dịch PDF cả bộ (29/11)
+
+**Khung web (28/11)**
+- Project `HotelCRM.GUI` (Razor Pages, `net10.0`) trong `HotelCRM.sln`; khung `Program.cs`; `_Layout` (thanh bên thu gọn, thanh trên); menu `Navigation/AppMenu.cs`; `site.js`; thư viện và font trong `wwwroot/lib`
+- Lọc menu theo vai trò (gọi hàm quyền của `Employee` đang đăng nhập, sau khi TV1 có đăng nhập cookie); toast đọc `TempData`, dùng cho thông báo lưu và lỗi từ `ErrorHandler` (P2)
 
 **Domain (P2, 1–4/12, chưa cần CSDL)**
 - Sửa `Customer` (CCCD, ngày sinh, đồng ý nhận ưu đãi), `MembershipTier` (hệ số tích điểm), `Booking` (giá/đêm chốt)
@@ -505,8 +511,10 @@ Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/
 | Cần gì | Ai làm | Cho ai | Hạn | Nếu chưa có |
 |---|---|---|---|---|
 | Chữ ký interface (mục 4.5) | cả hai | cả hai | 27/11 | — |
-| Khung web (`_Layout`, đăng nhập cookie, `ErrorHandler`) | TV1 | TV2 | 2/12 | TV2 làm Domain, service + Fake, phần dùng chung trước |
+| Khung web (project `HotelCRM.GUI`, `_Layout`, menu, khung `Program.cs`) | TV2 | TV1 | 28/11 (PR #10) | TV1 làm tài liệu P1 trước |
+| Đăng nhập cookie (cho lọc menu theo vai trò), `ErrorHandler` | TV1 | TV2 | 2/12 | TV2 làm Domain, service + Fake, phần dùng chung trước |
 | `UnitOfWork` + repository mẫu + `schema.sql` chạy được | TV1 | TV2 | 4/12 | TV2 làm Domain + unit test trước |
+| `DatabaseInitializer` (tạo CSDL từ `schema.sql` + nạp `seed.sql`) | TV1 | TV2 (hạ tầng integration test) | 4/12 | TV2 viết unit test dùng Fake trước |
 | Tài khoản 4 vai trò trong seed | TV1 | cả hai | 4/12 | — |
 | Thành phần giao diện dùng chung + `IReportExporter` + hàm định dạng/biểu đồ | TV2 | TV1 (frm101–frm106) | 7/12 | TV1 làm trang bằng class Bootstrap có sẵn trước, thay bằng thành phần chung sau |
 | `CustomerDirectory`, `StayLookup` thật | TV2 | TV1 | 8/12 | TV1 dùng Fake |
@@ -533,7 +541,7 @@ Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/
 | Admin làm được mọi thứ | giải thích là quyết định có chủ đích, có nhật ký; test RBAC dựa vào 3 vai trò còn lại |
 | Tiêu chí 2.4 "Cây Solution chuẩn Thầy Thăng" viết cho WinForms | đã chốt 27/11 (mục 3.1): tên trang `frm…_dm_/_nv_/_bc_`, giữ `Database/`, `Resource/`; bảng đối chiếu quy ước trong `07-thiet-ke-lop.md` |
 | Web không chạy được trên máy chấm (cổng sản phẩm, trần 3.5) | publish self-contained, HTTP chỉ nghe localhost, cổng trong `appsettings.json`, README 3 bước; thử máy sạch 4/12 và lại ở P4 |
-| Học ASP.NET Core trong 12 ngày code | Razor Pages (ít khái niệm); TV1 đưa khung và một trang mẫu lên trước 2/12 |
+| Học ASP.NET Core trong 12 ngày code | Razor Pages (ít khái niệm); TV2 đưa khung web lên 28/11; TV1 đưa đăng nhập và một trang mẫu dùng SQLite lên trước 2/12 |
 | Lỗi bảo mật web (CSRF, XSS, sắp xếp ghép chuỗi SQL) | mục 3.1 kỹ thuật 10, 11; service luôn kiểm quyền |
 | SQLite bị khoá khi nhiều request | WAL, `busy_timeout`, mỗi request một `UnitOfWork` |
 | TV1 làm trên Linux | sau khi xoá WinForms mọi project là `net10.0`; đường dẫn dùng `Path.Combine`; `.gitattributes`; publish cả `win-x64` và `linux-x64`; thử xuất Excel trên Linux (ClosedXML cần font) |
