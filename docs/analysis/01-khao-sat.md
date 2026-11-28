@@ -47,7 +47,7 @@ Năm câu hỏi trả lời cho cả hệ thống. 4W+1H riêng của phân hệ
 | **What** – quản lý gì | (1) Phiếu yêu cầu của khách (khiếu nại, yêu cầu dịch vụ, sửa chữa) từ lúc tiếp nhận tới lúc đóng: hạn SLA, phân công, nhật ký xử lý. (2) Phiếu khảo sát hài lòng sau mỗi lần ở, chấm điểm từng tiêu chí. (3) Hồ sơ khách 360 và các lần lưu trú. (4) Sổ điểm, hạng thành viên, đổi quà. (5) Chương trình chăm sóc theo phân khúc khách và phản hồi của khách. (6) Phòng ban, nhân viên, tài khoản, quyền. Kết quả cho quản lý: 5 báo cáo R1–R5, xuất Excel. Không quản lý hóa đơn, thanh toán, công nợ, doanh thu (mục 7). |
 | **Who** – ai dùng | 4 vai trò đăng nhập (`docs/PLAN.md` mục 4.1). **Admin**: quản trị tài khoản, danh mục; làm được mọi nghiệp vụ. **Quản lý** (trưởng bộ phận): phân công, đóng/mở lại phiếu yêu cầu, xóa khách, tạo chương trình chăm sóc, xem báo cáo. **Lễ tân**: hồ sơ khách, đặt/nhận/trả phòng, đổi quà, lập phiếu yêu cầu, ghi khảo sát. **Nhân viên CSKH** (nhân viên các bộ phận Quan hệ khách hàng, Buồng phòng, Kỹ thuật): xử lý phiếu được giao, ghi khảo sát, gọi khách theo chương trình chăm sóc. **Khách hàng** là tác nhân ngoài: nêu yêu cầu, trả lời khảo sát, nhận ưu đãi; không đăng nhập hệ thống. |
 | **Where** – ở đâu | Quầy lễ tân: tiếp nhận phản ánh, hồ sơ khách, lưu trú, đổi quà, ghi khảo sát lúc trả phòng. Bộ phận Quan hệ khách hàng, Buồng phòng, Kỹ thuật: nhận và xử lý phiếu được giao. Văn phòng quản lý: phân công, đóng phiếu, lập chương trình chăm sóc, xem báo cáo. Hệ thống là ứng dụng web chạy trên một máy của khách sạn, mở bằng trình duyệt ở `http://localhost:5080`, dữ liệu trong một file SQLite (mục 6). Trong phạm vi bài tập, các vai trò dùng chung máy đó, mỗi người đăng nhập bằng tài khoản riêng; truy cập từ máy khác nằm ngoài phạm vi (mục 7). |
-| **When** – khi nào | Khách phản ánh hoặc nhân viên phát hiện sự cố → lập phiếu yêu cầu, tính hạn SLA ngay (L1) → phân công → xử lý trong hạn → giải quyết → Quản lý đóng phiếu, khách được cộng điểm thiện chí (L2); khách phản ánh lại trong `ReopenDays` ngày (mặc định 7) sau khi giải quyết → mở lại. Khách đến lần đầu → lập hồ sơ. Đặt phòng, ngày nhận phòng, ngày trả phòng → ghi lưu trú; trả phòng → cộng điểm, xét hạng, tạo phiếu khảo sát Chờ (L3); lúc trả phòng hoặc khi gọi lại sau đó → ghi khảo sát. Khách yêu cầu đổi quà → đổi quà. Đầu mỗi đợt ưu đãi → lập chương trình chăm sóc (L4). Cuối tháng → báo cáo R1–R5. |
+| **When** – khi nào | Khách phản ánh hoặc nhân viên phát hiện sự cố → lập phiếu yêu cầu, tính hạn SLA ngay (L1) → phân công → xử lý trong hạn → giải quyết. Phiếu Đã giải quyết: khách phản ánh lại trong `ReopenDays` ngày (mặc định 7) → Quản lý mở lại, xử lý tiếp; khách hài lòng → Quản lý đóng phiếu, khách được cộng điểm thiện chí (L2). Phiếu Đã đóng không mở lại được (Q1). Khách đến lần đầu → lập hồ sơ. Đặt phòng, ngày nhận phòng, ngày trả phòng → ghi lưu trú; trả phòng → cộng điểm, xét hạng, tạo phiếu khảo sát Chờ (L3); lúc trả phòng hoặc khi gọi lại sau đó → ghi khảo sát. Khách yêu cầu đổi quà → đổi quà. Đầu mỗi đợt ưu đãi → lập chương trình chăm sóc (L4). Cuối tháng → báo cáo R1–R5. |
 | **How** – hiện làm thế nào | Bằng giấy, Excel và điện thoại: phản ánh ghi vào sổ giao ca hoặc phiếu yêu cầu giấy (BM1), chuyển việc bằng điện thoại nội bộ, theo dõi trên phiếu theo dõi xử lý (BM2); khảo sát bằng phiếu giấy (BM3); hồ sơ khách, điểm, hạng trong sổ đăng ký và một file Excel chung (BM4); phiếu đặt phòng, phiếu đổi quà bằng giấy (BM5, BM6); danh sách chăm sóc in ra giấy (BM7); báo cáo tự đếm cuối tháng. Chi tiết và nhược điểm ở mục 3.1 [TV1], 3.2 [TV2]. Cách làm mới: chức năng ở mục 5 và sáu quy trình L1–L6 dưới đây. |
 
 #### Đầu ra của khảo sát
@@ -107,7 +107,7 @@ Theo HuongdanXDHTTTQL (slide 5), khảo sát cho ra bốn thứ làm đầu vào
 ### 3.1 Chăm sóc & hỗ trợ khách hàng [TV1]
 
 #### Nguồn khảo sát
-Phần này khảo sát qua tài liệu đã công bố (nghiên cứu tài liệu), chưa phỏng vấn trực tiếp nhân viên khách sạn. Quy trình ở "Cách làm hiện tại" dựa trên các nguồn dưới đây; chi tiết nguồn không nói tới (mẫu phiếu, số liệu) do nhóm bổ sung, và BM1–BM3 là mẫu dựng lại (mục 4.1).
+Phần này khảo sát qua tài liệu đã công bố (nghiên cứu tài liệu), chưa phỏng vấn trực tiếp nhân viên khách sạn. Các nguồn chỉ cho khung chung: lễ tân tiếp nhận phàn nàn, chuyển sang bộ phận khác, ghi sổ giao ca, dùng phiếu nhận xét. Phần lớn chi tiết ở "Cách làm hiện tại" là **kịch bản nhóm dựng** cho một khách sạn tầm trung dựa trên khung đó; cột "Căn cứ" của bảng ghi rõ bước nào lấy từ nguồn, bước nào nhóm dựng. Mẫu phiếu BM1–BM3 cũng là mẫu nhóm dựng lại (mục 4.1), số liệu nghiệp vụ lấy từ code v1 (mục 5.1).
 
 | Nguồn | Người cung cấp / vai trò | Ngày | Cách thu thập |
 |---|---|---|---|
@@ -116,9 +116,9 @@ Phần này khảo sát qua tài liệu đã công bố (nghiên cứu tài li�
 | Oxmaint, *Guest-Reported Issue Routing: Front Desk to Engineering CMMS*, 03/07/2026 ([oxmaint.com](https://oxmaint.com/industries/hospitality/guest-reported-issue-routing-front-desk-engineering-cmms)) | bài viết của hãng phần mềm bảo trì (có tính quảng cáo; số liệu không dùng) | đọc 27/11/2026 | nghiên cứu tài liệu: cách chuyển yêu cầu sửa chữa bằng giấy, điện thoại, nhóm chat và nhược điểm |
 
 Điểm lấy từ nguồn:
-- Lễ tân là nơi tiếp nhận mọi phàn nàn của khách, chuyển thông tin tới các bộ phận khác; phàn nàn về kỹ thuật thì bộ phận kỹ thuật xử lý; phàn nàn vượt quyền thì báo cấp trên (giám sát, trưởng bộ phận) – khóa luận, mục 1.1.5, 2.2, 3.1.6.
+- Lễ tân là nơi "tiếp nhận, giải quyết mọi kêu ca phàn nàn của khách" và chuyển thông tin tới các bộ phận khác – khóa luận, mục 1.1.5. Ở khách sạn Lạc Long, lễ tân lắng nghe rồi tự giải quyết phàn nàn; phàn nàn về kỹ thuật thì có nhân viên kỹ thuật giúp – mục 2.2.6. Phàn nàn vượt quyền thì báo cấp trên – mục 3.1.6 (đề xuất của tác giả).
 - Giám sát lễ tân kiểm tra việc ghi chép sổ giao ca hằng ngày; khách sạn dùng phiếu nhận xét để biết mức hài lòng của khách – khóa luận, mục 2.2. Khi giải quyết phàn nàn cần ghi tên khách, số buồng, vấn đề – khóa luận, mục 3.1.6 (đề xuất của tác giả).
-- Yêu cầu sửa chữa ghi trên mẩu giấy hoặc nhắn nhóm chat, không có giờ ghi, không xác nhận lại với khách, không ai thấy trạng thái – bài Oxmaint (nhược điểm 1, 3, 4 ở dưới).
+- Yêu cầu sửa chữa ghi trên mẩu giấy để ở bảng của bộ phận kỹ thuật, không có giờ ghi, không xác nhận lại với khách; nhân viên buồng phòng báo sự cố qua nhóm chat, tin nhắn dễ bị trôi; khách không biết yêu cầu đã được nhận chưa, lễ tân cũng không biết để trả lời khách – bài Oxmaint (nhược điểm 1, 3, 4 ở dưới).
 - Yêu cầu sửa chữa trong PMS có phòng, lý do, ghi chú, người lập, đã xử lý hay chưa, người xử lý – OPERA 5.6 (đối chiếu với các ô của BM1, BM2).
 
 #### Phạm vi phân hệ
@@ -127,20 +127,22 @@ Phân hệ theo dõi mọi yêu cầu của khách từ lúc tiếp nhận tới
 #### Bộ phận liên quan
 | Bộ phận | Vai trò trong hệ thống | Loại phiếu yêu cầu xử lý |
 |---|---|---|
-| Lễ tân | Lễ tân | tiếp nhận mọi loại; không xử lý |
+| Lễ tân | Lễ tân | tiếp nhận mọi loại; trong hệ thống không xử lý (quyết định thiết kế, xem dưới) |
 | Quan hệ khách hàng | Nhân viên CSKH; trưởng bộ phận là Quản lý | Khiếu nại (thái độ phục vụ, ồn, tính sai tiền…) |
 | Buồng phòng | Nhân viên CSKH | Yêu cầu dịch vụ (dọn phòng, thêm khăn, gối, đồ dùng…) |
 | Kỹ thuật | Nhân viên CSKH | Sửa chữa (điện, nước, điều hòa, khóa cửa…) |
 
+Theo khóa luận, lễ tân tự giải quyết nhiều phàn nàn ngay tại quầy. Trong hệ thống, nhóm **chọn** để lễ tân chỉ lập phiếu, còn việc xử lý giao cho bộ phận đúng loại phiếu: như vậy mỗi phiếu có một người chịu trách nhiệm và đo được hạn SLA (nhược điểm 2, 3). Việc lễ tân giải quyết xong ngay tại quầy vẫn ghi được: lập phiếu rồi người có quyền phân công, giải quyết và đóng.
+
 #### Cách làm hiện tại
-| Bước | Cách làm hiện tại | Ai làm | Giấy tờ |
-|---|---|---|---|
-| Tiếp nhận | Khách nói ở quầy hoặc gọi điện nội bộ; lễ tân ghi vào sổ giao ca, việc lớn thì lập phiếu yêu cầu giấy (loại, phòng, nội dung, giờ nhận). Mức độ gấp do người nhận tự đánh giá; không phân biệt khách quen hay khách mới. | Lễ tân | BM1, sổ giao ca |
-| Chuyển việc | Lễ tân gọi điện hoặc nhắn nhóm chat của bộ phận (Buồng phòng, Kỹ thuật); khiếu nại báo trưởng bộ phận Quan hệ khách hàng. Ai rảnh thì nhận; không ghi tên người nhận, không hẹn giờ xong. | Lễ tân, trưởng bộ phận | điện thoại, nhóm chat |
-| Xử lý | Người nhận việc làm xong thì báo miệng về quầy; việc kéo dài thì ghi vào phiếu theo dõi xử lý (giờ, người làm, việc đã làm). | nhân viên bộ phận | BM2 |
-| Đóng | Trưởng bộ phận ký phiếu theo dõi cuối ca. Khách phàn nàn lại thì lập phiếu mới. | trưởng bộ phận | BM2 |
-| Khảo sát | Phiếu khảo sát giấy để trong phòng hoặc đưa lúc trả phòng; khách tự điền, bỏ vào hộp góp ý. Cuối tháng quản lý đọc và đếm tay. | khách, Lễ tân, Quản lý | BM3 |
-| Báo cáo | Cuối tháng quản lý đếm số khiếu nại trong sổ giao ca; không có số liệu theo nhân viên hay theo hạn xử lý. | Quản lý | – |
+| Bước | Cách làm hiện tại | Ai làm | Giấy tờ | Căn cứ |
+|---|---|---|---|---|
+| Tiếp nhận | Khách nói ở quầy hoặc gọi điện nội bộ; lễ tân ghi vào sổ giao ca, việc lớn thì lập phiếu yêu cầu giấy (loại, phòng, nội dung, giờ nhận). Mức độ gấp do người nhận tự đánh giá; không phân biệt khách quen hay khách mới. | Lễ tân | BM1, sổ giao ca | lễ tân tiếp nhận, sổ giao ca: khóa luận 1.1.5, 2.2; phiếu giấy BM1, mức độ gấp: nhóm dựng |
+| Chuyển việc | Lễ tân gọi điện hoặc nhắn nhóm chat của bộ phận (Buồng phòng, Kỹ thuật); khiếu nại báo trưởng bộ phận Quan hệ khách hàng. Ai rảnh thì nhận; không ghi tên người nhận, không hẹn giờ xong. | Lễ tân, trưởng bộ phận | điện thoại, nhóm chat | chuyển tới bộ phận khác: khóa luận 1.1.5; mẩu giấy, nhóm chat, không giờ ghi: Oxmaint; phần còn lại: nhóm dựng |
+| Xử lý | Người nhận việc làm xong thì báo miệng về quầy; việc kéo dài thì ghi vào phiếu theo dõi xử lý (giờ, người làm, việc đã làm). | nhân viên bộ phận | BM2 | nhóm dựng; các ô BM2 đối chiếu OPERA 5.6 |
+| Đóng | Trưởng bộ phận ký phiếu theo dõi cuối ca. Khách phàn nàn lại thì lập phiếu mới. | trưởng bộ phận | BM2 | nhóm dựng |
+| Khảo sát | Phiếu khảo sát giấy để trong phòng hoặc đưa lúc trả phòng; khách tự điền, bỏ vào hộp góp ý. Cuối tháng quản lý đọc và đếm tay. | khách, Lễ tân, Quản lý | BM3 | phiếu nhận xét: khóa luận 2.2.6; hộp góp ý, đếm tay: nhóm dựng |
+| Báo cáo | Cuối tháng quản lý đếm số khiếu nại trong sổ giao ca; không có số liệu theo nhân viên hay theo hạn xử lý. | Quản lý | – | nhóm dựng |
 
 #### Nhược điểm → hệ thống giải quyết bằng gì
 
@@ -493,14 +495,14 @@ Viết theo bản web chốt 27/11 (`docs/PLAN.md` mục 3.1, 5.1, 5.6). Cột c
 | 9 | Bảo mật | Phiên đăng nhập không dùng biến tĩnh dùng chung | Cookie lưu mã nhân viên; mỗi request nạp lại `Employee` và truyền làm `actor` |
 | 10 | Bảo mật | Phân quyền theo ma trận 4 vai trò (`docs/PLAN.md` mục 4.1); gọi thẳng handler hay đường dẫn cũng bị chặn | Service gọi `actor.EnsureCan…()` trước khi làm, quyền là hàm đa hình của 4 lớp con `Employee` (Q6); ẩn/khóa nút và `[Authorize]` chỉ là lớp chặn thứ hai; integration test RBAC của mỗi người |
 | 11 | Bảo mật | Chặn các lỗi web cơ bản | Antiforgery mặc định cho mọi form POST; mọi câu SQL có tham số; cột sắp xếp lấy từ danh sách cho phép; không dùng `Html.Raw` với dữ liệu người dùng nhập; trang lỗi không lộ stack trace |
-| 12 | Truy vết | Biết ai làm gì, lúc nào | Mọi thao tác ghi người làm (`CreatedById`, `RecordedById`, `ProcessedById`, `ticket_logs.EmployeeId`); thời gian lấy qua `IClock`; lỗi hệ thống ghi `logs/error.log` |
+| 12 | Truy vết | Biết ai làm gì, lúc nào trong các giao dịch nghiệp vụ | Các giao dịch nghiệp vụ ghi người làm: lập và phân công phiếu yêu cầu (`tickets.CreatedById`, `AssignedAgentId`), từng bước xử lý (`ticket_logs.EmployeeId`), ghi khảo sát (`surveys.RecordedById`), đặt phòng (`bookings.CreatedById`), đổi quà (`reward_redemptions.ProcessedById`), lập chương trình chăm sóc và ghi phản hồi (`campaigns.CreatedById`, `campaign_targets.RecordedById`), tương tác ghi tay (`interactions.EmployeeId`). Danh mục `customers`, `rooms`, `room_types`, `rewards` không lưu người sửa. Thời gian lấy qua `IClock`; lỗi hệ thống ghi `logs/error.log` |
 | 13 | Giao diện | Toàn bộ chữ trên giao diện, thông báo lỗi, dữ liệu mẫu bằng tiếng Việt | Trang có `lang="vi"`; `ErrorHandler` đổi ngoại lệ thành câu tiếng Việt nói rõ sai gì |
 | 14 | Giao diện | Tiền VND định dạng `#,##0`, căn phải (ví dụ 1.250.000); ngày `dd/MM/yyyy`, có giờ thì `dd/MM/yyyy HH:mm` | Hàm định dạng tiền/ngày dùng chung của GUI (TV2 viết, `docs/PLAN.md` mục 6.2); file Excel xuất ra dùng cùng định dạng |
 | 15 | Giao diện | Chỉ dùng trên máy tính, màn hình từ 1280px; chỉ giao diện sáng | Bố cục thanh bên + thanh trên của `_Layout`; không làm bố cục điện thoại, không làm giao diện tối |
 | 16 | Giao diện | Đạt WCAG 2.1 mức AA về tương phản và nhận biết | Chữ ≥ 4,5:1; viền ô nhập và vòng focus ≥ 3:1; nhãn trạng thái có chữ, không chỉ dựa vào màu; lỗi nhập hiện cạnh ô (`is-invalid` + `invalid-feedback`, gắn `aria-describedby`), con trỏ nhảy tới ô lỗi đầu tiên; hiệu ứng tắt khi máy đặt giảm chuyển động |
 | 17 | Giao diện | Sai dữ liệu được báo ngay tại ô và được kiểm lại ở tầng dưới | Kiểm ở trang (InputModel) và ở Domain/Service; ngoại lệ `ValidationException`, `BusinessRuleException`, `AuthorizationException` hiện bằng toast hoặc mở lại modal kèm lỗi |
-| 18 | Hiệu năng | Mỗi trang danh sách, báo cáo và việc xuất Excel xong trong ≤ 2 giây với dữ liệu mẫu (≥ 150 dòng) trên máy chấm | Phân trang, sắp xếp ở server (`LIMIT/OFFSET`); lưới và báo cáo dùng truy vấn JOIN, không N+1; repository đọc CSDL khi cần, không nạp hết vào bộ nhớ; bấm thử bằng tay ở P4 |
-| 19 | Bảo trì | Thêm loại phiếu yêu cầu, phân khúc khách hay observer mới không sửa lớp cũ | Thêm một lớp và một dòng đăng ký ở `Program.cs` (Live OCP: `LostItemTicket`, `FrequentGuestSegment`); không `switch` cứng theo tên |
+| 18 | Hiệu năng | Mỗi trang danh sách, báo cáo và việc xuất Excel xong trong ≤ 2 giây với dữ liệu mẫu (≥ 150 dòng) trên máy của nhóm (không đo trước được trên máy chấm) | Phân trang, sắp xếp ở server (`LIMIT/OFFSET`); lưới và báo cáo dùng truy vấn JOIN, không N+1; repository đọc CSDL khi cần, không nạp hết vào bộ nhớ; bấm thử bằng tay ở P4 |
+| 19 | Bảo trì | Thêm loại phiếu yêu cầu, phân khúc khách hay observer mới không sửa lớp cũ | Loại phiếu yêu cầu mới: thêm **hai** lớp (lớp phiếu + factory) và một dòng đăng ký ở `Program.cs` (`docs/PLAN.md` mục 5.4; Live OCP: `LostItemTicket`); phân khúc hay observer mới: một lớp + một dòng đăng ký (Live OCP: `FrequentGuestSegment`). Không `switch` cứng theo tên; cột `tickets.Type` không đặt `CHECK` danh sách loại, để thêm loại không phải sửa schema |
 | 20 | Bảo trì | Tầng rõ ràng, hai phân hệ tách nhau | `GUI → BLL → Domain ← DAL`; trang không chứa SQL hay quy tắc; hai phân hệ chỉ gọi nhau qua 6 interface (L1–L6); cấu hình đọc một lần từ `appsettings.json`, truyền qua constructor |
 | 21 | Kiểm thử | Lỗi cố ý cài vào code phải làm test đỏ | 28 test: mỗi người 10 unit (dùng Fake, không cần CSDL) + 4 integration (CSDL SQLite tạm có seed); `IClock` cố định thời gian; giá trị kỳ vọng lấy từ bảng tính tay (`docs/PLAN.md` mục 5.8) |
 
