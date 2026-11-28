@@ -33,6 +33,7 @@
     --bs-body-bg: var(--hc-bg);
     --bs-body-color: var(--hc-ink);
     --bs-secondary-color: var(--hc-mut);
+    --bs-secondary-rgb: 85, 94, 111; /* --hc-mut as numbers: .text-secondary needs an RGB triplet */
     --bs-border-color: var(--hc-line);
     --bs-border-radius: 0.5rem;
     --bs-primary: #1f3a68;
@@ -106,6 +107,7 @@ html.hc-collapsed {
 }
 
 .card {
+    --bs-card-bg: var(--hc-card); /* Bootstrap would give cards the page background */
     --bs-card-border-color: var(--hc-line);
     --bs-card-border-radius: 12px;
     --bs-card-cap-bg: var(--hc-card);
