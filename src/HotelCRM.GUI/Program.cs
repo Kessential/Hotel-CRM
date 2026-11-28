@@ -4,7 +4,16 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Microsoft.Extensions.WebEncoders;
 
-var builder = WebApplication.CreateBuilder(args);
+// The content root is the program's own folder, not the current directory, so appsettings.json and
+// wwwroot are still found when the published app is started from somewhere else.
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = AppContext.BaseDirectory,
+});
+// The build output has no wwwroot of its own: this reads the manifest that points to the source files.
+// ASP.NET Core only does it by itself in Development; a published app has no manifest and is not affected.
+builder.WebHost.UseStaticWebAssets();
 
 // Razor escapes every non-ASCII letter as &#x...; by default. Allowing all Unicode ranges keeps
 // Vietnamese text readable in the page source; <, >, & and quotes are still escaped (XSS stays blocked).
