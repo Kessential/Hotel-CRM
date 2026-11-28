@@ -81,8 +81,8 @@ Ngày 26/11 thầy yêu cầu đổi giao diện từ WinForms sang web. TV1 so�
 
 **Phân công và `git blame`**
 - Giữ chia theo phân hệ. TV2 nhận thêm **phần dùng chung** (khoảng 350–450 dòng, hạn 7/12): thành phần bảng, thanh lọc có "Xóa lọc", khung modal, báo lỗi cạnh ô, nhãn trạng thái, ô số liệu, định dạng tiền/ngày, `site.css`, hàm vẽ Chart.js, `ExcelReportExporter`, hạ tầng integration test (CSDL SQLite tạm từ `schema.sql` + `seed.sql`, `FixedClock`; làm sau khi TV1 có `DatabaseInitializer`).
-- Khung web (project `HotelCRM.GUI`, khung `Program.cs`, `_Layout` gồm thanh bên và thanh trên, menu `Navigation/AppMenu.cs` và lọc menu theo vai trò, toast, `site.js`) chuyển từ TV1 sang TV2 (đổi 28/11, PR #10), vì TV2 cần trang chạy thật cho slide 30/11.
-- TV1 giữ đăng nhập cookie, `ErrorHandler` (đẩy thông báo lỗi ra toast của TV2, trang lỗi chung), nền SQLite, nội dung trang chủ; đưa đăng nhập, `IUnitOfWork` và một repository mẫu lên **trước 2/12**.
+- Khung web (project `HotelCRM.GUI`, khung `Program.cs`, `_Layout` gồm thanh bên và thanh trên, menu `Navigation/AppMenu.cs`, toast, `site.js`) chuyển từ TV1 sang TV2 (đổi 28/11, PR #10), vì TV2 cần trang chạy thật cho slide 30/11.
+- TV1 giữ đăng nhập cookie, lọc menu theo vai trò (đi liền với `actor`), `ErrorHandler` (đẩy thông báo lỗi ra toast của TV2, trang lỗi chung), nền SQLite, nội dung trang chủ; đưa đăng nhập, `IUnitOfWork` và một repository mẫu lên **trước 2/12**.
 - frm001 chỉ ghép các khối; mỗi người viết khối số liệu phân hệ mình.
 - Luật giữ blame: không chạy định dạng/refactor hàng loạt lên file của người kia; ai mở PR thì tự rebase và giải xung đột trong file của mình; không sửa vặt để lấy dòng. TV2 mở PR nhỏ mỗi 1–2 ngày.
 - Phạm vi đo: nhóm tự đo trên các file `.cs`, `.cshtml`, `.js`, `.css`; bỏ `wwwroot/lib` (thư viện chép vào), `*.Designer.cs` và tài liệu. Phần dùng chung giao cho TV2 phần lớn là `.cshtml`/`.css`/`.js`, chỉ đo `.cs` thì việc giao thêm không cân được tỷ lệ.
@@ -363,7 +363,7 @@ Mỗi người tự thử tiêm lỗi vào phần mình (đổi `>=` thành `>`,
 | BLL | `AuthService`, `EmployeeService`, `TicketService`, `SurveyService`, `CustomerCareReportService`, `Factories/**`, `TicketQuery`, `SurveyScheduler`, `CustomerCareStats` | `CustomerService`, `StayService`, `LoyaltyService`, `CampaignService`, `CustomerReportService`, `DashboardService`, `CustomerDirectory`, `StayLookup`, `Observers/**`, `Segments/**`, `ExcelReportExporter` |
 | DAL | `Sqlite/**` (kết nối, UnitOfWork, tạo CSDL, nạp seed); repository + truy vấn báo cáo 7 bảng TV1 | repository + truy vấn báo cáo 10 bảng TV2 |
 | Database | `schema.sql`/`seed.sql`: khung file + 7 bảng TV1 | 10 bảng TV2 |
-| GUI | dòng đăng ký của mình trong `Program.cs`; đăng nhập cookie, `ErrorHandler` (đẩy lỗi ra toast, trang lỗi chung), frm000, nội dung frm001, frm101–frm106 | khung web: project `HotelCRM.GUI`, khung `Program.cs` (mỗi người thêm dòng đăng ký của mình), `_Layout` (thanh bên, thanh trên), menu `AppMenu.cs` và lọc menu theo vai trò, toast, `site.js` (từ 28/11); frm201–frm207; thành phần dùng chung (bảng, thanh lọc, modal, báo lỗi cạnh ô, nhãn trạng thái, ô số liệu, `site.css`), hàm định dạng tiền/ngày, hàm vẽ Chart.js |
+| GUI | dòng đăng ký của mình trong `Program.cs`; đăng nhập cookie, lọc menu theo vai trò, `ErrorHandler` (đẩy lỗi ra toast, trang lỗi chung), frm000, nội dung frm001, frm101–frm106 | khung web: project `HotelCRM.GUI`, khung `Program.cs` (mỗi người thêm dòng đăng ký của mình), `_Layout` (thanh bên, thanh trên), menu `AppMenu.cs`, toast, `site.js` (từ 28/11); frm201–frm207; thành phần dùng chung (bảng, thanh lọc, modal, báo lỗi cạnh ô, nhãn trạng thái, ô số liệu, `site.css`), hàm định dạng tiền/ngày, hàm vẽ Chart.js |
 | Tests | 10 unit + 4 integration TV1; Fake cho interface của TV2 | 10 unit + 4 integration TV2; Fake cho interface của TV1; hạ tầng integration test dùng chung |
 | Tài liệu | phần chung (4W+1H tổng, cây BFD, sơ đồ UC tổng, DFD ngữ cảnh + mức 0, ma trận quyền, kiến trúc/package) + phân hệ TV1 | phân hệ TV2 |
 | Slide | phần chung + TV1 + 1 slide kiến trúc web | phần TV2; biên dịch (máy có TeX) |
@@ -410,7 +410,7 @@ Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/
 
 **Nền chung (P2, 1–4/12)**
 - Đổi tên project thành `HotelCRM.BLL`, `HotelCRM.DAL` bằng commit chỉ có `git mv`; xoá code v1 không còn dùng của TV1 (WinForms, JSON, 3 strategy phân công cũ, `UserSession`, `UiNotificationObserver`); thêm `Database/`, `Resource/` (1/12)
-- Trên khung web của TV2: đăng nhập cookie (frm000), nội dung trang chủ (frm001), trang lỗi chung; đưa lên trước 2/12
+- Trên khung web của TV2: đăng nhập cookie (frm000), lọc menu theo vai trò, nội dung trang chủ (frm001), trang lỗi chung; đưa lên trước 2/12
 - SQLite: kết nối, `UnitOfWork` theo từng request, WAL + `busy_timeout`, tạo CSDL từ `schema.sql` + nạp `seed.sql`; một repository mẫu để TV2 làm theo
 - Cây ngoại lệ, `ErrorHandler` tiếng Việt, `appsettings.json` + file mẫu (có `Urls`), bỏ Singleton, `IClock`
 - `Employee` + `Administrator`, `Manager`, `Agent`
@@ -460,7 +460,7 @@ Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/
 
 **Khung web (28/11)**
 - Project `HotelCRM.GUI` (Razor Pages, `net10.0`) trong `HotelCRM.sln`; khung `Program.cs`; `_Layout` (thanh bên thu gọn, thanh trên); menu `Navigation/AppMenu.cs`; `site.js`; thư viện và font trong `wwwroot/lib`
-- Lọc menu theo vai trò (gọi hàm quyền của `Employee` đang đăng nhập, sau khi TV1 có đăng nhập cookie); toast đọc `TempData`, dùng cho thông báo lưu và lỗi từ `ErrorHandler` (P2)
+- Toast đọc `TempData`, dùng cho thông báo lưu và lỗi từ `ErrorHandler` (P2)
 
 **Domain (P2, 1–4/12, chưa cần CSDL)**
 - Sửa `Customer` (CCCD, ngày sinh, đồng ý nhận ưu đãi), `MembershipTier` (hệ số tích điểm), `Booking` (giá/đêm chốt)
@@ -512,7 +512,7 @@ Trong ngoặc là hạn. Trạng thái (đánh dấu `[x]`) theo dõi ở `docs/
 |---|---|---|---|---|
 | Chữ ký interface (mục 4.5) | cả hai | cả hai | 27/11 | — |
 | Khung web (project `HotelCRM.GUI`, `_Layout`, menu, khung `Program.cs`) | TV2 | TV1 | 28/11 (PR #10) | TV1 làm tài liệu P1 trước |
-| Đăng nhập cookie (cho lọc menu theo vai trò), `ErrorHandler` | TV1 | TV2 | 2/12 | TV2 làm Domain, service + Fake, phần dùng chung trước |
+| Đăng nhập cookie, `ErrorHandler` | TV1 | TV2 | 2/12 | TV2 làm Domain, service + Fake, phần dùng chung trước |
 | `UnitOfWork` + repository mẫu + `schema.sql` chạy được | TV1 | TV2 | 4/12 | TV2 làm Domain + unit test trước |
 | `DatabaseInitializer` (tạo CSDL từ `schema.sql` + nạp `seed.sql`) | TV1 | TV2 (hạ tầng integration test) | 4/12 | TV2 viết unit test dùng Fake trước |
 | Tài khoản 4 vai trò trong seed | TV1 | cả hai | 4/12 | — |

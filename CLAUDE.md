@@ -83,7 +83,7 @@ Chữ ký chốt ở M6 (27/11). Bên dùng viết file khai báo, bên kia cài
   - BLL: `AuthService`, `EmployeeService`, `TicketService`, `SurveyService`, `CustomerCareReportService`, `Factories/**`, `TicketQuery`, `SurveyScheduler`, `CustomerCareStats`.
   - DAL: `Sqlite/**` (kết nối, UnitOfWork, tạo CSDL, nạp seed); repository và truy vấn báo cáo cho 7 bảng `departments`, `employees`, `tickets`, `ticket_logs`, `survey_criteria`, `surveys`, `survey_answers`.
   - Database: khung `schema.sql`/`seed.sql` + 7 bảng trên.
-  - GUI: dòng đăng ký của mình trong `Program.cs` (đăng nhập cookie, `UnitOfWork` theo request, service TV1), đăng nhập cookie, `ErrorHandler` (đẩy thông báo lỗi ra toast, trang lỗi chung), frm000, nội dung trang chủ frm001, frm101–frm106.
+  - GUI: dòng đăng ký của mình trong `Program.cs` (đăng nhập cookie, `UnitOfWork` theo request, service TV1), đăng nhập cookie, lọc menu theo vai trò, `ErrorHandler` (đẩy thông báo lỗi ra toast, trang lỗi chung), frm000, nội dung trang chủ frm001, frm101–frm106.
   - Tests: 10 unit + 4 integration của TV1; `FakeCustomerDirectory`, `FakeStayLookup`.
   - Tài liệu và slide: phần chung (4W+1H, cây BFD, sơ đồ UC tổng, DFD ngữ cảnh + mức 0, ma trận quyền, kiến trúc/package) + phân hệ TV1.
 - **TV2** (`munn8726`), Quan hệ khách hàng & khách hàng thân thiết:
@@ -92,7 +92,7 @@ Chữ ký chốt ở M6 (27/11). Bên dùng viết file khai báo, bên kia cài
   - BLL: `CustomerService`, `StayService`, `LoyaltyService`, `CampaignService`, `CustomerReportService`, `DashboardService`, `CustomerDirectory`, `StayLookup`, `Observers/**`, `Segments/**`, `ExcelReportExporter`.
   - DAL: repository và truy vấn báo cáo cho 10 bảng `customers`, `interactions`, `room_types`, `rooms`, `bookings`, `point_transactions`, `rewards`, `reward_redemptions`, `campaigns`, `campaign_targets`.
   - Database: 10 bảng trên trong `schema.sql`/`seed.sql`.
-  - GUI: khung web (project `HotelCRM.GUI`, khung `Program.cs`, `_Layout` gồm thanh bên thu gọn và thanh trên, menu `Navigation/AppMenu.cs` và lọc menu theo vai trò, toast, `site.js`; chuyển từ TV1 sang ngày 28/11); frm201–frm207; thành phần giao diện dùng chung (bảng có phân trang, sắp xếp, chọn cột, tiêu đề cố định; thanh lọc có "Xóa lọc"; khung modal; báo lỗi cạnh ô; nhãn trạng thái; ô số liệu; `site.css`); hàm định dạng tiền/ngày; hàm vẽ Chart.js dùng chung. Hạn 7/12.
+  - GUI: khung web (project `HotelCRM.GUI`, khung `Program.cs`, `_Layout` gồm thanh bên thu gọn và thanh trên, menu `Navigation/AppMenu.cs`, toast, `site.js`; chuyển từ TV1 sang ngày 28/11); frm201–frm207; thành phần giao diện dùng chung (bảng có phân trang, sắp xếp, chọn cột, tiêu đề cố định; thanh lọc có "Xóa lọc"; khung modal; báo lỗi cạnh ô; nhãn trạng thái; ô số liệu; `site.css`); hàm định dạng tiền/ngày; hàm vẽ Chart.js dùng chung. Hạn 7/12.
   - Tests: 10 unit + 4 integration của TV2; `FakeTicketQuery`, `FakeSurveyScheduler`, `FakeCustomerCareStats`; hạ tầng integration test dùng chung (CSDL SQLite tạm từ `schema.sql` + `seed.sql`, `FixedClock`).
   - Tài liệu và slide: phân hệ TV2; biên dịch slide (máy có TeX).
 - **Dùng chung:** `Program.cs` mỗi người thêm dòng đăng ký của mình. Sơ đồ chung (ERD, lớp) tách `-tv1.iuml`, `-tv2.iuml` rồi `!include` vào một file `.puml`. `CLAUDE.md`, `.claude/rules/**`, `docs/PLAN.md` sửa qua PR có cả hai duyệt. `docs/PROGRESS.md` mỗi người cập nhật dòng của mình trong PR của mình.
