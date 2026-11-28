@@ -1,0 +1,88 @@
+﻿@{
+    // The page being shown, e.g. "/frm201_dm_customer"; the menu entry gives its group for the breadcrumb.
+    var pagePath = ViewContext.RouteData.Values["page"] as string ?? "";
+    var current = AppMenu.Find(pagePath);
+    var version = typeof(AppMenu).Assembly.GetName().Version;
+    string? group = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · Hotel CRM</title>
+    @* Runs before the first paint so a collapsed sidebar does not flash open on every page load. *@
+    <script>try { if (localStorage.getItem("hc-side") === "collapsed") document.documentElement.classList.add("hc-collapsed"); } catch (e) { }</script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/lib/fonts/be-vietnam-pro/400.css" />
+    <link rel="stylesheet" href="~/lib/fonts/be-vietnam-pro/500.css" />
+    <link rel="stylesheet" href="~/lib/fonts/be-vietnam-pro/600.css" />
+    <link rel="stylesheet" href="~/lib/fonts/be-vietnam-pro/700.css" />
+    <link rel="stylesheet" href="~/lib/fonts/cormorant-garamond/600.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="hc-shell">
+        <nav class="hc-side" aria-label="Menu chính">
+            <div class="hc-logo">
+                <span class="hc-mark" aria-hidden="true">H</span>
+                <div><b>Hotel CRM</b><small>Chăm sóc khách hàng</small></div>
+            </div>
+            @foreach (var item in AppMenu.Items)
+            {
+                if (item.Group != group)
+                {
+                    group = item.Group;
+                    if (group.Length > 0)
+                    {
+                        <div class="hc-grp">@group</div>
+                    }
+                }
+                @* Plain href, not asp-page: the tag helper leaves href empty for a page that does not exist yet. *@
+                <a class="hc-nav" href="@item.Path" title="@item.Title (frm@(item.Code))"
+                   aria-current="@(item == current ? "page" : null)">
+                    <i class="bi bi-@item.Icon" aria-hidden="true"></i>
+                    <span class="hc-lbl">@item.Title</span>
+                    <span class="hc-code">@item.Code</span>
+                </a>
+            }
+        </nav>
+
+        <div class="hc-main">
+            <header class="hc-appbar">
+                <button type="button" class="hc-iconbtn" id="hc-toggle" aria-label="Thu gọn hoặc mở rộng thanh bên" title="Ẩn/hiện thanh bên">
+                    <i class="bi bi-list" aria-hidden="true"></i>
+                </button>
+                <div class="hc-crumb">
+                    @if (!string.IsNullOrEmpty(current?.Group))
+                    {
+                        <span>@current.Group ›</span>
+                    }
+                    <b>@(current?.Title ?? ViewData["Title"])</b>
+                </div>
+                <form class="hc-search" method="get" action="/frm201_dm_customer" role="search">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input type="search" name="q" placeholder="Tìm khách theo tên, SĐT, email" aria-label="Tìm khách" />
+                </form>
+                <span class="hc-ver" title="Phiên bản phần mềm">v@(version?.ToString(2))</span>
+            </header>
+
+            <main class="hc-page">
+                <div class="hc-ph">
+                    <div>
+                        <h1>@ViewData["Title"]</h1>
+                        <div class="hc-map">@pagePath.TrimStart('/')@(ViewData["Trace"] is string trace ? " · " + trace : "")</div>
+                    </div>
+                    <div class="hc-phr">@await RenderSectionAsync("PageActions", required: false)</div>
+                </div>
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

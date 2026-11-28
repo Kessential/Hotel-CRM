@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Nullable, ImplicitUsings and TreatWarningsAsErrors come from Directory.Build.props. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Shown in the top bar (C9 #2: department and version, as in slide 20 of HuongdanXDHTTTQL). -->
+    <Version>2.0.0</Version>
+  </PropertyGroup>
+
+</Project>

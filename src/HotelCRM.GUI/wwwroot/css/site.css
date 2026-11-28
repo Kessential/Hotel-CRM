@@ -1,0 +1,410 @@
+/* Hotel CRM theme "Navy & đồng thau" (decision D1) on top of Bootstrap 5.3.
+   Light only (B5), desktop only from 1280px (B12). Values follow the approved web mock-up (version 6).
+   Fonts and icons are served from wwwroot/lib so the app also works without Internet. */
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+    --hc-side: #16213a;          /* sidebar */
+    --hc-side2: #24345a;         /* sidebar hover / active item */
+    --hc-brand: #1f3a68;         /* buttons, links, numbers */
+    --hc-accent: #b08d57;        /* brass: borders, active marker */
+    --hc-accent-soft: #f5eee2;
+    --hc-bg: #f2f4f8;
+    --hc-card: #fff;
+    --hc-ink: color-mix(in srgb, var(--hc-side) 82%, #000);
+    --hc-mut: color-mix(in srgb, var(--hc-side) 52%, #9aa0a8);
+    --hc-line: color-mix(in srgb, var(--hc-brand) 12%, #fff);
+    --hc-field-line: color-mix(in srgb, var(--hc-brand) 64%, #fff); /* field border >= 3:1 (WCAG 1.4.11) */
+    --hc-sunk: color-mix(in srgb, var(--hc-bg) 55%, #fff);
+    --hc-hover: color-mix(in srgb, var(--hc-accent-soft) 55%, #fff);
+    --hc-side-ink: color-mix(in srgb, var(--hc-side) 14%, #fff);
+    --hc-side-mut: color-mix(in srgb, var(--hc-side) 16%, #c8cfd9);
+    --hc-ok: #1c7a47;
+    --hc-warn: #8a5100;
+    --hc-bad: #bd3a2c;
+    --hc-info: #2b6cb0;
+    --hc-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --hc-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    --hc-side-w: 256px;
+
+    /* Bootstrap reads these, so text, borders and links follow the theme without extra classes. */
+    --bs-body-font-family: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+    --bs-body-font-size: 0.875rem;
+    --bs-body-bg: var(--hc-bg);
+    --bs-body-color: var(--hc-ink);
+    --bs-secondary-color: var(--hc-mut);
+    --bs-secondary-rgb: 85, 94, 111; /* --hc-mut as numbers: .text-secondary needs an RGB triplet */
+    --bs-border-color: var(--hc-line);
+    --bs-border-radius: 0.5rem;
+    --bs-primary: #1f3a68;
+    --bs-primary-rgb: 31, 58, 104;
+    --bs-link-color: #1f3a68;
+    --bs-link-color-rgb: 31, 58, 104;
+    --bs-link-hover-color: #152a4c;
+    --bs-link-hover-color-rgb: 21, 42, 76;
+    --bs-success-rgb: 28, 122, 71;
+    --bs-warning-rgb: 138, 81, 0;
+    --bs-danger-rgb: 189, 58, 44;
+    --bs-info-rgb: 43, 108, 176;
+}
+
+html.hc-collapsed {
+    --hc-side-w: 68px;
+}
+
+:focus-visible {
+    outline: 2px solid var(--hc-brand);
+    outline-offset: 2px;
+}
+
+/* ---------- 2. Bootstrap components in the theme ---------- */
+.btn {
+    --bs-btn-font-size: 0.8125rem;
+    --bs-btn-font-weight: 500;
+    --bs-btn-padding-x: 0.8rem;
+    --bs-btn-padding-y: 0.44rem;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--hc-brand);
+    --bs-btn-border-color: var(--hc-brand);
+    --bs-btn-hover-bg: #1a3159;
+    --bs-btn-hover-border-color: #1a3159;
+    --bs-btn-active-bg: #152a4c;
+    --bs-btn-active-border-color: #152a4c;
+    --bs-btn-disabled-bg: var(--hc-brand);
+    --bs-btn-disabled-border-color: var(--hc-brand);
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--hc-ink);
+    --bs-btn-border-color: var(--hc-field-line);
+    --bs-btn-hover-color: var(--hc-ink);
+    --bs-btn-hover-bg: var(--hc-card);
+    --bs-btn-hover-border-color: var(--hc-brand);
+    --bs-btn-active-color: var(--hc-ink);
+    --bs-btn-active-bg: var(--hc-sunk);
+    --bs-btn-active-border-color: var(--hc-brand);
+}
+
+.btn-danger {
+    --bs-btn-bg: var(--hc-bad);
+    --bs-btn-border-color: var(--hc-bad);
+    --bs-btn-hover-bg: #a23123;
+    --bs-btn-hover-border-color: #a23123;
+}
+
+.form-control,
+.form-select {
+    font-size: 0.8125rem;
+    border-color: var(--hc-field-line);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--hc-brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--hc-brand) 16%, transparent);
+}
+
+.card {
+    --bs-card-bg: var(--hc-card); /* Bootstrap would give cards the page background */
+    --bs-card-border-color: var(--hc-line);
+    --bs-card-border-radius: 12px;
+    --bs-card-cap-bg: var(--hc-card);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+/* ---------- 3. App shell: sidebar + top bar + page ---------- */
+body {
+    margin: 0;
+}
+
+.hc-shell {
+    display: grid;
+    grid-template-columns: var(--hc-side-w) minmax(0, 1fr);
+    min-height: 100vh;
+    min-width: 1100px;
+    transition: grid-template-columns 0.15s ease;
+}
+
+.hc-side {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 14px 10px;
+    background: var(--hc-side);
+    color: var(--hc-side-ink);
+    box-shadow: inset -1px 0 0 color-mix(in srgb, var(--hc-accent) 30%, transparent);
+}
+
+.hc-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 4px 6px 14px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hc-logo b {
+    display: block;
+    font-family: var(--hc-serif);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.1;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.hc-logo small {
+    display: block;
+    font-size: 12px;
+    color: var(--hc-side-mut);
+    white-space: nowrap;
+}
+
+/* Round brass seal with a thin inner ring, like hotel stationery. */
+.hc-mark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--hc-accent);
+    box-shadow: inset 0 0 0 3px var(--hc-side), inset 0 0 0 4px color-mix(in srgb, var(--hc-accent) 45%, transparent);
+    color: var(--hc-accent);
+    font-family: var(--hc-serif);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.hc-grp {
+    padding: 14px 10px 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--hc-side-mut);
+    white-space: nowrap;
+}
+
+.hc-nav {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: inherit;
+    font-size: 13.5px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.hc-nav:hover {
+    background: var(--hc-side2);
+    color: #fff;
+}
+
+.hc-nav:focus-visible {
+    outline-color: var(--hc-accent);
+}
+
+.hc-nav .bi {
+    flex: none;
+    font-size: 17px;
+}
+
+.hc-nav[aria-current="page"] {
+    background: var(--hc-side2);
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Brass marker on the left edge of the active item. */
+.hc-nav[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--hc-accent);
+}
+
+.hc-lbl {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hc-code {
+    margin-left: auto;
+    font-family: var(--hc-mono);
+    font-size: 11px;
+    color: var(--hc-side-mut);
+}
+
+/* Collapsed sidebar: icons only; group titles become thin separators. */
+.hc-collapsed .hc-lbl,
+.hc-collapsed .hc-code,
+.hc-collapsed .hc-logo div {
+    display: none;
+}
+
+.hc-collapsed .hc-nav {
+    justify-content: center;
+    padding: 9px 0;
+}
+
+.hc-collapsed .hc-grp {
+    font-size: 0;
+    padding: 0;
+    margin: 8px 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hc-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.hc-appbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 58px;
+    padding: 10px 20px;
+    background: var(--hc-card);
+    border-bottom: 1px solid var(--hc-line);
+}
+
+.hc-iconbtn {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--hc-line);
+    border-radius: 8px;
+    background: var(--hc-card);
+    color: var(--hc-ink);
+    font-size: 18px;
+}
+
+.hc-iconbtn:hover {
+    border-color: var(--hc-brand);
+}
+
+.hc-crumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 12.5px;
+    color: var(--hc-mut);
+    white-space: nowrap;
+}
+
+.hc-crumb b {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--hc-ink);
+}
+
+.hc-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 260px;
+    height: 36px;
+    margin-left: auto;
+    padding: 0 10px;
+    border: 1px solid var(--hc-field-line);
+    border-radius: 8px;
+    color: var(--hc-mut);
+}
+
+.hc-search:focus-within {
+    border-color: var(--hc-brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--hc-brand) 16%, transparent);
+}
+
+.hc-search input {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--hc-ink);
+    font: inherit;
+}
+
+.hc-ver {
+    padding: 1px 9px;
+    border: 1px solid var(--hc-line);
+    border-radius: 999px;
+    font-size: 11.5px;
+    color: var(--hc-mut);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.hc-page {
+    min-width: 0;
+    padding: 20px 22px 28px;
+}
+
+/* Page header: serif title, then the page name and its trace (F, UC, BM) for criterion 3.1. */
+.hc-ph {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.hc-ph h1 {
+    margin: 0;
+    font-family: var(--hc-serif);
+    font-size: 29px;
+    font-weight: 600;
+    font-variant-numeric: lining-nums;
+    line-height: 1.1;
+    color: var(--hc-ink);
+}
+
+.hc-map {
+    margin-top: 2px;
+    font-family: var(--hc-mono);
+    font-size: 11.5px;
+    color: var(--hc-mut);
+}
+
+.hc-phr {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* ---------- 4. Light motion only (B17), off when the OS asks for reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}

@@ -91,6 +91,11 @@ Các dòng dưới chưa sửa theo quyết định chuyển sang web (phần d�
 - [x] Bảng Form F5–F8; ma trận test TC2-xx; bảng tính tay R5 (28/11) — PR #3
 - [ ] Slide phần TV2; biên dịch PDF cả bộ (29/11)
 
+**Khung web (28/11)**
+- [ ] Project `HotelCRM.GUI`, khung `Program.cs`, `_Layout` (thanh bên, thanh trên), menu `Navigation/AppMenu.cs`, `site.css`, `site.js` (28/11) — PR #10, chờ merge
+- [ ] Toast đọc `TempData` cho thông báo lưu và lỗi từ `ErrorHandler` (trước 2/12)
+- [ ] Thanh trên: bộ phận, vai trò người đăng nhập, nút Đăng xuất (sau khi TV1 có đăng nhập cookie, 2/12)
+
 **Domain (P2, 1–4/12, chưa cần CSDL)**
 - [x] Sửa `Customer` (CCCD, ngày sinh, đồng ý nhận ưu đãi), `MembershipTier` (hệ số tích điểm), `Booking` (giá/đêm chốt) — `MembershipTier` ở PR #2; `Customer`, `Interaction`, `Booking`, `Room` viết lại ở `tv2/domain-2` (26/11)
 - [ ] Thêm `PointTransaction`, `Reward`, `RewardRedemption`, `Campaign`, `CampaignTarget`, `Receptionist` — đã có trừ `Receptionist` (chờ TV1 viết lại `Employee`)
@@ -139,10 +144,11 @@ Các dòng dưới chưa sửa theo quyết định chuyển sang web (phần d�
 | PR #2 `tv2/domain` → `v2` (Domain P2 đợt 1: hệ số tích điểm, sổ điểm, đổi quà, chiến dịch, 3 phân khúc + test) | TV2 mở 25/11, TV1 review | ~~chờ merge~~ đã merge 26/11 (`45f9df8`); 5 góp ý của TV1 xử lý ở `tv2/domain-2` |
 | PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | ~~chờ merge~~ đã merge 26/11 (`e6264a3`) sau khi sửa 3 việc TV1 yêu cầu |
 | PR `tv1/web-plan` → `v2` (đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md`, `docs/PROGRESS.md`, file task P1) | TV1 mở 27/11, TV2 review | TV2 yêu cầu sửa 3 việc + 3 góp ý nhỏ (27/11); TV1 đã sửa (28/11), chờ TV2 duyệt lại |
-| Nhánh `tv2/domain-2` → `v2` (Domain đợt 2: bỏ JSON phần TV2; `Customer`, `Interaction`, `Booking`, `Room` v2; góp ý PR #2) | TV2 làm 26/11, TV1 review | PR #5, TV1 approve 28/11; chờ merge. Từ lúc merge tới khi có repository SQLite (P3), app không có khách và phòng: frm "New Ticket" của TV1 có danh sách khách rỗng |
+| Nhánh `tv2/domain-2` → `v2` (Domain đợt 2: bỏ JSON phần TV2; `Customer`, `Interaction`, `Booking`, `Room` v2; góp ý PR #2) | TV2 làm 26/11, TV1 review | PR #5, TV1 approve 28/11; đã merge 28/11 (`0beaddf`). Từ lúc merge tới khi có repository SQLite (P3), app không có khách và phòng: frm "New Ticket" của TV1 có danh sách khách rỗng |
 | M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | TV2: phần mình nằm trong PR #3 (M2–M8); TV1: làm 27/11, mục 6 phi chức năng viết thẳng bản web |
 | Sửa tài liệu P1 phần TV2 theo web: `09-giao-dien.md` mục 1 (16 lựa chọn giao diện) và tên trang frm201–frm207; `08-hanh-vi.md` mục 3.3 (Call Stack `OnPostCheckOut`); cột Form của BM6, BM7 trong `01-khao-sat.md`; F8 "chiến dịch" → "chương trình chăm sóc"; boundary `frm203_nv_stay` trong `seq-l3-checkout.puml` | TV2 | trước slide 30/11 |
 | Sửa đường dẫn trong slide: `sec1`, `sec3`, `sec5`, `sec6` còn trỏ `docs/PLAN.md` (v1), `docs/PROGRESS.md` (v1), `docs/tasks/stage-*.md` — các file này đã xóa (bản v1 chỉ còn trong lịch sử git, `fd7b7e4`) | TV2 | làm ở M9 |
+| PR `tv2/web-shell` → `v2`: khung web `HotelCRM.GUI` (thanh bên thu gọn, thanh trên, tông Navy & đồng thau, chạy ở `http://localhost:5080`) | TV2 mở 28/11, TV1 review | TV1 yêu cầu sửa 3 việc (28/11); TV2 đã sửa, chờ TV1 duyệt lại |
 
 ## 7. Việc chờ người
 | Việc | Ai | Hạn | Trạng thái |
@@ -184,6 +190,7 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 27/11 | TV1 | TV2 nhận thêm phần dùng chung giao diện và hạ tầng integration test, hạn 7/12 (PLAN 6.2, 6.5) | cân `git blame`; hai phân hệ trông như một | TV1 + TV2 (27/11) |
 | 27/11 | TV1 | Mốc đo `git blame`: 28/11, 4/12, 6/12, 9/12, 13/12 thay cho mỗi Chủ nhật; đo trên `.cs`, `.cshtml`, `.js`, `.css`, bỏ `wwwroot/lib`, `*.Designer.cs` và tài liệu; luật giữ blame (PLAN 3.1, 6.6, 7) | phát hiện lệch sớm hơn; phần dùng chung của TV2 phần lớn là `.cshtml`/`.css`/`.js` (TV2 đề nghị ở review PR #6) | TV1 + TV2 (27/11) |
 | 27/11 | TV1 + TV2 | Tông màu Navy & đồng thau; font Cormorant Garamond + Be Vietnam Pro; không làm chuông báo SLA; giữ hạn P1, TV1 làm dồn M2–M8 trong 27–29/11 (PLAN 3.1, 6.3) | hai người chọn | TV1 + TV2 (27/11) |
+| 28/11 | TV2 | Khung web (bản đầu của PR #6 giao TV1 làm `_Layout`, menu, khung `Program.cs`): TV2 làm project `HotelCRM.GUI`, `_Layout` (thanh bên, thanh trên), menu, toast, `site.css`, `site.js` và khung `Program.cs`. TV1 giữ đăng nhập cookie, lọc menu theo vai trò, `ErrorHandler`, nền SQLite và nội dung trang chủ | cần trang chạy thật cho slide và buổi trình bày 30/11 | TV1 + TV2: đã ghi vào PR #6 (TV2 approve 28/11); TV1 xác nhận thêm khi approve PR #10 |
 
 ## 9. Nhật ký
 | Ngày | Ai | Việc |
@@ -203,3 +210,5 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 27/11 | TV2 | Xóa 2 file test v1 do TV2 viết: `Assignment/AssignmentStrategyTests.cs` (3 strategy phân công cũ, TV1 xóa phần code ở P2) và `Customers/SurveyServiceTests.cs` (khảo sát nay thuộc TV1, TV1 viết test mới). Build 0 warning, 60 test xanh |
 | 27/11 | TV1 | Mở PR `tv1/web-plan`: đưa quyết định chuyển sang web vào `CLAUDE.md`, `docs/PLAN.md` (mục mới 3.1, sửa 0, 3, 4.2, 4.3, 5.1, 5.6, 6, 7, 8, 9), file này, `docs/tasks/v2-p1-analysis.md` |
 | 28/11 | TV1 | Sửa PR #6 theo review TV2 (27/11): phạm vi đo `git blame` (`.cs`, `.cshtml`, `.js`, `.css`, bỏ `wwwroot/lib`) ở `CLAUDE.md` và PLAN 3.1; file v1 ai viết người đó xoá (PLAN 3.1 việc 2); bỏ dòng nhật ký 27/11 của TV2; thêm "3 strategy phân công cũ" vào danh sách xoá (PLAN 6.4, mục 3), dòng `DatabaseInitializer` ở PLAN 6.7, ContentRoot = `AppContext.BaseDirectory` (PLAN 3.1 việc 8). Theo PR #10: khung web (`HotelCRM.GUI`, `_Layout`, menu, toast, khung `Program.cs`) chuyển sang TV2; lọc menu theo vai trò giữ ở TV1 (theo đề xuất của TV2 ngày 28/11) (`CLAUDE.md` Phân công, PLAN 3.1, 5.6, 6.2–6.5, 6.7, 9). Theo PR #8: "chiến dịch", "Ticket" → "chương trình chăm sóc", "phiếu yêu cầu" ở tên BM7 (PLAN 5.1, 6.5) và danh mục chung (file task mục 1.5) |
+| 28/11 | TV2 | Dựng khung web trên nhánh `tv2/web-shell`: project `HotelCRM.GUI` (Razor Pages, `net10.0`) trong `HotelCRM.sln`; font và Bootstrap Icons để trong `wwwroot/lib` để chạy không cần mạng; mở PR vào `v2` |
+| 28/11 | TV2 | Sửa PR #10 theo review TV1: bỏ jQuery, jquery-validation, jquery-validation-unobtrusive và `_ValidationScriptsPartial` (ngoài danh sách thư viện đã chốt); thẻ nền trắng, chữ phụ dùng màu của tông (tương phản 6,53:1 trên thẻ); content root đặt là thư mục chứa file chạy, đã thử `dotnet run`, DLL và bản publish chạy từ thư mục khác. Thêm việc khung web vào mục 4 |
