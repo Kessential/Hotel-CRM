@@ -4,7 +4,7 @@ Kế hoạch: `docs/PLAN.md` (v2). Việc chi tiết giai đoạn đang làm: `d
 
 Cách cập nhật: mỗi người sửa dòng/ô của mình trong PR của mình, sau mỗi module (đánh dấu `[x]`, đổi cột trạng thái, thêm một dòng nhật ký). Không sửa dòng của người kia.
 
-Cập nhật lần cuối: 26/11/2026 (PR #3, TV2).
+Cập nhật lần cuối: 27/11/2026 (PR `tv2/remove-v1-tests`, TV2).
 
 ## 1. Trạng thái giai đoạn
 | Giai đoạn | Thời gian (plan) | Trạng thái | Mốc kiểm cuối giai đoạn |
@@ -188,5 +188,7 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV1 | Sửa PR #4 theo review (mục 8, `docs/slide_checklist/` ngoài repo + `.gitignore`), merge PR #4 vào `v2` |
 | 25/11 | TV2 | Rebase PR #3 lên `v2` (`37884a0`; commit "Record the three decisions agreed with TV1" đổi mã từ `284ee92` thành `3ccc924`). Sửa 10 file `docs/analysis/` theo khung của file task (mục của TV1 và mục chung TV1 để dòng chờ); bỏ mã YC tự đặt, dùng mã F; ảnh biểu mẫu vào `docs/analysis/bieu-mau/`; đổi tên `use-case-tv2.iuml`, `dfd-level1-f7.puml`; DFD F7 theo Gane–Sarson với kho D5, D9, D10; mã test TC2-11…TC2-14; thêm loại ngoại lệ + thông báo cho UC08–UC10, Strategy (7.2), Observer phía nhận (7.3), cây `MembershipTier` (8.2), phác thảo bố cục 7 Form, kế hoạch tiêm lỗi |
 | 26/11 | TV2 | Sửa PR #3 theo review approve của TV1 (26/11): mục 8 đổi 2 dòng sang "TV1 + TV2", thêm dòng Q13 mở rộng và dòng bỏ "Điều chỉnh" của `PointReason` (kèm cách R3 tính điểm đã đổi); Q13 mở rộng ở `04`, `06` mục 3.5, `07` mục 4.1/4.3, `class-tv2.iuml`; thêm ca "khách chỉ nằm trong chiến dịch" vào TC2-10; sửa tiêu đề, mô tả PR |
+| 27/11 | TV2 | Đồng ý (miệng, 27/11) toàn bộ bản kế hoạch chuyển giao diện sang web của TV1; cùng chọn tông Navy & đồng thau, font Cormorant Garamond + Be Vietnam Pro, không làm chuông SLA, giữ hạn P1. Góp ý trong review PR #6: đo `git blame` tính cả `.cshtml`, `.js`, `.css` (bỏ `wwwroot/lib`, `*.Designer.cs`); test v1 của TV2 do TV2 tự xóa |
+| 27/11 | TV2 | Xóa 2 file test v1 do TV2 viết: `Assignment/AssignmentStrategyTests.cs` (3 strategy phân công cũ, TV1 xóa phần code ở P2) và `Customers/SurveyServiceTests.cs` (khảo sát nay thuộc TV1, TV1 viết test mới). Build 0 warning, 60 test xanh |
 | 28/11 | TV2 | Dựng khung web trên nhánh `tv2/web-shell`: project `HotelCRM.GUI` (Razor Pages, `net10.0`) trong `HotelCRM.sln`; font và Bootstrap Icons để trong `wwwroot/lib` để chạy không cần mạng; mở PR vào `v2` |
 | 28/11 | TV2 | Sửa PR #10 theo review TV1: bỏ jQuery, jquery-validation, jquery-validation-unobtrusive và `_ValidationScriptsPartial` (ngoài danh sách thư viện đã chốt); thẻ nền trắng, chữ phụ dùng màu của tông (tương phản 6,53:1 trên thẻ); content root đặt là thư mục chứa file chạy, đã thử `dotnet run`, DLL và bản publish chạy từ thư mục khác. Thêm việc khung web vào mục 4 |
