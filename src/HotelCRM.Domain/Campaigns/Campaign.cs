@@ -81,7 +81,11 @@ public sealed class Campaign : IEntity
     /// <summary>Customers the offer was sent to.</summary>
     public IReadOnlyList<CampaignTarget> Targets => _targets.AsReadOnly();
 
-    /// <summary>Share of targets that answered, from 0 to 1; 0 when the list is empty.</summary>
+    /// <summary>
+    /// "Tỷ lệ phản hồi" at the bottom of BM7 / frm206: share of targets that gave any answer, Declined
+    /// included, from 0 to 1; 0 when the list is empty. The interest and booking rates of report R4 are
+    /// counted by the report query from <c>campaign_targets</c>, not here.
+    /// </summary>
     public decimal ResponseRate =>
         _targets.Count == 0 ? 0m : (decimal)_targets.Count(t => t.Response is not null) / _targets.Count;
 
@@ -146,7 +150,8 @@ public sealed class Campaign : IEntity
 
     /// <summary>
     /// Q11: records or replaces the answer of a targeted customer while the campaign is not over
-    /// (for example Interested first, Booked later).
+    /// (for example Interested first, Booked later). Allowed before <see cref="StartDate"/> on purpose:
+    /// the offer is sent when the campaign is saved, so a customer can answer as soon as they receive it.
     /// </summary>
     /// <exception cref="BusinessRuleException">The campaign is over or the customer is not on the list.</exception>
     public void RecordResponse(int customerId, CampaignResponse response, int employeeId, DateTime now)

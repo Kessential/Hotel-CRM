@@ -71,8 +71,14 @@ public sealed class PointTransaction : IEntity
     }
 
     /// <summary>Q10: takes the points fixed in <paramref name="redemption"/> from the ledger.</summary>
+    /// <exception cref="BusinessRuleException">The redemption is cancelled, so there is nothing to spend.</exception>
     public static PointTransaction ForRedemption(int id, RewardRedemption redemption)
     {
+        if (redemption.Status != RedemptionStatus.Completed)
+        {
+            throw new BusinessRuleException($"Lượt đổi quà {redemption.Id} đã bị hủy nên không trừ điểm.");
+        }
+
         return new PointTransaction(
             id,
             redemption.CustomerId,

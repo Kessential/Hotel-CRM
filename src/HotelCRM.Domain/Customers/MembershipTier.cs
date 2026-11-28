@@ -11,16 +11,16 @@ public abstract class MembershipTier
     /// <summary>Q9: room charges, in VND, that earn one point before the tier's earn rate is applied.</summary>
     public const decimal VndPerPoint = 10_000m;
 
-    /// <summary>Name of the tier: <c>Standard</c>, <c>Silver</c>, <c>Gold</c> or <c>VIP</c>. Stored in <c>customers.json</c>.</summary>
+    /// <summary>Name of the tier: <c>Standard</c>, <c>Silver</c>, <c>Gold</c> or <c>VIP</c>. Stored in <c>customers.Tier</c>.</summary>
     public abstract string Name { get; }
 
-    /// <summary>Rule 4: multiplier of the ticket handling time. Standard 1.0, Silver 0.9, Gold 0.75, VIP 0.5.</summary>
+    /// <summary>Q3: multiplier of the ticket handling time. Standard 1.0, Silver 0.9, Gold 0.75, VIP 0.5.</summary>
     public abstract double SlaFactor { get; }
 
-    /// <summary>Rule 4: priority levels added to a new ticket. Standard 0, Silver 0, Gold 1, VIP 2.</summary>
+    /// <summary>Q3: priority levels added to a new ticket. Standard 0, Silver 0, Gold 1, VIP 2.</summary>
     public abstract int PriorityBoost { get; }
 
-    /// <summary>Rule 8: points needed to reach this tier. Standard 0, Silver 1000, Gold 5000, VIP 15000.</summary>
+    /// <summary>Q9: lifetime points needed to reach this tier. Standard 0, Silver 1000, Gold 5000, VIP 15000.</summary>
     public abstract int MinPoints { get; }
 
     /// <summary>Q9: multiplier applied to the points of a stay. Standard 1.0, Silver 1.2, Gold 1.5, VIP 2.0.</summary>
@@ -52,22 +52,24 @@ public abstract class MembershipTier
     }
 
     /// <summary>
-    /// Returns the tier object for a stored name. Adding a new tier means adding one line here.
+    /// Returns the tier object for a stored name by walking the ladder from <see cref="StandardTier"/>
+    /// through <see cref="Next"/>. A new tier only has to be linked into the ladder; nothing changes here.
     /// </summary>
-    /// <exception cref="ArgumentException">The name is not a known tier (corrupt data file).</exception>
+    /// <exception cref="ArgumentException">The name is not a known tier (corrupt stored data, not a business error).</exception>
     public static MembershipTier FromName(string name)
     {
-        return name switch
+        for (MembershipTier? tier = new StandardTier(); tier is not null; tier = tier.Next())
         {
-            StandardTier.TierName => new StandardTier(),
-            SilverTier.TierName => new SilverTier(),
-            GoldTier.TierName => new GoldTier(),
-            VipTier.TierName => new VipTier(),
-            _ => throw new ArgumentException($"Unknown membership tier '{name}'.", nameof(name)),
-        };
+            if (tier.Name == name)
+            {
+                return tier;
+            }
+        }
+
+        throw new ArgumentException($"Hạng thành viên \"{name}\" không hợp lệ.", nameof(name));
     }
 
-    /// <summary>Rule 8: returns the next higher tier, or null when this is the highest tier.</summary>
+    /// <summary>Q9: returns the next higher tier, or null when this is the highest tier.</summary>
     public abstract MembershipTier? Next();
 
     /// <summary>Returns <see cref="Name"/>.</summary>

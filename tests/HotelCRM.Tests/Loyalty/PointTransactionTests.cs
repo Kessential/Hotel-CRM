@@ -39,6 +39,18 @@ public class PointTransactionTests
     }
 
     [Fact]
+    public void ForRedemption_CancelledRedemption_ThrowsBusinessRule()
+    {
+        // Arrange
+        Reward reward = new(1, "Voucher spa", 800, new StandardTier(), 3, true);
+        RewardRedemption redemption = reward.Redeem(5, 7, new StandardTier(), 1_000, 3, Now);
+        reward.CancelRedemption(redemption);
+
+        // Act + Assert: a cancelled redemption must not take points.
+        Assert.Throws<BusinessRuleException>(() => PointTransaction.ForRedemption(10, redemption));
+    }
+
+    [Fact]
     public void ForStay_ZeroPoints_ThrowsValidation()
     {
         // Act + Assert
