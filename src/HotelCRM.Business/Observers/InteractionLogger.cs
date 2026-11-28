@@ -6,9 +6,10 @@ using HotelCRM.Domain.Tickets.States;
 namespace HotelCRM.Business.Observers;
 
 /// <summary>
-/// Observer that records one <see cref="Interaction"/> every time a ticket of a customer changes state:
+/// Observer that will record one <see cref="Interaction"/> every time a ticket of a customer changes state:
 /// channel <see cref="ContactChannel.System"/>, time <see cref="SupportTicket.UpdatedAt"/>, the ticket Id,
-/// and a summary naming the ticket and both states. Rewritten on the SQLite repositories in P3.
+/// and a summary naming the ticket and both states. Not implemented yet: <see cref="OnStateChanged"/> does
+/// nothing until it is rewritten on the SQLite repositories in P3.
 /// </summary>
 public sealed class InteractionLogger : ITicketObserver
 {
@@ -24,7 +25,7 @@ public sealed class InteractionLogger : ITicketObserver
     /// <inheritdoc />
     public void OnStateChanged(SupportTicket ticket, TicketState from, TicketState to)
     {
-        // Filled in at stage 4. Left empty instead of throwing so that ticket transitions already work
+        // To be written in P3. Left empty instead of throwing so that ticket transitions already work
         // while the customer subsystem is unfinished.
     }
 }
