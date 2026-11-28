@@ -86,6 +86,11 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 - [x] Bảng Form F5–F8; ma trận test TC2-xx; bảng tính tay R5 (28/11) — PR #3
 - [ ] Slide phần TV2; biên dịch PDF cả bộ (29/11)
 
+**Khung web (28/11)**
+- [ ] Project `HotelCRM.GUI`, khung `Program.cs`, `_Layout` (thanh bên, thanh trên), menu `Navigation/AppMenu.cs`, `site.css`, `site.js` (28/11) — PR #10, chờ merge
+- [ ] Toast đọc `TempData` cho thông báo lưu và lỗi từ `ErrorHandler` (trước 2/12)
+- [ ] Thanh trên: bộ phận, vai trò người đăng nhập, nút Đăng xuất (sau khi TV1 có đăng nhập cookie, 2/12)
+
 **Domain (P2, 1–4/12, chưa cần CSDL)**
 - [ ] Sửa `Customer` (CCCD, ngày sinh, đồng ý nhận ưu đãi), `MembershipTier` (hệ số tích điểm), `Booking` (giá/đêm chốt)
 - [ ] Thêm `PointTransaction`, `Reward`, `RewardRedemption`, `Campaign`, `CampaignTarget`, `Receptionist`
@@ -135,7 +140,7 @@ Dời lịch M2–M9 hay giữ: chờ quyết (mục 7).
 | PR #3 `tv2/p1-analysis` → `v2` (M2–M8 phần TV2) | TV2 mở 25/11, TV1 review | đã rebase lên `v2` (`37884a0`) và sửa theo khung của `docs/tasks/v2-p1-analysis.md` (25/11); TV1 approve 26/11, đồng ý 7 điểm hỏi; TV2 đã sửa 3 việc trước khi merge (mục 8, Q13, tiêu đề PR) (26/11); chờ TV2 merge |
 | M2 Khảo sát (`docs/analysis/01-khao-sat.md`) | TV1 + TV2 | TV2: phần mình nằm trong PR #3 (M2–M8); TV1: bắt đầu sau khi M1 merge, xem `docs/tasks/v2-p1-analysis.md` |
 | Sửa đường dẫn trong slide: `sec1`, `sec3`, `sec5`, `sec6` còn trỏ `docs/PLAN.md` (v1), `docs/PROGRESS.md` (v1), `docs/tasks/stage-*.md` — các file này đã xóa (bản v1 chỉ còn trong lịch sử git, `fd7b7e4`) | TV2 | làm ở M9 |
-| PR `tv2/web-shell` → `v2`: khung web `HotelCRM.GUI` (thanh bên thu gọn, thanh trên, tông Navy & đồng thau, chạy ở `http://localhost:5080`) | TV2 mở 28/11, TV1 review | chờ review |
+| PR `tv2/web-shell` → `v2`: khung web `HotelCRM.GUI` (thanh bên thu gọn, thanh trên, tông Navy & đồng thau, chạy ở `http://localhost:5080`) | TV2 mở 28/11, TV1 review | TV1 yêu cầu sửa 3 việc (28/11); TV2 đã sửa, chờ TV1 duyệt lại |
 
 ## 7. Việc chờ người
 | Việc | Ai | Hạn | Trạng thái |
@@ -169,7 +174,7 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV2 | File task mục 1.1 ("mỗi người, mỗi module một nhánh"): P1 của TV2 nằm trên một nhánh `tv2/p1-analysis` (PR #3), mỗi module một commit | PR #3 mở trước khi có file task; tách lại thì mất lịch sử review | TV1 + TV2 (PR #3) |
 | 26/11 | TV2 | Q13 (PLAN 5.3): không xóa khách đã có lưu trú, ticket **hoặc đã nằm trong chiến dịch**; `Customer.EnsureCanBeDeleted(hasStays, hasTickets, inCampaigns)`. PLAN chỉ ghi "lưu trú hoặc ticket" | khách chưa ở lần nào vẫn có thể nằm trong chiến dịch; xóa khách này thì khóa ngoại `campaign_targets.CustomerId` (RESTRICT) chặn với lỗi khó hiểu, còn `CASCADE` làm mất số liệu R4 (`06-erd.md` mục 3.5) | TV1 + TV2 (PR #3) |
 | 26/11 | TV2 | PLAN 5.2 (`point_transactions.Reason`): bỏ giá trị "Điều chỉnh", chỉ còn `Stay`, `Goodwill`, `Redemption`; hoàn điểm khi hủy lượt đổi dùng chung `Redemption` (dòng dương cùng `RedemptionId`). R3: điểm đã tích = tổng dòng `Stay` + `Goodwill`; điểm đã đổi = −tổng dòng `Redemption` (ròng, lượt đã hủy góp 0) | không UC, Form hay quyền nào cho phép chỉnh điểm tay; thêm giá trị thì thành code chết | TV1 + TV2 (PR #3) |
-| 28/11 | TV2 | Khung web (bản kế hoạch web ở PR #6, mục 3.5 việc 3: TV1 làm `_Layout`, menu, khung `Program.cs`): TV2 làm project `HotelCRM.GUI`, `_Layout` (thanh bên, thanh trên), `site.css`, `site.js` và khung `Program.cs`. TV1 giữ đăng nhập cookie, `ErrorHandler`, nền SQLite và nội dung khung trang chủ | cần trang chạy thật cho slide và buổi trình bày 30/11 | TV1 đồng ý ngoài GitHub (28/11), xác nhận khi approve PR của `tv2/web-shell` |
+| 28/11 | TV2 | Khung web (bản đầu của PR #6 giao TV1 làm `_Layout`, menu, khung `Program.cs`): TV2 làm project `HotelCRM.GUI`, `_Layout` (thanh bên, thanh trên), menu, toast, `site.css`, `site.js` và khung `Program.cs`. TV1 giữ đăng nhập cookie, lọc menu theo vai trò, `ErrorHandler`, nền SQLite và nội dung trang chủ | cần trang chạy thật cho slide và buổi trình bày 30/11 | TV1 + TV2: đã ghi vào PR #6 (TV2 approve 28/11); TV1 xác nhận thêm khi approve PR #10 |
 
 ## 9. Nhật ký
 | Ngày | Ai | Việc |
@@ -184,3 +189,4 @@ Khi lệch: ghi ngày, ai đề xuất, lệch gì so với mục nào của `do
 | 25/11 | TV2 | Rebase PR #3 lên `v2` (`37884a0`; commit "Record the three decisions agreed with TV1" đổi mã từ `284ee92` thành `3ccc924`). Sửa 10 file `docs/analysis/` theo khung của file task (mục của TV1 và mục chung TV1 để dòng chờ); bỏ mã YC tự đặt, dùng mã F; ảnh biểu mẫu vào `docs/analysis/bieu-mau/`; đổi tên `use-case-tv2.iuml`, `dfd-level1-f7.puml`; DFD F7 theo Gane–Sarson với kho D5, D9, D10; mã test TC2-11…TC2-14; thêm loại ngoại lệ + thông báo cho UC08–UC10, Strategy (7.2), Observer phía nhận (7.3), cây `MembershipTier` (8.2), phác thảo bố cục 7 Form, kế hoạch tiêm lỗi |
 | 26/11 | TV2 | Sửa PR #3 theo review approve của TV1 (26/11): mục 8 đổi 2 dòng sang "TV1 + TV2", thêm dòng Q13 mở rộng và dòng bỏ "Điều chỉnh" của `PointReason` (kèm cách R3 tính điểm đã đổi); Q13 mở rộng ở `04`, `06` mục 3.5, `07` mục 4.1/4.3, `class-tv2.iuml`; thêm ca "khách chỉ nằm trong chiến dịch" vào TC2-10; sửa tiêu đề, mô tả PR |
 | 28/11 | TV2 | Dựng khung web trên nhánh `tv2/web-shell`: project `HotelCRM.GUI` (Razor Pages, `net10.0`) trong `HotelCRM.sln`; font và Bootstrap Icons để trong `wwwroot/lib` để chạy không cần mạng; mở PR vào `v2` |
+| 28/11 | TV2 | Sửa PR #10 theo review TV1: bỏ jQuery, jquery-validation, jquery-validation-unobtrusive và `_ValidationScriptsPartial` (ngoài danh sách thư viện đã chốt); thẻ nền trắng, chữ phụ dùng màu của tông (tương phản 6,53:1 trên thẻ); content root đặt là thư mục chứa file chạy, đã thử `dotnet run`, DLL và bản publish chạy từ thư mục khác. Thêm việc khung web vào mục 4 |
